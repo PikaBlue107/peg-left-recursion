@@ -9,10 +9,10 @@ public class SimpleExpression extends Pattern {
 	private static final SimpleNumber num = new SimpleNumber();
 	
 	@Override
-	protected Result<?> match(Derivation derivation) {
-		Result<?> expression = new Result<Object>(true, null, null);
+	protected Result match(Derivation derivation) {
+		Result expression = new Result(true, null, null);
 		expression.setType("Expression");
-		Result<?> result;
+		Result result;
 		// Ordered choice
 		
 		// Attempt full expression
@@ -26,13 +26,15 @@ public class SimpleExpression extends Pattern {
 //		expression.setValue(result.getValue());
 		expression.setDerivation(result.getDerivation());
 		expression.addChild(result);
+		expression.setData(result.getData());
 		return expression;
 	}
 	
-	private Result<?> tryFullExpression(Derivation derivation) {
-		Result<?> expression = new Result<Object>(true, null, null);
+	private Result tryFullExpression(Derivation derivation) {
+		Result expression = new Result(true, null, null);
 		expression.setType("Expression");
-		Result<?> result;
+		expression.setData("");
+		Result result;
 		
 		// Sequence
 		
@@ -41,26 +43,29 @@ public class SimpleExpression extends Pattern {
 		if( !result.isSuccess())
 			return result;
 		expression.addChild(result);
+		expression.setData(expression.getData() + result.getData());
 		
 		// Match plus
 		result = this.matchPlus(result.getDerivation());
 		if (!result.isSuccess())
 			return result;
+		expression.setData(expression.getData() + result.getData());
 		
 		// Match Num
 		result = num.lazyMatch(result.getDerivation());
 		if ( !result.isSuccess())
 			return result;
 		expression.addChild(result);
+		expression.setData(expression.getData() + result.getData());
 		
 		expression.setDerivation(result.getDerivation());
 		return expression;
 	}
 	
-	private Result<?> matchPlus(Derivation derivation) {
-		if(derivation.getChResult().isSuccess() && derivation.getChResult().getValue() == '+') {
-			System.out.println("Matched [" + derivation.getChResult().getValue() + "]");
-			return new Result<Object>(true, "+", derivation.getChResult().getDerivation());
+	private Result matchPlus(Derivation derivation) {
+		if(derivation.getChResult().isSuccess() && derivation.getChResult().getData().charAt(0) == '+') {
+			System.out.println("Matched [" + derivation.getChResult().getData() + "]");
+			return new Result(true, "+", derivation.getChResult().getDerivation());
 		} else {
 			return Result.FAIL();
 		}

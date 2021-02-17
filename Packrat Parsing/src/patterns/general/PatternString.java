@@ -28,12 +28,12 @@ public class PatternString extends Pattern {
 	 * Matches this pattern string by recursively matching one character at a time.
 	 */
 	@Override
-	protected Result<Object> match(Derivation derivation) {
+	protected Result match(Derivation derivation) {
 		// Use recursive helper
-		Result<Object> match = matchRemaining(matchString, derivation);
+		Result match = matchRemaining(matchString, derivation);
 		if (match.isSuccess()) {
 			// Success
-			match.setValue(matchString);
+			match.setData(matchString);
 		}
 		return match;
 	}
@@ -46,16 +46,16 @@ public class PatternString extends Pattern {
 	 * @return a Result with empty value indicating a true/false match and, if true,
 	 *         the derivation we ended at.
 	 */
-	private Result<Object> matchRemaining(String remainingPattern, Derivation remainingInput) {
+	private Result matchRemaining(String remainingPattern, Derivation remainingInput) {
 		// Base case
 		if ("".equals(remainingPattern)) {
-			return new Result<Object>(true, null, remainingInput);
+			return new Result(true, null, remainingInput);
 		}
 		// Recursive case
 		else {
 			// Match the one character
 			if (remainingInput.getChResult().isSuccess()
-					&& remainingPattern.charAt(0) == remainingInput.getChResult().getValue()) {
+					&& remainingPattern.charAt(0) == remainingInput.getChResult().getData().charAt(0)) {
 				// Success
 				System.out.println("Matched [" + remainingPattern.charAt(0) + "]");
 				return matchRemaining(remainingPattern.substring(1), remainingInput.getChResult().getDerivation());

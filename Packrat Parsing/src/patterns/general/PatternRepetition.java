@@ -37,15 +37,15 @@ public class PatternRepetition extends Pattern {
 	 * Matches a sequence of instances of the Pattern, with upper and lower bounds specified by fields.
 	 */
 	@Override
-	protected Result<?> match(Derivation derivation) {
+	protected Result match(Derivation derivation) {
 		// Track the previous result so that we know where to start each loop from and what to return if we fail
-		Result<?> previousResult = new Result<Object>(true, null, derivation);
+		Result previousResult = new Result(true, null, derivation);
 		// Track the number of successful iterations
 		int matches = 0;
 		// Begin iterating over the Derivation
 		while(matches != upperBound) {
 			// Attempt to match at this iteration
-			Result<?> result = pattern.lazyMatch(previousResult.getDerivation());
+			Result result = pattern.lazyMatch(previousResult.getDerivation());
 			
 			// If we succeeded in matching
 			if(result.isSuccess()) {

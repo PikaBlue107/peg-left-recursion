@@ -25,7 +25,7 @@ public class PackratDriver {
 		Pattern matcher = new SimpleExpression();
 
 		// Attempt to match
-		Result<?> result = matcher.lazyMatch(base);
+		Result result = matcher.lazyMatch(base);
 
 		// Print out the result
 		System.out.println(result.toString());

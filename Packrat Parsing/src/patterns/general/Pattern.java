@@ -39,8 +39,8 @@ public abstract class Pattern {
 	 * @return the final Result of growing the left-recursive Pattern, also saved in
 	 *         the Derivation.
 	 */
-	private Result<?> growLeftRecursion(Derivation derivation) {
-		Result<?> attempt;
+	private Result growLeftRecursion(Derivation derivation) {
+		Result attempt;
 		// Loop until we find a special case
 		while (true) {
 			// Start matching from this current derivation we're given
@@ -71,12 +71,12 @@ public abstract class Pattern {
 	 * @param derivation
 	 * @return
 	 */
-	public final Result<?> lazyMatch(Derivation derivation) {
+	public final Result lazyMatch(Derivation derivation) {
 
 		// let m = MEMO(R,P)
 		// Let m hold the "known" result of applying this Rule at this Position
 		// Let m hold the "known" result of applying this Pattern at this Derivation
-		Result<?> m = derivation.resultFor(this); 
+		Result m = derivation.resultFor(this); 
 
 		// if m = NIL
 		// If the "known" result does not yet exist
@@ -102,7 +102,7 @@ public abstract class Pattern {
 			// Evaluate the Rule at this position, saving the answer in the field "ans"
 			// Attempt to match the Pattern on this Derivation, saving the Result in the
 			// field "ans"
-			Result<?> ans = match(derivation);
+			Result ans = match(derivation);
 			
 			ans.setLRStatus(m.getLRStatus());
 			derivation.setResultFor(this, ans);
@@ -199,7 +199,7 @@ public abstract class Pattern {
 	 * @return a Result indicating whether the match was successful, and if so, how
 	 *         much was consumed by this match.
 	 */
-	protected abstract Result<?> match(Derivation derivation);
+	protected abstract Result match(Derivation derivation);
 
 	/**
 	 * Generates (the base of) a unique hash code for this Pattern. By default, all

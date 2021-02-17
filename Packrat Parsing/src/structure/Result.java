@@ -3,13 +3,13 @@ package structure;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Result<T> {
+public class Result {
 
 	/** The success of this result. */
 	private boolean success;
 
 	/** The syntactic value of this Result. */
-	private T value;
+	private String data;
 	
 	/** The "type" of the pattern that matched this Result. */
 	private String type;
@@ -18,7 +18,7 @@ public class Result<T> {
 	private LeftRecursionStatus lRStatus;
 
 	/** The sub-matches within this Result. */
-	private List<Result<?>> children;
+	private List<Result> children;
 
 	/**
 	 * The Derivation that this result gives (the remaining unmatched characters
@@ -31,8 +31,8 @@ public class Result<T> {
 	 * 
 	 * @return a Result representing a failed match.
 	 */
-	public static final Result<Object> FAIL() {
-		return new Result<Object>(false, null, null);
+	public static final Result FAIL() {
+		return new Result(false, null, null);
 	}
 
 	/**
@@ -40,13 +40,13 @@ public class Result<T> {
 	 * @param value
 	 * @param derivation
 	 */
-	public Result(boolean success, T value, Derivation derivation) {
+	public Result(boolean success, String value, Derivation derivation) {
 		this(success, value, derivation, LeftRecursionStatus.POSSIBLE);
 	}
 
-	public Result(boolean success, T value, Derivation derivation, LeftRecursionStatus leftRecursionStatus) {
+	public Result(boolean success, String data, Derivation derivation, LeftRecursionStatus leftRecursionStatus) {
 		this.success = success;
-		this.value = value;
+		this.data = data;
 		this.derivation = derivation;
 		this.lRStatus = leftRecursionStatus;
 		this.children = new ArrayList<>();
@@ -69,15 +69,15 @@ public class Result<T> {
 	/**
 	 * @return the value
 	 */
-	public T getValue() {
-		return value;
+	public String getData() {
+		return data;
 	}
 
 	/**
-	 * @param value the value to set
+	 * @param data the value to set
 	 */
-	public void setValue(T value) {
-		this.value = value;
+	public void setData(String data) {
+		this.data = data;
 	}
 
 	/**
@@ -127,7 +127,7 @@ public class Result<T> {
 	 * 
 	 * @param child
 	 */
-	public Result<T> addChild(Result<?> child) {
+	public Result addChild(Result child) {
 		children.add(child);
 		return this;
 	}
@@ -137,7 +137,7 @@ public class Result<T> {
 	 */
 	@Override
 	public String toString() {
-		return "Result [success=" + success + ", value=" + value + ", lRStatus=" + lRStatus + ", derivation="
+		return "Result [success=" + success + ", data=" + data + ", lRStatus=" + lRStatus + ", derivation="
 				+ derivation + "]";
 	}
 	
@@ -155,11 +155,13 @@ public class Result<T> {
 		
 		tree.append(tabs(indentLevel + 1)).append("\"type\": \"").append(type).append("\"\n");
 		
+		tree.append(tabs(indentLevel + 1)).append("\"data\": \"").append(data).append("\"\n");
+		
 //		tree.append(tabs(indentLevel + 1)).append("end: ").append(derivation?).append("\n");
 		
 		if(!children.isEmpty()) {
 			tree.append(tabs(indentLevel + 1)).append("\"subs\": [\n");
-			for(Result<?> r : children) {
+			for(Result r : children) {
 				tree.append(r.printResultSubTree(indentLevel + 2));
 				
 				if(r != children.get(children.size() - 1))

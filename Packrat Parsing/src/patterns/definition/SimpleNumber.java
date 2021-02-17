@@ -7,24 +7,26 @@ import structure.Result;
 public class SimpleNumber extends Pattern {
 
 	@Override
-	protected Result<?> match(Derivation derivation) {
+	protected Result match(Derivation derivation) {
 		if (!derivation.getChResult().isSuccess())
 			return Result.FAIL();
 		
-		if (!Character.isDigit(derivation.getChResult().getValue()))
+		if (!Character.isDigit(derivation.getChResult().getData().charAt(0)))
 			return Result.FAIL();
 		
-		System.out.println("Matched [" + derivation.getChResult().getValue() + "]");
+		System.out.println("Matched [" + derivation.getChResult().getData() + "]");
 		
-		Result<?> priorResult = new Result<Object>(true, null, derivation.getChResult().getDerivation());
+		Result priorResult = new Result(true, null, derivation.getChResult().getDerivation());
 		priorResult.setType("Number");
+		priorResult.setData(derivation.getChResult().getData());
 		
 		// While next step is a valid character
 		while(priorResult.getDerivation().getChResult().isSuccess()) {
-			if (!Character.isDigit(priorResult.getDerivation().getChResult().getValue()))
+			if (!Character.isDigit(priorResult.getDerivation().getChResult().getData().charAt(0)))
 				return priorResult;
-			System.out.println("Matched [" + priorResult.getDerivation().getChResult().getValue() + "]");
+			System.out.println("Matched [" + priorResult.getDerivation().getChResult().getData() + "]");
 			priorResult.setDerivation(priorResult.getDerivation().getChResult().getDerivation());
+			priorResult.setData(priorResult.getData() + priorResult.getDerivation().getChResult().getData());
 		}
 		
 		

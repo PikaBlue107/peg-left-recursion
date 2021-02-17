@@ -8,13 +8,13 @@ import patterns.general.Pattern;
 public class Derivation implements Comparable<Derivation> {
 
 	/** The character held at this derivation. */
-	private Result<Character> ch;
+	private Result ch;
 
 	/** The length until the end of the string. */
 	private int charsRemaining;
 
 	/** The Map of Results identified by Pattern. */
-	private Map<Pattern, Result<?>> patterns;
+	private Map<Pattern, Result> patterns;
 	{
 		this.patterns = new HashMap<>();
 	}
@@ -31,9 +31,9 @@ public class Derivation implements Comparable<Derivation> {
 	public Derivation(String remaining) {
 		charsRemaining = remaining.length();
 		if ("".equals(remaining)) {
-			ch = new Result<Character>(false, null, null);
+			ch = new Result(false, null, null);
 		} else {
-			ch = new Result<Character>(true, remaining.charAt(0), new Derivation(remaining.substring(1)));
+			ch = new Result(true, "" + remaining.charAt(0), new Derivation(remaining.substring(1)));
 		}
 	}
 
@@ -55,7 +55,7 @@ public class Derivation implements Comparable<Derivation> {
 	 * @return the Result for this Derivation, indicating its character and next
 	 *         Derivation.
 	 */
-	public Result<Character> getChResult() {
+	public Result getChResult() {
 		return ch;
 	}
 
@@ -65,7 +65,7 @@ public class Derivation implements Comparable<Derivation> {
 	 * @param pattern
 	 * @param result
 	 */
-	public void setResultFor(Pattern pattern, Result<?> result) {
+	public void setResultFor(Pattern pattern, Result result) {
 		patterns.put(pattern, result);
 	}
 
@@ -75,7 +75,7 @@ public class Derivation implements Comparable<Derivation> {
 	 * @return the Result (if known) for the given Pattern, otherwise null if the
 	 *         pattern's result is not known.
 	 */
-	public Result<?> resultFor(Pattern p) {
+	public Result resultFor(Pattern p) {
 		return patterns.get(p);
 	}
 

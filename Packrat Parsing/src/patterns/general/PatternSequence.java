@@ -69,10 +69,10 @@ public class PatternSequence extends Pattern {
 	 *         if failure
 	 */
 	@Override
-	protected Result<?> match(Derivation derivation) {
+	protected Result match(Derivation derivation) {
 		// Run through the list of patterns to match
 		// Keep track of the previous pattern's result
-		Result<?> result = new Result<>(true, null, derivation);
+		Result result = new Result(true, null, derivation);
 		// Loop over all patterns
 		for (Pattern p : patterns) {
 			// Attempt to match this pattern
