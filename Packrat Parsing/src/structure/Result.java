@@ -10,13 +10,13 @@ public class Result {
 
 	/** The syntactic value of this Result. */
 	private String data;
-	
+
 	/** The "type" of the pattern that matched this Result. */
 	private String type;
-	
+
 	/** The index at which this match starts, inclusive, 1-indexed. */
 	private int startIdx;
-	
+
 	/** The index at which this match ends, exclusive, 1-indexed. */
 	private int endIdx;
 
@@ -167,55 +167,59 @@ public class Result {
 	}
 
 	/**
-	 * Generates a String containing all of the Result's fields
+	 * Generates a display-able string yielding all data of this Result except for
+	 * objects (derivation and children)
 	 */
 	@Override
 	public String toString() {
-		return "Result [success=" + success + ", data=" + data + ", lRStatus=" + lRStatus + ", derivation="
-				+ derivation + "]";
+		return "Result [success=" + success + ", data=" + data + ", type=" + type + ", startIdx=" + startIdx
+				+ ", endIdx=" + endIdx + ", lRStatus=" + lRStatus + "]";
 	}
-	
+
 	/**
 	 * Generates the Tree of matches that this Result represents.
+	 * 
 	 * @return a tree of the match, sub-matches, and additional information
 	 */
 	public String printResultTree() {
 		return printResultSubTree(0).toString();
 	}
-	
+
 	private StringBuilder printResultSubTree(int indentLevel) {
 		StringBuilder tree = new StringBuilder();
 		tree.append(tabs(indentLevel)).append("{\n");
-		
+
 		tree.append(tabs(indentLevel + 1)).append("\"type\": \"").append(type).append("\",\n");
-		
+
 		tree.append(tabs(indentLevel + 1)).append("\"data\": \"").append(data).append("\",\n");
-		
+
+		tree.append(tabs(indentLevel + 1)).append("\"left recursive\": \"").append(this.getLRStatus().toString())
+				.append("\",\n");
+
 		tree.append(tabs(indentLevel + 1)).append("\"s\": ").append(startIdx + 1).append(",\n");
-		
-		tree.append(tabs(indentLevel + 1)).append("\"e\": ").append(endIdx + 1).append(children.isEmpty() ? "" : ",").append("\n");
-		
-		
-		
+
+		tree.append(tabs(indentLevel + 1)).append("\"e\": ").append(endIdx + 1).append(children.isEmpty() ? "" : ",")
+				.append("\n");
+
 //		tree.append(tabs(indentLevel + 1)).append("end: ").append(derivation?).append("\n");
-		
-		if(!children.isEmpty()) {
+
+		if (!children.isEmpty()) {
 			tree.append(tabs(indentLevel + 1)).append("\"subs\": [\n");
-			for(Result r : children) {
+			for (Result r : children) {
 				tree.append(r.printResultSubTree(indentLevel + 2));
-				
-				if(r != children.get(children.size() - 1))
+
+				if (r != children.get(children.size() - 1))
 					tree.append(",");
-				
+
 				tree.append("\n");
 			}
 			tree.append(tabs(indentLevel + 1)).append("]\n");
 		}
-		
+
 		tree.append(tabs(indentLevel) + "}");
 		return tree;
 	}
-	
+
 	private String tabs(int num) {
 		return "  ".repeat(num);
 	}
@@ -242,7 +246,20 @@ public class Result {
 		 * The Pattern at this Derivation is not left-recursive. We finished one full
 		 * match without it calling itself.
 		 */
-		IMPOSSIBLE
+		IMPOSSIBLE;
+
+		/** Display-friendly names for each value. */
+		private static final String[] NAMES = { "Possible", "Detected", "Impossible" };
+
+		/**
+		 * Gets the display name of this Enum by indexing into the display names array
+		 * by the Enum's ordinal.
+		 * 
+		 * @return a display-friendly name for this Enum.
+		 */
+		public String toString() {
+			return NAMES[this.ordinal()];
+		}
 	}
 
 }
