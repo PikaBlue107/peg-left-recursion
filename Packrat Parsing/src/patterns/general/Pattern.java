@@ -39,25 +39,27 @@ public abstract class Pattern {
 	 * @return the final Result of growing the left-recursive Pattern, also saved in
 	 *         the Derivation.
 	 */
-	private Result<?> growLeftRecursion(Derivation derivation, Result<?> result) {
+	private Result<?> growLeftRecursion(Derivation derivation) {
+		Result<?> attempt;
 		// Loop until we find a special case
 		while (true) {
 			// Start matching from this current derivation we're given
 			// Attempt to *match* the Pattern (this one) against the Derivation
-			Result<?> attempt = match(derivation);
+			attempt = match(derivation);
 
 			// If we didn't make any progress, then exit
-			if (!attempt.isSuccess() || attempt.getDerivation().compareTo(result.getDerivation()) < 0) {
+			if (!attempt.isSuccess() || attempt.getDerivation().compareTo(derivation.resultFor(this).getDerivation()) < 0) {
 				break;
 			}
 
 			// Otherwise, update the Derivation's memoized Result with the one we just
 			// calculated, and try to match again!
 //			result.setSuccess(attempt.isSuccess()); // TODO: Is this necessary?
-			result.setDerivation(attempt.getDerivation());
+//			result.setDerivation(attempt.getDerivation());
+			derivation.setResultFor(this, attempt);
 		}
 
-		return result;
+		return derivation.resultFor(this);
 	}
 
 	/**
@@ -101,35 +103,38 @@ public abstract class Pattern {
 			// Attempt to match the Pattern on this Derivation, saving the Result in the
 			// field "ans"
 			Result<?> ans = match(derivation);
+			
+			ans.setLRStatus(m.getLRStatus());
+			derivation.setResultFor(this, ans);
 
 			// m.ans = ans
 			// Set the memoized answer equal to the answer from evaluating the rule at this
 			// position
 			// Set the memoized Rule's success equal to the success from evaluating the
 			// Pattern at this Derivation
-			m.setSuccess(ans.isSuccess());
+//			m.setSuccess(ans.isSuccess());
 
 			// m.pos = Pos
 			// Set the memoized position equal to the current Position after evaluating the
 			// rule
 			// Set the memoized Derivation equal to the Derivation within the Result
 			// acquired from evaluating the Pattern
-			m.setDerivation(ans.getDerivation());
+//			m.setDerivation(ans.getDerivation());
 			
 			
 			// if lr.detected and ans != FAIL
 			// If the answer from evaluating the rule says that it is left-recursive and it had a definite match when we finished evaluating it 3 lines of code up
 			// If the Result from evaluating the Pattern has a DETECTED LeftRecursionStatus and it has a successful match (seed) of the recursive pattern
-			if (m.getLRStatus() == LeftRecursionStatus.DETECTED && ans.isSuccess()) {
+			if (ans.getLRStatus() == LeftRecursionStatus.DETECTED && ans.isSuccess()) {
 				
 				// return GROW-LR(R,P,m,NIL)
 				// return the result of growing the left-recursive rule until it cannot be re-evaluated to consume any more input
 				// return the result of growing the left-recursive Pattern until it cannot be re-evaluated to consume any more input
-				return growLeftRecursion(derivation, m);
+				return growLeftRecursion(derivation);
 				
 			} else {
 				// Set left recursion status to impossible, since we didn't get a simultaneous call while this branch executed
-				m.setLRStatus(LeftRecursionStatus.IMPOSSIBLE);
+				ans.setLRStatus(LeftRecursionStatus.IMPOSSIBLE);
 				
 				// return ans
 				// Return the answer of the evaluation of the rule

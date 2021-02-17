@@ -1,5 +1,8 @@
 package structure;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Result<T> {
 
 	/** The success of this result. */
@@ -7,9 +10,15 @@ public class Result<T> {
 
 	/** The syntactic value of this Result. */
 	private T value;
+	
+	/** The "type" of the pattern that matched this Result. */
+	private String type;
 
 	/** The left-recursion status of this Result. */
 	private LeftRecursionStatus lRStatus;
+
+	/** The sub-matches within this Result. */
+	private List<Result<?>> children;
 
 	/**
 	 * The Derivation that this result gives (the remaining unmatched characters
@@ -34,12 +43,13 @@ public class Result<T> {
 	public Result(boolean success, T value, Derivation derivation) {
 		this(success, value, derivation, LeftRecursionStatus.POSSIBLE);
 	}
-	
+
 	public Result(boolean success, T value, Derivation derivation, LeftRecursionStatus leftRecursionStatus) {
 		this.success = success;
 		this.value = value;
 		this.derivation = derivation;
 		this.lRStatus = leftRecursionStatus;
+		this.children = new ArrayList<>();
 	}
 
 	/**
@@ -99,12 +109,73 @@ public class Result<T> {
 	}
 
 	/**
+	 * @return the type
+	 */
+	public String getType() {
+		return type;
+	}
+
+	/**
+	 * @param type the type to set
+	 */
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	/**
+	 * Adds a sub-match to this Result
+	 * 
+	 * @param child
+	 */
+	public Result<T> addChild(Result<?> child) {
+		children.add(child);
+		return this;
+	}
+
+	/**
 	 * Generates a String containing all of the Result's fields
 	 */
 	@Override
 	public String toString() {
 		return "Result [success=" + success + ", value=" + value + ", lRStatus=" + lRStatus + ", derivation="
 				+ derivation + "]";
+	}
+	
+	/**
+	 * Generates the Tree of matches that this Result represents.
+	 * @return a tree of the match, sub-matches, and additional information
+	 */
+	public String printResultTree() {
+		return printResultSubTree(0).toString();
+	}
+	
+	private StringBuilder printResultSubTree(int indentLevel) {
+		StringBuilder tree = new StringBuilder();
+		tree.append(tabs(indentLevel)).append("{\n");
+		
+		tree.append(tabs(indentLevel + 1)).append("\"type\": \"").append(type).append("\"\n");
+		
+//		tree.append(tabs(indentLevel + 1)).append("end: ").append(derivation?).append("\n");
+		
+		if(!children.isEmpty()) {
+			tree.append(tabs(indentLevel + 1)).append("\"subs\": [\n");
+			for(Result<?> r : children) {
+				tree.append(r.printResultSubTree(indentLevel + 2));
+				
+				if(r != children.get(children.size() - 1))
+					tree.append(",");
+				
+				tree.append("\n");
+			}
+			tree.append(tabs(indentLevel + 1)).append("]\n");
+		}
+		
+		tree.append(tabs(indentLevel) + "}");
+		return tree;
+	}
+	
+	private String tabs(int num) {
+		return "  ".repeat(num);
 	}
 
 	/**

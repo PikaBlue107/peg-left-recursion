@@ -10,24 +10,51 @@ public class SimpleExpression extends Pattern {
 	
 	@Override
 	protected Result<?> match(Derivation derivation) {
+		Result<?> expression = new Result<Object>(true, null, null);
+		expression.setType("Expression");
 		Result<?> result;
+		// Ordered choice
+		
+		// Attempt full expression
 		result = tryFullExpression(derivation);
 		if (result.isSuccess())
 			return result;
 		
-		return num.lazyMatch(derivation);
+		// Match num
+		result = num.lazyMatch(derivation);
+		
+//		expression.setValue(result.getValue());
+		expression.setDerivation(result.getDerivation());
+		expression.addChild(result);
+		return expression;
 	}
 	
 	private Result<?> tryFullExpression(Derivation derivation) {
+		Result<?> expression = new Result<Object>(true, null, null);
+		expression.setType("Expression");
 		Result<?> result;
+		
+		// Sequence
+		
+		// Match recursive Expression
 		result = this.lazyMatch(derivation);
 		if( !result.isSuccess())
 			return result;
+		expression.addChild(result);
+		
+		// Match plus
 		result = this.matchPlus(result.getDerivation());
 		if (!result.isSuccess())
 			return result;
+		
+		// Match Num
 		result = num.lazyMatch(result.getDerivation());
-		return result;
+		if ( !result.isSuccess())
+			return result;
+		expression.addChild(result);
+		
+		expression.setDerivation(result.getDerivation());
+		return expression;
 	}
 	
 	private Result<?> matchPlus(Derivation derivation) {

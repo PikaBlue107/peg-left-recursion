@@ -16,14 +16,18 @@ public class SimpleNumber extends Pattern {
 		
 		System.out.println("Matched [" + derivation.getChResult().getValue() + "]");
 		
-		Result<?> priorResult = derivation.getChResult();
+		Result<?> priorResult = new Result<Object>(true, null, derivation.getChResult().getDerivation());
+		priorResult.setType("Number");
+		
 		// While next step is a valid character
 		while(priorResult.getDerivation().getChResult().isSuccess()) {
 			if (!Character.isDigit(priorResult.getDerivation().getChResult().getValue()))
 				return priorResult;
 			System.out.println("Matched [" + priorResult.getDerivation().getChResult().getValue() + "]");
-			priorResult = priorResult.getDerivation().getChResult();
+			priorResult.setDerivation(priorResult.getDerivation().getChResult().getDerivation());
 		}
+		
+		
 		return priorResult;
 	}
 

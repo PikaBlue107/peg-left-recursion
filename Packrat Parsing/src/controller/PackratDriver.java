@@ -28,7 +28,8 @@ public class PackratDriver {
 		Result<?> result = matcher.lazyMatch(base);
 
 		// Print out the result
-		System.out.println(result.isSuccess());
+		System.out.println(result.toString());
+		System.out.println(result.printResultTree());
 
 	}
 }
