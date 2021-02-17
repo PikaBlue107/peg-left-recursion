@@ -11,7 +11,7 @@ public class Derivation implements Comparable<Derivation> {
 	private Result ch;
 
 	/** The index of this Derivation in the String, 1-indexed. */
-	private int index;
+	private final int index;
 
 	/** The Map of Results identified by Pattern. */
 	private Map<Pattern, Result> patterns;
@@ -25,7 +25,7 @@ public class Derivation implements Comparable<Derivation> {
 	 * 
 	 * @param str the input String that this Derivation will track
 	 */
-	public Derivation(String str) {
+	public Derivation(final String str) {
 		this(str, 0);
 	}
 
@@ -35,10 +35,10 @@ public class Derivation implements Comparable<Derivation> {
 	 * in the string, saves its character in a Result, and constructs the next
 	 * Derivation in that Result.
 	 * 
-	 * @param str the input String that this Derivation will track
+	 * @param str   the input String that this Derivation will track
 	 * @param index the index of the String that this Derivation will occupy
 	 */
-	private Derivation(String str, int index) {
+	private Derivation(final String str, final int index) {
 		this.index = index;
 		if (index == str.length()) {
 			ch = new Result(false, null, null);
@@ -50,7 +50,7 @@ public class Derivation implements Comparable<Derivation> {
 //	/**
 //	 * Provides the number of characters until the end of the String, from this
 //	 * Derivation.
-//	 * 
+//	 *
 //	 * @return this Derivation's number of characters remaining
 //	 */
 //	public int getCharsRemaining() {
@@ -84,7 +84,7 @@ public class Derivation implements Comparable<Derivation> {
 	 * @param pattern
 	 * @param result
 	 */
-	public void setResultFor(Pattern pattern, Result result) {
+	public void setResultFor(final Pattern pattern, final Result result) {
 		patterns.put(pattern, result);
 	}
 
@@ -94,7 +94,7 @@ public class Derivation implements Comparable<Derivation> {
 	 * @return the Result (if known) for the given Pattern, otherwise null if the
 	 *         pattern's result is not known.
 	 */
-	public Result resultFor(Pattern p) {
+	public Result resultFor(final Pattern p) {
 		return patterns.get(p);
 	}
 
@@ -105,7 +105,7 @@ public class Derivation implements Comparable<Derivation> {
 	 * @param p the Pattern to check
 	 * @return true if Pattern has a saved Result, else false
 	 */
-	public boolean hasSaved(Pattern p) {
+	public boolean hasSaved(final Pattern p) {
 		return patterns.containsKey(p);
 	}
 
@@ -115,7 +115,7 @@ public class Derivation implements Comparable<Derivation> {
 	 * remaining.
 	 */
 	@Override
-	public int compareTo(Derivation o) {
+	public int compareTo(final Derivation o) {
 		return this.getIndex() - o.getIndex();
 	}
 

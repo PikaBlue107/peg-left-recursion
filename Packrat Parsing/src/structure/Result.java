@@ -24,7 +24,7 @@ public class Result {
 	private LeftRecursionStatus lRStatus;
 
 	/** The sub-matches within this Result. */
-	private List<Result> children;
+	private final List<Result> children;
 
 	/**
 	 * The Derivation that this result gives (the remaining unmatched characters
@@ -46,11 +46,12 @@ public class Result {
 	 * @param value
 	 * @param derivation
 	 */
-	public Result(boolean success, String value, Derivation derivation) {
+	public Result(final boolean success, final String value, final Derivation derivation) {
 		this(success, value, derivation, LeftRecursionStatus.POSSIBLE);
 	}
 
-	public Result(boolean success, String data, Derivation derivation, LeftRecursionStatus leftRecursionStatus) {
+	public Result(final boolean success, final String data, final Derivation derivation,
+			final LeftRecursionStatus leftRecursionStatus) {
 		this.success = success;
 		this.data = data;
 		this.derivation = derivation;
@@ -68,7 +69,7 @@ public class Result {
 	/**
 	 * @param success the success to set
 	 */
-	public void setSuccess(boolean success) {
+	public void setSuccess(final boolean success) {
 		this.success = success;
 	}
 
@@ -82,7 +83,7 @@ public class Result {
 	/**
 	 * @param data the value to set
 	 */
-	public void setData(String data) {
+	public void setData(final String data) {
 		this.data = data;
 	}
 
@@ -96,7 +97,7 @@ public class Result {
 	/**
 	 * @param derivation the derivation to set
 	 */
-	public void setDerivation(Derivation derivation) {
+	public void setDerivation(final Derivation derivation) {
 		this.derivation = derivation;
 	}
 
@@ -110,7 +111,7 @@ public class Result {
 	/**
 	 * @param lRStatus the lRStatus to set
 	 */
-	public void setLRStatus(LeftRecursionStatus lRStatus) {
+	public void setLRStatus(final LeftRecursionStatus lRStatus) {
 		this.lRStatus = lRStatus;
 	}
 
@@ -124,7 +125,7 @@ public class Result {
 	/**
 	 * @param type the type to set
 	 */
-	public void setType(String type) {
+	public void setType(final String type) {
 		this.type = type;
 	}
 
@@ -138,7 +139,7 @@ public class Result {
 	/**
 	 * @param startIdx the startIdx to set
 	 */
-	public void setStartIdx(int startIdx) {
+	public void setStartIdx(final int startIdx) {
 		this.startIdx = startIdx;
 	}
 
@@ -152,7 +153,7 @@ public class Result {
 	/**
 	 * @param endIdx the endIdx to set
 	 */
-	public void setEndIdx(int endIdx) {
+	public void setEndIdx(final int endIdx) {
 		this.endIdx = endIdx;
 	}
 
@@ -161,7 +162,7 @@ public class Result {
 	 * 
 	 * @param child
 	 */
-	public Result addChild(Result child) {
+	public Result addChild(final Result child) {
 		children.add(child);
 		return this;
 	}
@@ -185,8 +186,8 @@ public class Result {
 		return printResultSubTree(0).toString();
 	}
 
-	private StringBuilder printResultSubTree(int indentLevel) {
-		StringBuilder tree = new StringBuilder();
+	private StringBuilder printResultSubTree(final int indentLevel) {
+		final StringBuilder tree = new StringBuilder();
 		tree.append(tabs(indentLevel)).append("{\n");
 
 		tree.append(tabs(indentLevel + 1)).append("\"type\": \"").append(type).append("\",\n");
@@ -205,11 +206,12 @@ public class Result {
 
 		if (!children.isEmpty()) {
 			tree.append(tabs(indentLevel + 1)).append("\"subs\": [\n");
-			for (Result r : children) {
+			for (final Result r : children) {
 				tree.append(r.printResultSubTree(indentLevel + 2));
 
-				if (r != children.get(children.size() - 1))
+				if (r != children.get(children.size() - 1)) {
 					tree.append(",");
+				}
 
 				tree.append("\n");
 			}
@@ -220,7 +222,7 @@ public class Result {
 		return tree;
 	}
 
-	private String tabs(int num) {
+	private String tabs(final int num) {
 		return "  ".repeat(num);
 	}
 
@@ -257,6 +259,7 @@ public class Result {
 		 * 
 		 * @return a display-friendly name for this Enum.
 		 */
+		@Override
 		public String toString() {
 			return NAMES[this.ordinal()];
 		}

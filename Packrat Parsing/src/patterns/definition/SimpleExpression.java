@@ -7,22 +7,22 @@ import structure.Result;
 public class SimpleExpression extends Pattern {
 
 	private static final SimpleNumber num = new SimpleNumber();
-	
+
 	@Override
-	protected Result match(Derivation derivation) {
+	protected Result match(final Derivation derivation) {
 		Result result;
 		// Ordered choice
-		
+
 		// Attempt full expression
 		result = tryFullExpression(derivation);
-		if (result.isSuccess())
+		if (result.isSuccess()) {
 			return result;
-		
+		}
+
 		// Match num
 		result = num.lazyMatch(derivation);
-		
 
-		Result expression = new Result(true, null, null);
+		final Result expression = new Result(true, null, null);
 		expression.setStartIdx(derivation.getIndex());
 		expression.setType("Expression");
 //		expression.setValue(result.getValue());
@@ -32,51 +32,51 @@ public class SimpleExpression extends Pattern {
 		expression.setEndIdx(result.getEndIdx());
 		return expression;
 	}
-	
-	private Result tryFullExpression(Derivation derivation) {
-		Result expression = new Result(true, null, null);
+
+	private Result tryFullExpression(final Derivation derivation) {
+		final Result expression = new Result(true, null, null);
 		expression.setStartIdx(derivation.getIndex());
 		expression.setType("Expression");
 		expression.setData("");
 		Result result;
-		
+
 		// Sequence
-		
+
 		// Match recursive Expression
 		result = this.lazyMatch(derivation);
-		if( !result.isSuccess())
+		if (!result.isSuccess()) {
 			return result;
+		}
 		expression.addChild(result);
 		expression.setData(expression.getData() + result.getData());
-		
+
 		// Match plus
 		result = this.matchPlus(result.getDerivation());
-		if (!result.isSuccess())
+		if (!result.isSuccess()) {
 			return result;
+		}
 		expression.setData(expression.getData() + result.getData());
-		
+
 		// Match Num
 		result = num.lazyMatch(result.getDerivation());
-		if ( !result.isSuccess())
+		if (!result.isSuccess()) {
 			return result;
+		}
 		expression.addChild(result);
 		expression.setData(expression.getData() + result.getData());
 		expression.setDerivation(result.getDerivation());
 		expression.setEndIdx(result.getEndIdx());
 		return expression;
 	}
-	
-	private Result matchPlus(Derivation derivation) {
-		if(derivation.getChResult().isSuccess() && 
-				derivation.getChResult().getData().charAt(0) == '+') {
+
+	private Result matchPlus(final Derivation derivation) {
+		if (derivation.getChResult().isSuccess() && (derivation.getChResult().getData().charAt(0) == '+')) {
 			System.out.println("Matched [" + derivation.getChResult().getData() + "]");
 			return new Result(true, "+", derivation.getChResult().getDerivation());
 		} else {
 			return Result.FAIL();
 		}
 	}
-	
-
 
 	/**
 	 * Unique by instance
@@ -90,7 +90,7 @@ public class SimpleExpression extends Pattern {
 	 * Must be same instance
 	 */
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		return this == obj;
 	}
 
