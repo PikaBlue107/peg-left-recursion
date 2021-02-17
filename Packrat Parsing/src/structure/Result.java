@@ -194,7 +194,7 @@ public class Result {
 
 		tree.append(tabs(indentLevel + 1)).append("\"data\": \"").append(data).append("\",\n");
 
-		tree.append(tabs(indentLevel + 1)).append("\"left recursive\": \"").append(this.getLRStatus().toString())
+		tree.append(tabs(indentLevel + 1)).append("\"left_recursion\": \"").append(this.getLRStatus().toString())
 				.append("\",\n");
 
 		tree.append(tabs(indentLevel + 1)).append("\"s\": ").append(startIdx + 1).append(",\n");
