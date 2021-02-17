@@ -13,6 +13,12 @@ public class Result {
 	
 	/** The "type" of the pattern that matched this Result. */
 	private String type;
+	
+	/** The index at which this match starts, inclusive, 1-indexed. */
+	private int startIdx;
+	
+	/** The index at which this match ends, exclusive, 1-indexed. */
+	private int endIdx;
 
 	/** The left-recursion status of this Result. */
 	private LeftRecursionStatus lRStatus;
@@ -123,6 +129,34 @@ public class Result {
 	}
 
 	/**
+	 * @return the startIdx
+	 */
+	public int getStartIdx() {
+		return startIdx;
+	}
+
+	/**
+	 * @param startIdx the startIdx to set
+	 */
+	public void setStartIdx(int startIdx) {
+		this.startIdx = startIdx;
+	}
+
+	/**
+	 * @return the endIdx
+	 */
+	public int getEndIdx() {
+		return endIdx;
+	}
+
+	/**
+	 * @param endIdx the endIdx to set
+	 */
+	public void setEndIdx(int endIdx) {
+		this.endIdx = endIdx;
+	}
+
+	/**
 	 * Adds a sub-match to this Result
 	 * 
 	 * @param child
@@ -153,9 +187,15 @@ public class Result {
 		StringBuilder tree = new StringBuilder();
 		tree.append(tabs(indentLevel)).append("{\n");
 		
-		tree.append(tabs(indentLevel + 1)).append("\"type\": \"").append(type).append("\"\n");
+		tree.append(tabs(indentLevel + 1)).append("\"type\": \"").append(type).append("\",\n");
 		
-		tree.append(tabs(indentLevel + 1)).append("\"data\": \"").append(data).append("\"\n");
+		tree.append(tabs(indentLevel + 1)).append("\"data\": \"").append(data).append("\",\n");
+		
+		tree.append(tabs(indentLevel + 1)).append("\"s\": ").append(startIdx + 1).append(",\n");
+		
+		tree.append(tabs(indentLevel + 1)).append("\"e\": ").append(endIdx + 1).append(children.isEmpty() ? "" : ",").append("\n");
+		
+		
 		
 //		tree.append(tabs(indentLevel + 1)).append("end: ").append(derivation?).append("\n");
 		

@@ -26,7 +26,7 @@ public class Derivation implements Comparable<Derivation> {
 	 * @param str the input String that this Derivation will track
 	 */
 	public Derivation(String str) {
-		this(str, 1);
+		this(str, 0);
 	}
 
 	/**

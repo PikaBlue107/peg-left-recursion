@@ -10,8 +10,6 @@ public class SimpleExpression extends Pattern {
 	
 	@Override
 	protected Result match(Derivation derivation) {
-		Result expression = new Result(true, null, null);
-		expression.setType("Expression");
 		Result result;
 		// Ordered choice
 		
@@ -23,15 +21,21 @@ public class SimpleExpression extends Pattern {
 		// Match num
 		result = num.lazyMatch(derivation);
 		
+
+		Result expression = new Result(true, null, null);
+		expression.setStartIdx(derivation.getIndex());
+		expression.setType("Expression");
 //		expression.setValue(result.getValue());
 		expression.setDerivation(result.getDerivation());
 		expression.addChild(result);
 		expression.setData(result.getData());
+		expression.setEndIdx(result.getEndIdx());
 		return expression;
 	}
 	
 	private Result tryFullExpression(Derivation derivation) {
 		Result expression = new Result(true, null, null);
+		expression.setStartIdx(derivation.getIndex());
 		expression.setType("Expression");
 		expression.setData("");
 		Result result;
@@ -57,13 +61,14 @@ public class SimpleExpression extends Pattern {
 			return result;
 		expression.addChild(result);
 		expression.setData(expression.getData() + result.getData());
-		
 		expression.setDerivation(result.getDerivation());
+		expression.setEndIdx(result.getEndIdx());
 		return expression;
 	}
 	
 	private Result matchPlus(Derivation derivation) {
-		if(derivation.getChResult().isSuccess() && derivation.getChResult().getData().charAt(0) == '+') {
+		if(derivation.getChResult().isSuccess() && 
+				derivation.getChResult().getData().charAt(0) == '+') {
 			System.out.println("Matched [" + derivation.getChResult().getData() + "]");
 			return new Result(true, "+", derivation.getChResult().getDerivation());
 		} else {

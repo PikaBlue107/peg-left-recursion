@@ -19,6 +19,8 @@ public class SimpleNumber extends Pattern {
 		Result priorResult = new Result(true, null, derivation.getChResult().getDerivation());
 		priorResult.setType("Number");
 		priorResult.setData(derivation.getChResult().getData());
+		priorResult.setStartIdx(derivation.getIndex());
+		priorResult.setEndIdx(derivation.getIndex() + 1);
 		
 		// While next step is a valid character
 		while(priorResult.getDerivation().getChResult().isSuccess()) {
@@ -27,8 +29,8 @@ public class SimpleNumber extends Pattern {
 			System.out.println("Matched [" + priorResult.getDerivation().getChResult().getData() + "]");
 			priorResult.setDerivation(priorResult.getDerivation().getChResult().getDerivation());
 			priorResult.setData(priorResult.getData() + priorResult.getDerivation().getChResult().getData());
+			priorResult.setEndIdx(priorResult.getDerivation().getIndex());
 		}
-		
 		
 		return priorResult;
 	}
