@@ -8,43 +8,62 @@ import patterns.general.Pattern;
 public class Derivation implements Comparable<Derivation> {
 
 	/** The character held at this derivation. */
-	private Result<Character> ch;
+	private Result ch;
 
-	/** The length until the end of the string. */
-	private int charsRemaining;
+	/** The index of this Derivation in the String, 1-indexed. */
+	private final int index;
 
 	/** The Map of Results identified by Pattern. */
-	private Map<Pattern, Result<?>> patterns;
+	private Map<Pattern, Result> patterns;
 	{
 		this.patterns = new HashMap<>();
 	}
 
 	/**
-	 * Constructs a Derivation with the String that it must represent. This
-	 * Derivation takes one character and constructs a new Derivation with one less
-	 * character to contain, all the way until a Derivation holding the empty string
-	 * is created.
+	 * Implements a public-facing constructor by delegating to the private indexed
+	 * constructor.
 	 * 
-	 * @param remaining the remaining input String that this Derivation must
-	 *                  represent
+	 * @param str the input String that this Derivation will track
 	 */
-	public Derivation(String remaining) {
-		charsRemaining = remaining.length();
-		if ("".equals(remaining)) {
-			ch = new Result<Character>(false, null, null);
-		} else {
-			ch = new Result<Character>(true, remaining.charAt(0), new Derivation(remaining.substring(1)));
-		}
+	public Derivation(final String str) {
+		this(str, 0);
 	}
 
 	/**
-	 * Provides the number of characters until the end of the String, from this
-	 * Derivation.
+	 * Constructs a Derivation with the String that it must represent. This
+	 * Derivation takes the full string and the index that this Derivation occupies
+	 * in the string, saves its character in a Result, and constructs the next
+	 * Derivation in that Result.
 	 * 
-	 * @return this Derivation's number of characters remaining
+	 * @param str   the input String that this Derivation will track
+	 * @param index the index of the String that this Derivation will occupy
 	 */
-	public int getCharsRemaining() {
-		return charsRemaining;
+	private Derivation(final String str, final int index) {
+		this.index = index;
+		if (index == str.length()) {
+			ch = new Result(false, null, null);
+		} else {
+			ch = new Result(true, "" + str.charAt(index), new Derivation(str, index + 1));
+		}
+	}
+
+//	/**
+//	 * Provides the number of characters until the end of the String, from this
+//	 * Derivation.
+//	 *
+//	 * @return this Derivation's number of characters remaining
+//	 */
+//	public int getCharsRemaining() {
+//		return charsRemaining;
+//	}
+
+	/**
+	 * Provides the index of this Derivation in the input String
+	 * 
+	 * @return the index of this Derivation
+	 */
+	public int getIndex() {
+		return index;
 	}
 
 	/**
@@ -55,7 +74,7 @@ public class Derivation implements Comparable<Derivation> {
 	 * @return the Result for this Derivation, indicating its character and next
 	 *         Derivation.
 	 */
-	public Result<Character> getChResult() {
+	public Result getChResult() {
 		return ch;
 	}
 
@@ -65,7 +84,7 @@ public class Derivation implements Comparable<Derivation> {
 	 * @param pattern
 	 * @param result
 	 */
-	public void setResultFor(Pattern pattern, Result<?> result) {
+	public void setResultFor(final Pattern pattern, final Result result) {
 		patterns.put(pattern, result);
 	}
 
@@ -75,7 +94,7 @@ public class Derivation implements Comparable<Derivation> {
 	 * @return the Result (if known) for the given Pattern, otherwise null if the
 	 *         pattern's result is not known.
 	 */
-	public Result<?> resultFor(Pattern p) {
+	public Result resultFor(final Pattern p) {
 		return patterns.get(p);
 	}
 
@@ -86,7 +105,7 @@ public class Derivation implements Comparable<Derivation> {
 	 * @param p the Pattern to check
 	 * @return true if Pattern has a saved Result, else false
 	 */
-	public boolean hasSaved(Pattern p) {
+	public boolean hasSaved(final Pattern p) {
 		return patterns.containsKey(p);
 	}
 
@@ -96,8 +115,8 @@ public class Derivation implements Comparable<Derivation> {
 	 * remaining.
 	 */
 	@Override
-	public int compareTo(Derivation o) {
-		return o.getCharsRemaining() - this.getCharsRemaining();
+	public int compareTo(final Derivation o) {
+		return this.getIndex() - o.getIndex();
 	}
 
 }

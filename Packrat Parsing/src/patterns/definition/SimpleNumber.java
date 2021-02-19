@@ -7,23 +7,34 @@ import structure.Result;
 public class SimpleNumber extends Pattern {
 
 	@Override
-	protected Result<?> match(Derivation derivation) {
-		if (!derivation.getChResult().isSuccess())
+	protected Result match(final Derivation derivation) {
+		if (!derivation.getChResult().isSuccess()) {
 			return Result.FAIL();
-		
-		if (!Character.isDigit(derivation.getChResult().getValue()))
-			return Result.FAIL();
-		
-		System.out.println("Matched [" + derivation.getChResult().getValue() + "]");
-		
-		Result<?> priorResult = derivation.getChResult();
-		// While next step is a valid character
-		while(priorResult.getDerivation().getChResult().isSuccess()) {
-			if (!Character.isDigit(priorResult.getDerivation().getChResult().getValue()))
-				return priorResult;
-			System.out.println("Matched [" + priorResult.getDerivation().getChResult().getValue() + "]");
-			priorResult = priorResult.getDerivation().getChResult();
 		}
+
+		if (!Character.isDigit(derivation.getChResult().getData().charAt(0))) {
+			return Result.FAIL();
+		}
+
+		System.out.println("Matched [" + derivation.getChResult().getData() + "]");
+
+		final Result priorResult = new Result(true, null, derivation.getChResult().getDerivation());
+		priorResult.setType("Number");
+		priorResult.setData(derivation.getChResult().getData());
+		priorResult.setStartIdx(derivation.getIndex());
+		priorResult.setEndIdx(derivation.getIndex() + 1);
+
+		// While next step is a valid character
+		while (priorResult.getDerivation().getChResult().isSuccess()) {
+			if (!Character.isDigit(priorResult.getDerivation().getChResult().getData().charAt(0))) {
+				return priorResult;
+			}
+			System.out.println("Matched [" + priorResult.getDerivation().getChResult().getData() + "]");
+			priorResult.setDerivation(priorResult.getDerivation().getChResult().getDerivation());
+			priorResult.setData(priorResult.getData() + priorResult.getDerivation().getChResult().getData());
+			priorResult.setEndIdx(priorResult.getDerivation().getIndex());
+		}
+
 		return priorResult;
 	}
 
@@ -39,10 +50,8 @@ public class SimpleNumber extends Pattern {
 	 * Must be same instance
 	 */
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		return this == obj;
 	}
 
-	
-	
 }

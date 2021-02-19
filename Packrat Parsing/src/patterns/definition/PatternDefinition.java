@@ -18,7 +18,7 @@ public abstract class PatternDefinition extends Pattern {
 	 * provided.
 	 */
 	@Override
-	protected Result<?> match(Derivation derivation) {
+	protected Result match(Derivation derivation) {
 		// Delegate to the pattern we created.
 		return getDefinition().lazyMatch(derivation);
 	}
