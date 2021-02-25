@@ -4,7 +4,7 @@
 package patterns.definition;
 
 import patterns.general.Pattern;
-import structure.Derivation;
+import structure.InputContext;
 import structure.Result;
 
 /**
@@ -18,9 +18,9 @@ public abstract class PatternDefinition extends Pattern {
 	 * provided.
 	 */
 	@Override
-	protected Result match(Derivation derivation) {
+	protected Result match(final InputContext context) {
 		// Delegate to the pattern we created.
-		return getDefinition().lazyMatch(derivation);
+		return getDefinition().lazyMatch(context);
 	}
 
 	/**
@@ -36,8 +36,8 @@ public abstract class PatternDefinition extends Pattern {
 	 */
 	@Override
 	public int hashCode() {
-		int prime = 31;
-		int hash = prime * super.hashCode() + super.getID();
+		final int prime = 31;
+		final int hash = (prime * super.hashCode()) + super.getID();
 		return hash;
 	}
 
@@ -45,16 +45,20 @@ public abstract class PatternDefinition extends Pattern {
 	 * Definitions are always compared by instance and ID.
 	 */
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
+	public boolean equals(final Object obj) {
+		if (this == obj) {
 			return true;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
-		PatternDefinition other = (PatternDefinition) obj;
-		if (this.getID() != other.getID())
+		}
+		final PatternDefinition other = (PatternDefinition) obj;
+		if (this.getID() != other.getID()) {
 			return false;
+		}
 		return true;
 	}
 
