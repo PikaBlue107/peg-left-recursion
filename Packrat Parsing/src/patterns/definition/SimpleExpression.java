@@ -8,6 +8,8 @@ public class SimpleExpression extends Pattern {
 
 	private static final SimpleNumber num = new SimpleNumber();
 
+	private static final String TYPE = "Expression";
+
 	@Override
 	protected Result match(final InputContext context) {
 		Result result;
@@ -108,6 +110,16 @@ public class SimpleExpression extends Pattern {
 	@Override
 	public boolean equals(final Object obj) {
 		return this == obj;
+	}
+
+	/**
+	 * Returns the type (name) of this Pattern.
+	 * 
+	 * @return the String type of this Pattern
+	 */
+	@Override
+	public String getType() {
+		return TYPE;
 	}
 
 }

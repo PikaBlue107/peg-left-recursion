@@ -31,6 +31,45 @@ public abstract class Pattern {
 	}
 
 	/**
+	 * Requires that subclasses declare whether they are defined as an alias
+	 * (skipped in the Results tree printout, not considered for memoization)
+	 * 
+	 * @return true if the Pattern is an alias
+	 */
+	public boolean isAlias() {
+		// Default behavior is to not be an alias
+		return false;
+	}
+
+	/**
+	 * Helper method to assign this Pattern's Type and Alias to any Results that
+	 * subclasses provide us with.
+	 *
+	 * @param context the context over which we should attempt to match
+	 * @return a Result returned by the subclass, set to have this Pattern's type
+	 *         and alias
+	 */
+	private Result matchAndName(final InputContext context) {
+		// Retrieve the result
+		final Result r = this.match(context);
+		// Copy type and alias status to the Result
+		r.setType(getType());
+		r.setAlias(isAlias());
+		// Return the updated Result
+		return r;
+	}
+
+	/**
+	 * Requires that subclasses declare their Type (the name that they are referred
+	 * to as in Result printouts and pattern references). If a Pattern's Type is
+	 * null, then it doesn't have a display name, indicating that it should be
+	 * skipped in the Results tree printout and not considered for memoization.
+	 *
+	 * @return the Pattern's display type
+	 */
+	public abstract String getType();
+
+	/**
 	 * Grows left-recursive rules from a seed by iteratively re-calculating them
 	 * with more memoized results until they cannot match any more.
 	 * 
@@ -52,7 +91,7 @@ public abstract class Pattern {
 
 			// Start matching from this current derivation we're given
 			// Attempt to *match* the Pattern (this one) against the Derivation
-			attempt = match(context);
+			attempt = matchAndName(context);
 			// Ensure that this attempt is labeled as left-recursive
 			attempt.setLRStatus(LeftRecursionStatus.DETECTED);
 
@@ -87,6 +126,13 @@ public abstract class Pattern {
 		// If context is at its end, reject
 		if (context.atEnd()) {
 			return Result.FAIL();
+		}
+
+		// If this pattern has no Type or is an alias, delegate immediately to match()
+		if ((this.getType() == null) || this.isAlias()) {
+
+			// Skip left-recursion and memoization
+			return this.matchAndName(context);
 		}
 
 		// let m = MEMO(R,P)
@@ -126,6 +172,8 @@ public abstract class Pattern {
 			// Attempt to match the Pattern on this Derivation, saving the Result in the
 			// field "ans"
 			final Result ans = match(context);
+			ans.setType(getType());
+			ans.setAlias(isAlias());
 
 			ans.setLRStatus(m.getLRStatus());
 			startMatch.setResultFor(this, ans);
