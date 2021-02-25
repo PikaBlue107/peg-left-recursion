@@ -15,7 +15,7 @@ import structure.Result;
  * @author Melody
  *
  */
-public class PatternMatchingTestUtils {
+public class PatternTestUtils {
 
 	/**
 	 * Time (in miliseconds) after which the test runner will kill any matching
@@ -30,7 +30,7 @@ public class PatternMatchingTestUtils {
 	 * @param p pattern to attempt to match
 	 * @param s input string to use
 	 */
-	public static void assertPatternMatchesPrefix(final Pattern p, final String s) {
+	public static void assertMatchesPrefix(final Pattern p, final String s) {
 		assertPatternAgainstExpected(p, s, true, false);
 	}
 
@@ -41,7 +41,7 @@ public class PatternMatchingTestUtils {
 	 * @param p pattern to attempt to match
 	 * @param s input string to use
 	 */
-	public static void assertPatternMatches(final Pattern p, final String s) {
+	public static void assertMatches(final Pattern p, final String s) {
 		assertPatternAgainstExpected(p, s, true, true);
 	}
 
@@ -51,7 +51,7 @@ public class PatternMatchingTestUtils {
 	 * @param p pattern to attempt to match
 	 * @param s input string to use
 	 */
-	public static void assertPatternRejects(final Pattern p, final String s) {
+	public static void assertRejects(final Pattern p, final String s) {
 		assertPatternAgainstExpected(p, s, false, false);
 	}
 
@@ -155,7 +155,7 @@ public class PatternMatchingTestUtils {
 		// If we need a full match, ensure the context is at the end and the strings
 		// match exactly
 		if (requireFullMatch) {
-			Assert.assertTrue(inputString + "Input string should be exhausted.", matcher.context.atEnd());
+			Assert.assertTrue(inputString + "Input string should be exhausted.", matcher.context.isAtEnd());
 			Assert.assertEquals(inputString + "Result data should match input.", s, matcher.r.getData());
 		}
 	}
