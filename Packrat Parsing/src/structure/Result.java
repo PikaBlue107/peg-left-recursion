@@ -20,6 +20,12 @@ public class Result {
 	/** The index at which this match ends, exclusive, 1-indexed. */
 	private int endIdx;
 
+	/**
+	 * Tracks whether this Result matches an alias, which should be skipped in the
+	 * printout tree.
+	 */
+	private boolean alias;
+
 	/** The left-recursion status of this Result. */
 	private LeftRecursionStatus lRStatus;
 
@@ -160,6 +166,20 @@ public class Result {
 	 */
 	public void setEndIdx(final int endIdx) {
 		this.endIdx = endIdx;
+	}
+
+	/**
+	 * @return the alias
+	 */
+	public boolean isAlias() {
+		return alias;
+	}
+
+	/**
+	 * @param alias the alias to set
+	 */
+	public void setAlias(final boolean alias) {
+		this.alias = alias;
 	}
 
 	/**

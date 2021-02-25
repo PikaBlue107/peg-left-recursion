@@ -138,21 +138,25 @@ public class PatternMatchingTestUtils {
 
 		// Expect success or failure
 		if (expectedSuccess) {
-			Assert.assertTrue(inputString + "Match should succeed", matcher.r.isSuccess());
+			// Ensure positive match
+			Assert.assertTrue(inputString + "Match should succeed.", matcher.r.isSuccess());
 			// Ensure the match is a prefix of the original string
-			Assert.assertTrue(inputString + "Match should be less or equal to input in length",
+			Assert.assertTrue(inputString + "Match should be less or equal to input in length.",
 					matcher.r.getData().length() <= s.length());
-			Assert.assertEquals(inputString + "Match should be a prefix of input",
+			Assert.assertEquals(inputString + "Match should be a prefix of input.",
 					s.substring(0, matcher.r.getData().length()), matcher.r.getData());
+			// Ensure match's type matches pattern's type
+			Assert.assertEquals(inputString + "Match Result's type should match Pattern's type.", p.getType(),
+					matcher.r.getType());
 		} else {
-			Assert.assertFalse(inputString + "Match should not succeed", matcher.r.isSuccess());
+			Assert.assertFalse(inputString + "Match should not succeed.", matcher.r.isSuccess());
 		}
 
 		// If we need a full match, ensure the context is at the end and the strings
 		// match exactly
 		if (requireFullMatch) {
-			Assert.assertTrue(inputString + "Input string should be exhausted", matcher.context.atEnd());
-			Assert.assertEquals(inputString + "Result data should match input", s, matcher.r.getData());
+			Assert.assertTrue(inputString + "Input string should be exhausted.", matcher.context.atEnd());
+			Assert.assertEquals(inputString + "Result data should match input.", s, matcher.r.getData());
 		}
 	}
 
