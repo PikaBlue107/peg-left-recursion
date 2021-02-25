@@ -115,7 +115,7 @@ public class PatternTestUtils {
 		}
 
 		// If it's stuck in an infinite loop, then fail by that reason.
-		if (matcher.isAlive()) {
+		if (matcher.isAlive() && !matcher.workDone) {
 			matcher.stop();
 			Assert.fail(inputString + "Test timed out after " + TIMEOUT + " miliseconds.");
 		}
@@ -182,6 +182,8 @@ public class PatternTestUtils {
 		/** Stores any Exceptions that caused this matching thread's death. */
 		RuntimeException causeOfDeath;
 
+		boolean workDone = false;
+
 		/**
 		 * Constructs this matcher thread by providing the input string and pattern to
 		 * match.
@@ -205,6 +207,7 @@ public class PatternTestUtils {
 		public void run() {
 			try {
 				r = p.lazyMatch(context);
+				workDone = true;
 				synchronized (this) {
 					this.notifyAll();
 				}
