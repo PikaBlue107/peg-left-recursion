@@ -183,12 +183,24 @@ public class Result {
 	}
 
 	/**
-	 * Adds a sub-match to this Result
+	 * Adds a sub-match to this Result. Transfers the child's information to this
+	 * parent Result (appends data, sets endIndex, etc.)
 	 * 
 	 * @param child
 	 */
 	public Result addChild(final Result child) {
+		// If this is the first child, set start index and empty data
+		if (children.isEmpty()) {
+			this.setData("");
+			this.setStartIdx(child.getStartIdx());
+		}
+		// Add the child to the children list
 		children.add(child);
+		// Append the child's data to our own
+		setData(this.getData() + child.getData());
+		// Set end index equal to child's end index
+		setEndIdx(child.getEndIdx());
+		// Return this object so that you can add multiple children in sequence
 		return this;
 	}
 

@@ -124,7 +124,7 @@ public abstract class Pattern {
 	public final Result lazyMatch(final InputContext context) {
 
 		// If context is at its end, reject
-		if (context.atEnd()) {
+		if (context.isAtEnd()) {
 			return Result.FAIL();
 		}
 

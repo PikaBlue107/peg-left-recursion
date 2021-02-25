@@ -84,7 +84,7 @@ public class InputContext {
 	 * @return true if the current position is at the end of the string (no active
 	 *         character to consume)
 	 */
-	public boolean atEnd() {
+	public boolean isAtEnd() {
 		return this.position == this.inputString.length();
 	}
 
@@ -102,7 +102,7 @@ public class InputContext {
 	 * @throws IllegalStateException if at the end of the input string
 	 */
 	public char currentChar() {
-		if (atEnd()) {
+		if (isAtEnd()) {
 			throw new IllegalStateException();
 		}
 		return this.inputString.charAt(position);
@@ -151,7 +151,7 @@ public class InputContext {
 	}
 
 	public boolean checkChar(final CharCheckable checker) {
-		if (atEnd()) {
+		if (isAtEnd()) {
 			return false;
 		}
 		return checker.check(currentDeriv().getChResult().getData().charAt(0));
