@@ -1,7 +1,7 @@
 package patterns.definition;
 
 import patterns.general.Pattern;
-import structure.Derivation;
+import structure.InputContext;
 import structure.Result;
 
 public class SimpleExpression extends Pattern {
@@ -9,70 +9,86 @@ public class SimpleExpression extends Pattern {
 	private static final SimpleNumber num = new SimpleNumber();
 
 	@Override
-	protected Result match(final Derivation derivation) {
+	protected Result match(final InputContext context) {
 		Result result;
 		// Ordered choice
+		final int initialPos = context.getPosition();
 
 		// Attempt full expression
-		result = tryFullExpression(derivation);
+		result = tryFullExpression(context);
 		if (result.isSuccess()) {
 			return result;
 		}
 
-		// Match num
-		result = num.lazyMatch(derivation);
+		// On failure, reset to beginning
+		context.setPosition(initialPos);
 
-		final Result expression = new Result(true, null, null);
-		expression.setStartIdx(derivation.getIndex());
+		// Match num
+		result = num.lazyMatch(context);
+		if (!result.isSuccess()) {
+			return result;
+		}
+
+		final Result expression = new Result(true, result.getData(), result.getStartIdx());
 		expression.setType("Expression");
-//		expression.setValue(result.getValue());
-		expression.setDerivation(result.getDerivation());
-		expression.addChild(result);
-		expression.setData(result.getData());
-		expression.setEndIdx(result.getEndIdx());
+		expression.addChild(result); // TODO: Restructure addChild() to automatically add in data and index
+										// information. Possibly a new constructor as well?
 		return expression;
 	}
 
-	private Result tryFullExpression(final Derivation derivation) {
-		final Result expression = new Result(true, null, null);
-		expression.setStartIdx(derivation.getIndex());
+	private Result tryFullExpression(final InputContext context) {
+
+		// Create the possible Result found by matching this Expression
+		final Result expression = new Result(true, "", context.getPosition());
 		expression.setType("Expression");
-		expression.setData("");
+
+		// Create a placeholder for the Results returned by each sub-match
 		Result result;
 
 		// Sequence
 
 		// Match recursive Expression
-		result = this.lazyMatch(derivation);
+		result = this.lazyMatch(context);
+		// If not successful, return that Expression's failure
 		if (!result.isSuccess()) {
 			return result;
 		}
+		// Successful match. Add the child result to the overall Expression children and
+		// append its data
 		expression.addChild(result);
 		expression.setData(expression.getData() + result.getData());
 
 		// Match plus
-		result = this.matchPlus(result.getDerivation());
+		result = this.matchPlus(context);
+		// If unsuccessful, return that failure
 		if (!result.isSuccess()) {
 			return result;
 		}
+		// Successful match. Append the child match's data
+		// TODO: Add the child result and flag it as "invisible"?
 		expression.setData(expression.getData() + result.getData());
 
 		// Match Num
-		result = num.lazyMatch(result.getDerivation());
+		result = num.lazyMatch(context);
+		// If unsuccessful, return that failure
 		if (!result.isSuccess()) {
 			return result;
 		}
+		// Successful match. Add the child result to the overall Expression children and
+		// append its data
 		expression.addChild(result);
 		expression.setData(expression.getData() + result.getData());
-		expression.setDerivation(result.getDerivation());
+
 		expression.setEndIdx(result.getEndIdx());
 		return expression;
 	}
 
-	private Result matchPlus(final Derivation derivation) {
-		if (derivation.getChResult().isSuccess() && (derivation.getChResult().getData().charAt(0) == '+')) {
-			System.out.println("Matched [" + derivation.getChResult().getData() + "]");
-			return new Result(true, "+", derivation.getChResult().getDerivation());
+	private Result matchPlus(final InputContext context) {
+		if (!context.atEnd() && context.currentDeriv().getChResult().isSuccess()
+				&& (context.currentDeriv().getChResult().getData().charAt(0) == '+')) {
+			System.out.println("Matched [" + context.currentDeriv().getChResult().getData() + "]");
+			context.advance();
+			return new Result(true, '+', context.getPosition() - 1);
 		} else {
 			return Result.FAIL();
 		}
