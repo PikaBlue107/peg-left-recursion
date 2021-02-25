@@ -57,8 +57,8 @@ public class InputContext {
 			inputData[i] = new Derivation(input.charAt(i), i);
 		}
 
-		// For the last index, set it to null
-		inputData[input.length()] = null;
+		// For the last index, set it to an empty Derivation
+		inputData[input.length()] = new Derivation('\0', input.length());
 
 		// Start the print range off at the default
 		printRange = DEFAUT_PRINT_RANGE;
