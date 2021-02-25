@@ -70,10 +70,10 @@ public class PatternChoice extends Pattern {
 	 *         of them do
 	 */
 	@Override
-	protected Result<?> match(Derivation derivation) {
+	protected Result match(Derivation derivation) {
 		// Run through the list of patterns to match
 		// Keep track of the previous pattern's result
-		Result<?> result;
+		Result result;
 		// Loop over all patterns
 		for (Pattern p : patterns) {
 			// Attempt to match this pattern
@@ -85,7 +85,7 @@ public class PatternChoice extends Pattern {
 		}
 
 		// Looped over all patterns successfully, none matched. Send it back!
-		return new Result<>(false, null, null);
+		return new Result(false, null, null);
 	}
 
 	/**

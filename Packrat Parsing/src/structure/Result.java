@@ -1,15 +1,30 @@
 package structure;
 
-public class Result<T> {
+import java.util.ArrayList;
+import java.util.List;
+
+public class Result {
 
 	/** The success of this result. */
 	private boolean success;
 
 	/** The syntactic value of this Result. */
-	private T value;
+	private String data;
+
+	/** The "type" of the pattern that matched this Result. */
+	private String type;
+
+	/** The index at which this match starts, inclusive, 1-indexed. */
+	private int startIdx;
+
+	/** The index at which this match ends, exclusive, 1-indexed. */
+	private int endIdx;
 
 	/** The left-recursion status of this Result. */
 	private LeftRecursionStatus lRStatus;
+
+	/** The sub-matches within this Result. */
+	private final List<Result> children;
 
 	/**
 	 * The Derivation that this result gives (the remaining unmatched characters
@@ -22,8 +37,8 @@ public class Result<T> {
 	 * 
 	 * @return a Result representing a failed match.
 	 */
-	public static final Result<Object> FAIL() {
-		return new Result<Object>(false, null, null);
+	public static final Result FAIL() {
+		return new Result(false, null, null);
 	}
 
 	/**
@@ -31,15 +46,17 @@ public class Result<T> {
 	 * @param value
 	 * @param derivation
 	 */
-	public Result(boolean success, T value, Derivation derivation) {
+	public Result(final boolean success, final String value, final Derivation derivation) {
 		this(success, value, derivation, LeftRecursionStatus.POSSIBLE);
 	}
-	
-	public Result(boolean success, T value, Derivation derivation, LeftRecursionStatus leftRecursionStatus) {
+
+	public Result(final boolean success, final String data, final Derivation derivation,
+			final LeftRecursionStatus leftRecursionStatus) {
 		this.success = success;
-		this.value = value;
+		this.data = data;
 		this.derivation = derivation;
 		this.lRStatus = leftRecursionStatus;
+		this.children = new ArrayList<>();
 	}
 
 	/**
@@ -52,22 +69,22 @@ public class Result<T> {
 	/**
 	 * @param success the success to set
 	 */
-	public void setSuccess(boolean success) {
+	public void setSuccess(final boolean success) {
 		this.success = success;
 	}
 
 	/**
 	 * @return the value
 	 */
-	public T getValue() {
-		return value;
+	public String getData() {
+		return data;
 	}
 
 	/**
-	 * @param value the value to set
+	 * @param data the value to set
 	 */
-	public void setValue(T value) {
-		this.value = value;
+	public void setData(final String data) {
+		this.data = data;
 	}
 
 	/**
@@ -80,7 +97,7 @@ public class Result<T> {
 	/**
 	 * @param derivation the derivation to set
 	 */
-	public void setDerivation(Derivation derivation) {
+	public void setDerivation(final Derivation derivation) {
 		this.derivation = derivation;
 	}
 
@@ -94,17 +111,119 @@ public class Result<T> {
 	/**
 	 * @param lRStatus the lRStatus to set
 	 */
-	public void setLRStatus(LeftRecursionStatus lRStatus) {
+	public void setLRStatus(final LeftRecursionStatus lRStatus) {
 		this.lRStatus = lRStatus;
 	}
 
 	/**
-	 * Generates a String containing all of the Result's fields
+	 * @return the type
+	 */
+	public String getType() {
+		return type;
+	}
+
+	/**
+	 * @param type the type to set
+	 */
+	public void setType(final String type) {
+		this.type = type;
+	}
+
+	/**
+	 * @return the startIdx
+	 */
+	public int getStartIdx() {
+		return startIdx;
+	}
+
+	/**
+	 * @param startIdx the startIdx to set
+	 */
+	public void setStartIdx(final int startIdx) {
+		this.startIdx = startIdx;
+	}
+
+	/**
+	 * @return the endIdx
+	 */
+	public int getEndIdx() {
+		return endIdx;
+	}
+
+	/**
+	 * @param endIdx the endIdx to set
+	 */
+	public void setEndIdx(final int endIdx) {
+		this.endIdx = endIdx;
+	}
+
+	/**
+	 * Adds a sub-match to this Result
+	 * 
+	 * @param child
+	 */
+	public Result addChild(final Result child) {
+		children.add(child);
+		return this;
+	}
+
+	/**
+	 * Generates a display-able string yielding all data of this Result except for
+	 * objects (derivation and children)
 	 */
 	@Override
 	public String toString() {
-		return "Result [success=" + success + ", value=" + value + ", lRStatus=" + lRStatus + ", derivation="
-				+ derivation + "]";
+		return "Result [success=" + success + ", data=" + data + ", type=" + type + ", startIdx=" + startIdx
+				+ ", endIdx=" + endIdx + ", lRStatus=" + lRStatus + "]";
+	}
+
+	/**
+	 * Generates the Tree of matches that this Result represents.
+	 * 
+	 * @return a tree of the match, sub-matches, and additional information
+	 */
+	public String printResultTree() {
+		return printResultSubTree(0).toString();
+	}
+
+	private StringBuilder printResultSubTree(final int indentLevel) {
+		final StringBuilder tree = new StringBuilder();
+		tree.append(tabs(indentLevel)).append("{\n");
+
+		tree.append(tabs(indentLevel + 1)).append("\"type\": \"").append(type).append("\",\n");
+
+		tree.append(tabs(indentLevel + 1)).append("\"data\": \"").append(data).append("\",\n");
+
+		tree.append(tabs(indentLevel + 1)).append("\"left_recursion\": \"").append(this.getLRStatus().toString())
+				.append("\",\n");
+
+		tree.append(tabs(indentLevel + 1)).append("\"s\": ").append(startIdx + 1).append(",\n");
+
+		tree.append(tabs(indentLevel + 1)).append("\"e\": ").append(endIdx + 1).append(children.isEmpty() ? "" : ",")
+				.append("\n");
+
+//		tree.append(tabs(indentLevel + 1)).append("end: ").append(derivation?).append("\n");
+
+		if (!children.isEmpty()) {
+			tree.append(tabs(indentLevel + 1)).append("\"subs\": [\n");
+			for (final Result r : children) {
+				tree.append(r.printResultSubTree(indentLevel + 2));
+
+				if (r != children.get(children.size() - 1)) {
+					tree.append(",");
+				}
+
+				tree.append("\n");
+			}
+			tree.append(tabs(indentLevel + 1)).append("]\n");
+		}
+
+		tree.append(tabs(indentLevel) + "}");
+		return tree;
+	}
+
+	private String tabs(final int num) {
+		return "  ".repeat(num);
 	}
 
 	/**
@@ -129,7 +248,21 @@ public class Result<T> {
 		 * The Pattern at this Derivation is not left-recursive. We finished one full
 		 * match without it calling itself.
 		 */
-		IMPOSSIBLE
+		IMPOSSIBLE;
+
+		/** Display-friendly names for each value. */
+		private static final String[] NAMES = { "Possible", "Detected", "Impossible" };
+
+		/**
+		 * Gets the display name of this Enum by indexing into the display names array
+		 * by the Enum's ordinal.
+		 * 
+		 * @return a display-friendly name for this Enum.
+		 */
+		@Override
+		public String toString() {
+			return NAMES[this.ordinal()];
+		}
 	}
 
 }

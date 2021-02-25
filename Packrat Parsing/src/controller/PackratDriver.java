@@ -1,7 +1,7 @@
 package controller;
 
-import patterns.definition.*;
-import patterns.general.*;
+import patterns.definition.SimpleExpression;
+import patterns.general.Pattern;
 import structure.Derivation;
 import structure.Result;
 
@@ -15,20 +15,21 @@ public class PackratDriver {
 	 * 
 	 * @param args command-line arguments, unused.
 	 */
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 
 		// Create the Derivations
-		Derivation base = new Derivation(TEST_STRING);
+		final Derivation base = new Derivation(TEST_STRING);
 
 		// Create the pattern
-		
-		Pattern matcher = new SimpleExpression();
+
+		final Pattern matcher = new SimpleExpression();
 
 		// Attempt to match
-		Result<?> result = matcher.lazyMatch(base);
+		final Result result = matcher.lazyMatch(base);
 
 		// Print out the result
-		System.out.println(result.isSuccess());
+		System.out.println(result.toString());
+		System.out.println(result.printResultTree());
 
 	}
 }
