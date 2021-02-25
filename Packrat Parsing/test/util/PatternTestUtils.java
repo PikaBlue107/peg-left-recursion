@@ -114,22 +114,22 @@ public class PatternTestUtils {
 			e.printStackTrace();
 		}
 
-		// If we stopped waiting from a timeout, then fail the test.
-		if (!matcher.workDone) {
-			// If it's stuck in an infinite loop, then fail by that reason.
-			if (matcher.isAlive()) {
-				matcher.stop();
-				Assert.fail(inputString + "Test timed out after " + TIMEOUT + " miliseconds.");
-			}
+		// If it's stuck in an infinite loop, then fail by that reason.
+		if (matcher.isAlive()) {
+			matcher.stop();
+			Assert.fail(inputString + "Test timed out after " + TIMEOUT + " miliseconds.");
+		}
+
+		// If the exception knows its cause of death, then print that exception.
+		if (matcher.causeOfDeath != null) {
+
 			// If it died because of an Exception or other natural cause, fail by that
 			// reason instead.
-			else {
-				System.out.println(
-						"The above exception caused the matcher thread to fail for the test with the following conditions.\n"
-								+ inputString);
-				Assert.fail(
-						inputString + "The given test case killed the matching thread with an unhandled exception.");
-			}
+			System.out.println(
+					"The above exception caused the matcher thread to fail for the test with the following conditions.\n"
+							+ inputString);
+//			Assert.fail(inputString + "The given test case killed the matching thread with an unhandled exception.");
+			throw matcher.causeOfDeath; //
 		}
 
 		inputString += "\tMatch: [" + matcher.r.getData() + "]\n";
@@ -149,7 +149,11 @@ public class PatternTestUtils {
 			Assert.assertEquals(inputString + "Match Result's type should match Pattern's type.", p.getType(),
 					matcher.r.getType());
 		} else {
+			// Ensure no match
 			Assert.assertFalse(inputString + "Match should not succeed.", matcher.r.isSuccess());
+			// Ensure context was properly reset
+			Assert.assertEquals(inputString + "Failed match should reset to original position.", 0,
+					matcher.context.getPosition());
 		}
 
 		// If we need a full match, ensure the context is at the end and the strings
@@ -175,11 +179,8 @@ public class PatternTestUtils {
 		Pattern p;
 		/** The Result of matching the pattern. */
 		Result r;
-		/**
-		 * Whether the thread has finished matching. If false after a given timeout, the
-		 * thread is likely stuck in an infinite loop.
-		 */
-		boolean workDone = false;
+		/** Stores any Exceptions that caused this matching thread's death. */
+		RuntimeException causeOfDeath;
 
 		/**
 		 * Constructs this matcher thread by providing the input string and pattern to
@@ -202,10 +203,15 @@ public class PatternTestUtils {
 		 */
 		@Override
 		public void run() {
-			r = p.lazyMatch(context);
-			workDone = true;
-			synchronized (this) {
-				this.notifyAll();
+			try {
+				r = p.lazyMatch(context);
+				synchronized (this) {
+					this.notifyAll();
+				}
+			} catch (final RuntimeException e) {
+				causeOfDeath = e;
+				// Re-throw the exception so that we get that lovely stderr
+				throw e;
 			}
 		}
 	}
