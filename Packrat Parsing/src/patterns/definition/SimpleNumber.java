@@ -1,38 +1,37 @@
 package patterns.definition;
 
 import patterns.general.Pattern;
-import structure.Derivation;
+import structure.InputContext;
 import structure.Result;
 
 public class SimpleNumber extends Pattern {
 
 	@Override
-	protected Result match(final Derivation derivation) {
-		if (!derivation.getChResult().isSuccess()) {
+	protected Result match(final InputContext context) {
+		if (!context.currentDeriv().getChResult().isSuccess()
+				|| !Character.isDigit(context.currentDeriv().getChResult().getData().charAt(0))) {
 			return Result.FAIL();
 		}
 
-		if (!Character.isDigit(derivation.getChResult().getData().charAt(0))) {
-			return Result.FAIL();
-		}
-
-		System.out.println("Matched [" + derivation.getChResult().getData() + "]");
-
-		final Result priorResult = new Result(true, null, derivation.getChResult().getDerivation());
+		final Result priorResult = new Result(true, context.currentChar(), context.getPosition());
 		priorResult.setType("Number");
-		priorResult.setData(derivation.getChResult().getData());
-		priorResult.setStartIdx(derivation.getIndex());
-		priorResult.setEndIdx(derivation.getIndex() + 1);
+
+		char match = context.next();
+
+		// Indicate that we matched at least one number
+		System.out.println("Matched [" + match + "]");
 
 		// While next step is a valid character
-		while (priorResult.getDerivation().getChResult().isSuccess()) {
-			if (!Character.isDigit(priorResult.getDerivation().getChResult().getData().charAt(0))) {
-				return priorResult;
-			}
-			System.out.println("Matched [" + priorResult.getDerivation().getChResult().getData() + "]");
-			priorResult.setDerivation(priorResult.getDerivation().getChResult().getDerivation());
-			priorResult.setData(priorResult.getData() + priorResult.getDerivation().getChResult().getData());
-			priorResult.setEndIdx(priorResult.getDerivation().getIndex());
+		while (context.checkChar(Character::isDigit)) {
+
+			// Save the next match and step the context
+			match = context.next();
+
+			// Indicate that we matched that digit
+			System.out.println("Matched [" + match + "]");
+
+			// Add matched character into Result
+			priorResult.addChar(match);
 		}
 
 		return priorResult;

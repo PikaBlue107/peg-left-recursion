@@ -2,7 +2,7 @@ package controller;
 
 import patterns.definition.SimpleExpression;
 import patterns.general.Pattern;
-import structure.Derivation;
+import structure.InputContext;
 import structure.Result;
 
 public class PackratDriver {
@@ -18,14 +18,13 @@ public class PackratDriver {
 	public static void main(final String[] args) {
 
 		// Create the Derivations
-		final Derivation base = new Derivation(TEST_STRING);
+		final InputContext input = new InputContext(TEST_STRING);
 
 		// Create the pattern
-
 		final Pattern matcher = new SimpleExpression();
 
 		// Attempt to match
-		final Result result = matcher.lazyMatch(base);
+		final Result result = matcher.lazyMatch(input);
 
 		// Print out the result
 		System.out.println(result.toString());
