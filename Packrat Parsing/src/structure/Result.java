@@ -183,6 +183,22 @@ public class Result {
 	}
 
 	/**
+	 * Determines if this Result is a hidden result. A Result is hidden if at least
+	 * one of the following is true:
+	 * 
+	 * - the Result has a null Type
+	 * 
+	 * - the Result is an alias
+	 * 
+	 * 
+	 * @return whether this Result is hidden (removed from the printResultTree()
+	 *         output)
+	 */
+	public boolean isHidden() {
+		return this.isAlias() || (this.getType() == null);
+	}
+
+	/**
 	 * Adds a sub-match to this Result. Transfers the child's information to this
 	 * parent Result (appends data, sets endIndex, etc.)
 	 * 
@@ -215,16 +231,83 @@ public class Result {
 	}
 
 	/**
+	 * Returns a list of non-hidden children. Only meant for use in
+	 * printResultTree().
+	 *
+	 * @return the list of non-hidden children
+	 */
+	private List<Result> nonHiddenChildren() {
+
+		// Start counting from zero
+		final List<Result> nonHiddenChildren = new ArrayList<>();
+
+		// Loop over all children in this Result
+		for (final Result child : this.children) {
+			// Child is hidden. Recurse down to count its non-hidden children
+			if (child.isHidden()) {
+				nonHiddenChildren.addAll(child.nonHiddenChildren());
+			}
+			// Child is not hidden. Increment counter for non-hidden children
+			else {
+				nonHiddenChildren.add(child);
+			}
+		}
+
+		// Return our total count
+		return nonHiddenChildren;
+	}
+
+	/**
 	 * Generates the Tree of matches that this Result represents.
 	 * 
 	 * @return a tree of the match, sub-matches, and additional information
 	 */
 	public String printResultTree() {
-		return printResultSubTree(0).toString();
+		// Default behavior is to skip hidden elements
+		return printResultTree(false);
 	}
 
-	private StringBuilder printResultSubTree(final int indentLevel) {
+	/**
+	 * Generates the Tree of matches that this Result represents. If includeHidden
+	 * is true, prints all hidden matches (null-type and alias) as well.
+	 * 
+	 * @param includeHidden whether to include hidden Results
+	 * @return a tree of hte match, sub-matches, and additional information
+	 */
+	public String printResultTree(final boolean includeHidden) {
+		return printResultSubTree(0, includeHidden).toString();
+	}
+
+	/**
+	 * Recursive helper to printResultTree(). Prints the tree at this level, and
+	 * recurses for each child.
+	 *
+	 * @param indentLevel the level of indentation that this subtree should print at
+	 * @return a StringBuilder yielding the sub-tree for this Result
+	 */
+	private StringBuilder printResultSubTree(final int indentLevel, final boolean includeHidden) {
+		// Find list of non-hidden children
+		final List<Result> nonHiddenChildren = this.nonHiddenChildren();
+
+		// Create the StringBuilder that this method will build from
 		final StringBuilder tree = new StringBuilder();
+
+		// Special case to handle the hidden Results
+		if (!includeHidden && this.isHidden()) {
+
+			// Delegate to its children
+			for (final Result child : nonHiddenChildren) {
+				tree.append(child.printResultSubTree(indentLevel, includeHidden));
+
+				// If it's a non-final child in a list, mark it down here
+				if (child != nonHiddenChildren.get(nonHiddenChildren.size() - 1)) {
+					tree.append(",");
+				}
+
+				tree.append("\n");
+			}
+		}
+
 		tree.append(tabs(indentLevel)).append("{\n");
 
 		tree.append(tabs(indentLevel + 1)).append("\"type\": \"").append(type).append("\",\n");
@@ -241,12 +324,14 @@ public class Result {
 
 //		tree.append(tabs(indentLevel + 1)).append("end: ").append(derivation?).append("\n");
 
-		if (!children.isEmpty()) {
-			tree.append(tabs(indentLevel + 1)).append("\"subs\": [\n");
-			for (final Result r : children) {
-				tree.append(r.printResultSubTree(indentLevel + 2));
+		final List<Result> childrenToPrint = includeHidden ? children : nonHiddenChildren;
 
-				if (r != children.get(children.size() - 1)) {
+		if (!childrenToPrint.isEmpty()) {
+			tree.append(tabs(indentLevel + 1)).append("\"subs\": [\n");
+			for (final Result child : childrenToPrint) {
+				tree.append(child.printResultSubTree(indentLevel + 2, includeHidden));
+
+				if (child != childrenToPrint.get(childrenToPrint.size() - 1)) {
 					tree.append(",");
 				}
 
