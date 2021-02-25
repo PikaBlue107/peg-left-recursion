@@ -57,8 +57,8 @@ public class InputContext {
 			inputData[i] = new Derivation(input.charAt(i), i);
 		}
 
-		// For the last index, set it to null
-		inputData[input.length()] = null;
+		// For the last index, set it to an empty Derivation
+		inputData[input.length()] = new Derivation('\0', input.length());
 
 		// Start the print range off at the default
 		printRange = DEFAUT_PRINT_RANGE;
@@ -84,7 +84,7 @@ public class InputContext {
 	 * @return true if the current position is at the end of the string (no active
 	 *         character to consume)
 	 */
-	public boolean atEnd() {
+	public boolean isAtEnd() {
 		return this.position == this.inputString.length();
 	}
 
@@ -102,7 +102,7 @@ public class InputContext {
 	 * @throws IllegalStateException if at the end of the input string
 	 */
 	public char currentChar() {
-		if (atEnd()) {
+		if (isAtEnd()) {
 			throw new IllegalStateException();
 		}
 		return this.inputString.charAt(position);
@@ -151,7 +151,7 @@ public class InputContext {
 	}
 
 	public boolean checkChar(final CharCheckable checker) {
-		if (atEnd()) {
+		if (isAtEnd()) {
 			return false;
 		}
 		return checker.check(currentDeriv().getChResult().getData().charAt(0));

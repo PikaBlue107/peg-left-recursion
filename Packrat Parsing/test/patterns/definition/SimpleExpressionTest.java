@@ -6,7 +6,7 @@ package patterns.definition;
 import org.junit.Test;
 
 import patterns.general.Pattern;
-import util.PatternMatchingTestUtils;
+import util.PatternTestUtils;
 
 /**
  * @author Melody Griesen
@@ -19,26 +19,26 @@ public class SimpleExpressionTest {
 	@Test
 	public void testMatchesNumber() {
 		// Matches number
-		PatternMatchingTestUtils.assertPatternMatches(PATTERN, "1");
-		PatternMatchingTestUtils.assertPatternMatches(PATTERN, "12345");
-		PatternMatchingTestUtils.assertPatternMatches(PATTERN, "1230190123981");
+		PatternTestUtils.assertMatches(PATTERN, "1");
+		PatternTestUtils.assertMatches(PATTERN, "12345");
+		PatternTestUtils.assertMatches(PATTERN, "1230190123981");
 	}
 
 	@Test
 	public void testMatchesExpression() {
 		// Matches expressions
-		PatternMatchingTestUtils.assertPatternMatches(PATTERN, "1+1");
-		PatternMatchingTestUtils.assertPatternMatches(PATTERN, "598+29382");
-		PatternMatchingTestUtils.assertPatternMatches(PATTERN, "1+2+34+567");
+		PatternTestUtils.assertMatches(PATTERN, "1+1");
+		PatternTestUtils.assertMatches(PATTERN, "598+29382");
+		PatternTestUtils.assertMatches(PATTERN, "1+2+34+567");
 	}
 
 	@Test
 	public void testRejects() {
-		PatternMatchingTestUtils.assertPatternRejects(PATTERN, "");
-		PatternMatchingTestUtils.assertPatternRejects(PATTERN, "a");
-		PatternMatchingTestUtils.assertPatternRejects(PATTERN, " ");
-		PatternMatchingTestUtils.assertPatternRejects(PATTERN, "-");
-		PatternMatchingTestUtils.assertPatternRejects(PATTERN, "+5");
+		PatternTestUtils.assertRejects(PATTERN, "");
+		PatternTestUtils.assertRejects(PATTERN, "a");
+		PatternTestUtils.assertRejects(PATTERN, " ");
+		PatternTestUtils.assertRejects(PATTERN, "-");
+		PatternTestUtils.assertRejects(PATTERN, "+5");
 	}
 
 }

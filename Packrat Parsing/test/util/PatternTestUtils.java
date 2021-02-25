@@ -15,7 +15,7 @@ import structure.Result;
  * @author Melody
  *
  */
-public class PatternMatchingTestUtils {
+public class PatternTestUtils {
 
 	/**
 	 * Time (in miliseconds) after which the test runner will kill any matching
@@ -30,7 +30,7 @@ public class PatternMatchingTestUtils {
 	 * @param p pattern to attempt to match
 	 * @param s input string to use
 	 */
-	public static void assertPatternMatchesPrefix(final Pattern p, final String s) {
+	public static void assertMatchesPrefix(final Pattern p, final String s) {
 		assertPatternAgainstExpected(p, s, true, false);
 	}
 
@@ -41,7 +41,7 @@ public class PatternMatchingTestUtils {
 	 * @param p pattern to attempt to match
 	 * @param s input string to use
 	 */
-	public static void assertPatternMatches(final Pattern p, final String s) {
+	public static void assertMatches(final Pattern p, final String s) {
 		assertPatternAgainstExpected(p, s, true, true);
 	}
 
@@ -51,7 +51,7 @@ public class PatternMatchingTestUtils {
 	 * @param p pattern to attempt to match
 	 * @param s input string to use
 	 */
-	public static void assertPatternRejects(final Pattern p, final String s) {
+	public static void assertRejects(final Pattern p, final String s) {
 		assertPatternAgainstExpected(p, s, false, false);
 	}
 
@@ -114,22 +114,22 @@ public class PatternMatchingTestUtils {
 			e.printStackTrace();
 		}
 
-		// If we stopped waiting from a timeout, then fail the test.
-		if (!matcher.workDone) {
-			// If it's stuck in an infinite loop, then fail by that reason.
-			if (matcher.isAlive()) {
-				matcher.stop();
-				Assert.fail(inputString + "Test timed out after " + TIMEOUT + " miliseconds.");
-			}
+		// If it's stuck in an infinite loop, then fail by that reason.
+		if (matcher.isAlive() && !matcher.workDone) {
+			matcher.stop();
+			Assert.fail(inputString + "Test timed out after " + TIMEOUT + " miliseconds.");
+		}
+
+		// If the exception knows its cause of death, then print that exception.
+		if (matcher.causeOfDeath != null) {
+
 			// If it died because of an Exception or other natural cause, fail by that
 			// reason instead.
-			else {
-				System.out.println(
-						"The above exception caused the matcher thread to fail for the test with the following conditions.\n"
-								+ inputString);
-				Assert.fail(
-						inputString + "The given test case killed the matching thread with an unhandled exception.");
-			}
+			System.out.println(
+					"The above exception caused the matcher thread to fail for the test with the following conditions.\n"
+							+ inputString);
+//			Assert.fail(inputString + "The given test case killed the matching thread with an unhandled exception.");
+			throw matcher.causeOfDeath; //
 		}
 
 		inputString += "\tMatch: [" + matcher.r.getData() + "]\n";
@@ -138,21 +138,29 @@ public class PatternMatchingTestUtils {
 
 		// Expect success or failure
 		if (expectedSuccess) {
-			Assert.assertTrue(inputString + "Match should succeed", matcher.r.isSuccess());
+			// Ensure positive match
+			Assert.assertTrue(inputString + "Match should succeed.", matcher.r.isSuccess());
 			// Ensure the match is a prefix of the original string
-			Assert.assertTrue(inputString + "Match should be less or equal to input in length",
+			Assert.assertTrue(inputString + "Match should be less or equal to input in length.",
 					matcher.r.getData().length() <= s.length());
-			Assert.assertEquals(inputString + "Match should be a prefix of input",
+			Assert.assertEquals(inputString + "Match should be a prefix of input.",
 					s.substring(0, matcher.r.getData().length()), matcher.r.getData());
+			// Ensure match's type matches pattern's type
+			Assert.assertEquals(inputString + "Match Result's type should match Pattern's type.", p.getType(),
+					matcher.r.getType());
 		} else {
-			Assert.assertFalse(inputString + "Match should not succeed", matcher.r.isSuccess());
+			// Ensure no match
+			Assert.assertFalse(inputString + "Match should not succeed.", matcher.r.isSuccess());
+			// Ensure context was properly reset
+			Assert.assertEquals(inputString + "Failed match should reset to original position.", 0,
+					matcher.context.getPosition());
 		}
 
 		// If we need a full match, ensure the context is at the end and the strings
 		// match exactly
 		if (requireFullMatch) {
-			Assert.assertTrue(inputString + "Input string should be exhausted", matcher.context.atEnd());
-			Assert.assertEquals(inputString + "Result data should match input", s, matcher.r.getData());
+			Assert.assertTrue(inputString + "Input string should be exhausted.", matcher.context.isAtEnd());
+			Assert.assertEquals(inputString + "Result data should match input.", s, matcher.r.getData());
 		}
 	}
 
@@ -171,10 +179,9 @@ public class PatternMatchingTestUtils {
 		Pattern p;
 		/** The Result of matching the pattern. */
 		Result r;
-		/**
-		 * Whether the thread has finished matching. If false after a given timeout, the
-		 * thread is likely stuck in an infinite loop.
-		 */
+		/** Stores any Exceptions that caused this matching thread's death. */
+		RuntimeException causeOfDeath;
+
 		boolean workDone = false;
 
 		/**
@@ -198,10 +205,16 @@ public class PatternMatchingTestUtils {
 		 */
 		@Override
 		public void run() {
-			r = p.lazyMatch(context);
-			workDone = true;
-			synchronized (this) {
-				this.notifyAll();
+			try {
+				r = p.lazyMatch(context);
+				workDone = true;
+				synchronized (this) {
+					this.notifyAll();
+				}
+			} catch (final RuntimeException e) {
+				causeOfDeath = e;
+				// Re-throw the exception so that we get that lovely stderr
+				throw e;
 			}
 		}
 	}

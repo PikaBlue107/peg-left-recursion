@@ -8,6 +8,8 @@ public class SimpleExpression extends Pattern {
 
 	private static final SimpleNumber num = new SimpleNumber();
 
+	private static final String TYPE = "Expression";
+
 	@Override
 	protected Result match(final InputContext context) {
 		Result result;
@@ -53,10 +55,8 @@ public class SimpleExpression extends Pattern {
 		if (!result.isSuccess()) {
 			return result;
 		}
-		// Successful match. Add the child result to the overall Expression children and
-		// append its data
+		// Successful match. Add the child result to the overall Expression result
 		expression.addChild(result);
-		expression.setData(expression.getData() + result.getData());
 
 		// Match plus
 		result = this.matchPlus(context);
@@ -66,7 +66,7 @@ public class SimpleExpression extends Pattern {
 		}
 		// Successful match. Append the child match's data
 		// TODO: Add the child result and flag it as "invisible"?
-		expression.setData(expression.getData() + result.getData());
+		expression.addChild(result);
 
 		// Match Num
 		result = num.lazyMatch(context);
@@ -74,17 +74,13 @@ public class SimpleExpression extends Pattern {
 		if (!result.isSuccess()) {
 			return result;
 		}
-		// Successful match. Add the child result to the overall Expression children and
-		// append its data
+		// Successful match. Add the child result to the overall Expression result
 		expression.addChild(result);
-		expression.setData(expression.getData() + result.getData());
-
-		expression.setEndIdx(result.getEndIdx());
 		return expression;
 	}
 
 	private Result matchPlus(final InputContext context) {
-		if (!context.atEnd() && context.currentDeriv().getChResult().isSuccess()
+		if (!context.isAtEnd() && context.currentDeriv().getChResult().isSuccess()
 				&& (context.currentDeriv().getChResult().getData().charAt(0) == '+')) {
 			System.out.println("Matched [" + context.currentDeriv().getChResult().getData() + "]");
 			context.advance();
@@ -108,6 +104,16 @@ public class SimpleExpression extends Pattern {
 	@Override
 	public boolean equals(final Object obj) {
 		return this == obj;
+	}
+
+	/**
+	 * Returns the type (name) of this Pattern.
+	 * 
+	 * @return the String type of this Pattern
+	 */
+	@Override
+	public String getType() {
+		return TYPE;
 	}
 
 }

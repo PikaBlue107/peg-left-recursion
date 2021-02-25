@@ -6,6 +6,9 @@ import structure.Result;
 
 public class SimpleNumber extends Pattern {
 
+	/** The Type of this pattern (display/reference name) */
+	private static final String TYPE = "Number";
+
 	@Override
 	protected Result match(final InputContext context) {
 		if (!context.currentDeriv().getChResult().isSuccess()
@@ -14,7 +17,7 @@ public class SimpleNumber extends Pattern {
 		}
 
 		final Result priorResult = new Result(true, context.currentChar(), context.getPosition());
-		priorResult.setType("Number");
+//		priorResult.setType("Number");
 
 		char match = context.next();
 
@@ -51,6 +54,14 @@ public class SimpleNumber extends Pattern {
 	@Override
 	public boolean equals(final Object obj) {
 		return this == obj;
+	}
+
+	/**
+	 * Provides the Type of this pattern
+	 */
+	@Override
+	public String getType() {
+		return TYPE;
 	}
 
 }

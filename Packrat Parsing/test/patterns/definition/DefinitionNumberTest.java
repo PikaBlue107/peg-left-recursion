@@ -13,9 +13,9 @@ import util.PatternTestUtils;
  * @author Melody Griesen
  *
  */
-public class SimpleNumberTest {
+public class DefinitionNumberTest {
 
-	private static final Pattern PATTERN = new SimpleNumber();
+	private static final Pattern PATTERN = new DefinitionNumber();
 
 	/**
 	 * @throws java.lang.Exception

@@ -3,24 +3,24 @@
  */
 package patterns.general;
 
-import structure.Derivation;
+import structure.InputContext;
 import structure.Result;
 
 /**
  * @author Melody Griesen
  *
  */
-public class PatternString extends Pattern {
+public class PatternString extends PatternComponent {
 
 	/** The string we're expecting to match. */
-	private String matchString;
+	private final String matchString;
 
 	/**
 	 * Constructs a PatternString with a string to match.
 	 * 
 	 * @param matchString
 	 */
-	public PatternString(String matchString) {
+	public PatternString(final String matchString) {
 		this.matchString = matchString;
 	}
 
@@ -28,44 +28,42 @@ public class PatternString extends Pattern {
 	 * Matches this pattern string by recursively matching one character at a time.
 	 */
 	@Override
-	protected Result match(Derivation derivation) {
-		// Use recursive helper
-		Result match = matchRemaining(matchString, derivation);
-		if (match.isSuccess()) {
-			// Success
-			match.setData(matchString);
-		}
-		return match;
-	}
+	protected Result match(final InputContext context) {
 
-	/**
-	 * Recursive method that matches a sequence of characters.
-	 * 
-	 * @param remainingPattern the String to match
-	 * @param remainingInput   the input to match against
-	 * @return a Result with empty value indicating a true/false match and, if true,
-	 *         the derivation we ended at.
-	 */
-	private Result matchRemaining(String remainingPattern, Derivation remainingInput) {
-		// Base case
-		if ("".equals(remainingPattern)) {
-			return new Result(true, null, remainingInput);
-		}
-		// Recursive case
-		else {
-			// Match the one character
-			if (remainingInput.getChResult().isSuccess()
-					&& remainingPattern.charAt(0) == remainingInput.getChResult().getData().charAt(0)) {
-				// Success
-				System.out.println("Matched [" + remainingPattern.charAt(0) + "]");
-				return matchRemaining(remainingPattern.substring(1), remainingInput.getChResult().getDerivation());
-			} else {
-				// Failure
-				System.out.println("Failed to match " + remainingPattern.charAt(0));
+		// Save initial position
+		final int initialPosition = context.getPosition();
+
+		// Use iterative solution
+		final Result match = new Result(true, "", initialPosition);
+
+		// Loop for each character of the target string
+		for (final char c : matchString.toCharArray()) {
+			// If the next character matches, accept
+			if (!context.isAtEnd() && (c == context.next())) {
+				// Add character to Result
+				match.addChar(c);
+				System.out.println("Matched [" + c + "]");
+			}
+			// Else, character doesn't match.
+			else {
+				// Pack up, go home.
+				// Reset context back to start
+				context.setPosition(initialPosition);
+				// Return failure
 				return Result.FAIL();
 			}
 		}
 
+		// Return successful match
+		return match;
+	}
+
+	/**
+	 * Generates a display string that shows the PatternString's match string
+	 */
+	@Override
+	public String toString() {
+		return "PatternString [matchString=" + matchString + "]";
 	}
 
 	/**
@@ -75,7 +73,7 @@ public class PatternString extends Pattern {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((matchString == null) ? 0 : matchString.hashCode());
+		result = (prime * result) + ((matchString == null) ? 0 : matchString.hashCode());
 		return result;
 	}
 
@@ -83,19 +81,24 @@ public class PatternString extends Pattern {
 	 * Declares that two PatternString objects are equal if their String matches.
 	 */
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
+	public boolean equals(final Object obj) {
+		if (this == obj) {
 			return true;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
-		PatternString other = (PatternString) obj;
+		}
+		final PatternString other = (PatternString) obj;
 		if (matchString == null) {
-			if (other.matchString != null)
+			if (other.matchString != null) {
 				return false;
-		} else if (!matchString.equals(other.matchString))
+			}
+		} else if (!matchString.equals(other.matchString)) {
 			return false;
+		}
 		return true;
 	}
 
