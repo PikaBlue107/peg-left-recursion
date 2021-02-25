@@ -6,14 +6,14 @@ package patterns.general;
 import java.util.ArrayList;
 import java.util.List;
 
-import structure.Derivation;
+import structure.InputContext;
 import structure.Result;
 
 /**
  * @author Melody Griesen
  *
  */
-public class PatternSequence extends Pattern {
+public class PatternSequence extends PatternComponent {
 
 	/** List of patterns to match one after another. */
 	private List<Pattern> patterns;
@@ -29,10 +29,11 @@ public class PatternSequence extends Pattern {
 	 * 
 	 * @param patterns the sequence of patterns to match
 	 */
-	public PatternSequence(Pattern... patterns) {
+	public PatternSequence(final Pattern... patterns) {
 		// For each Pattern in the list, add it to the ArrayList
-		for (Pattern p : patterns)
+		for (final Pattern p : patterns) {
 			this.patterns.add(p);
+		}
 	}
 
 	/**
@@ -41,7 +42,7 @@ public class PatternSequence extends Pattern {
 	 * 
 	 * @param patterns the sequence of patterns to match
 	 */
-	public PatternSequence(List<Pattern> patterns) {
+	public PatternSequence(final List<Pattern> patterns) {
 		this.patterns.addAll(patterns);
 	}
 
@@ -52,7 +53,7 @@ public class PatternSequence extends Pattern {
 	 * @param toAdd the new pattern to match after all previous patterns
 	 * @return this PatternSequence object for multiple chainings of this method
 	 */
-	public PatternSequence add(Pattern toAdd) {
+	public PatternSequence add(final Pattern toAdd) {
 		// Add the new pattern to the end of the list
 		patterns.add(toAdd);
 		// Return this object for method chaining
@@ -69,25 +70,29 @@ public class PatternSequence extends Pattern {
 	 *         if failure
 	 */
 	@Override
-	protected Result match(Derivation derivation) {
+	protected Result match(final InputContext context) {
 		// Run through the list of patterns to match
 		// Keep track of the previous pattern's result
-		Result result = new Result(true, null, derivation);
+		final Result sequence = new Result(true, "", context.getPosition());
+		Result result;
 		// Loop over all patterns
-		for (Pattern p : patterns) {
+		for (final Pattern p : patterns) {
 			// Attempt to match this pattern
-			result = p.lazyMatch(result.getDerivation());
+			result = p.lazyMatch(context);
 			// If fail, return it
-			if (!result.isSuccess())
+			if (!result.isSuccess()) {
+				// Reset the context first
+				context.setPosition(sequence.getStartIdx());
 				return result;
-			// Otherwise, use its result to try the next one.
+				// Otherwise, use its result to try the next one.
+			}
+			// Otherwise, add its contents into the Result
+			sequence.addChild(result);
 		}
 
 		// Looped over all patterns successfully. Send result!
-		return result;
+		return sequence;
 	}
-	
-
 
 	/**
 	 * Assigns a unique hash code based on the contents of the patterns list.
@@ -96,27 +101,33 @@ public class PatternSequence extends Pattern {
 	public int hashCode() {
 		final int prime = 31;
 		int result = super.hashCode();
-		result = prime * result + ((patterns == null) ? 0 : patterns.hashCode());
+		result = (prime * result) + ((patterns == null) ? 0 : patterns.hashCode());
 		return result;
 	}
 
 	/**
-	 * Declares that two PatternSequence objects are only equal if they have the same sequence of Patterns.
+	 * Declares that two PatternSequence objects are only equal if they have the
+	 * same sequence of Patterns.
 	 */
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
+	public boolean equals(final Object obj) {
+		if (this == obj) {
 			return true;
-		if (!super.equals(obj))
+		}
+		if (!super.equals(obj)) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (getClass() != obj.getClass()) {
 			return false;
-		PatternSequence other = (PatternSequence) obj;
+		}
+		final PatternSequence other = (PatternSequence) obj;
 		if (patterns == null) {
-			if (other.patterns != null)
+			if (other.patterns != null) {
 				return false;
-		} else if (!patterns.equals(other.patterns))
+			}
+		} else if (!patterns.equals(other.patterns)) {
 			return false;
+		}
 		return true;
 	}
 
