@@ -7,7 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import patterns.general.Pattern;
-import util.PatternMatchingTestUtils;
+import util.PatternTestUtils;
 
 /**
  * @author Melody Griesen
@@ -26,17 +26,17 @@ public class SimpleNumberTest {
 
 	@Test
 	public void testValidMatches() {
-		PatternMatchingTestUtils.assertPatternMatches(PATTERN, "1");
-		PatternMatchingTestUtils.assertPatternMatches(PATTERN, "12345");
-		PatternMatchingTestUtils.assertPatternMatches(PATTERN, "1230190123981");
+		PatternTestUtils.assertMatches(PATTERN, "1");
+		PatternTestUtils.assertMatches(PATTERN, "12345");
+		PatternTestUtils.assertMatches(PATTERN, "1230190123981");
 	}
 
 	@Test
 	public void testRejectsEmpty() {
-		PatternMatchingTestUtils.assertPatternRejects(PATTERN, "");
-		PatternMatchingTestUtils.assertPatternRejects(PATTERN, "a");
-		PatternMatchingTestUtils.assertPatternRejects(PATTERN, " ");
-		PatternMatchingTestUtils.assertPatternRejects(PATTERN, "-");
+		PatternTestUtils.assertRejects(PATTERN, "");
+		PatternTestUtils.assertRejects(PATTERN, "a");
+		PatternTestUtils.assertRejects(PATTERN, " ");
+		PatternTestUtils.assertRejects(PATTERN, "-");
 	}
 
 }
