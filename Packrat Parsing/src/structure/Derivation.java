@@ -8,7 +8,7 @@ import patterns.general.Pattern;
 public class Derivation implements Comparable<Derivation> {
 
 	/** The character held at this derivation. */
-	private Result ch;
+	private final Result ch;
 
 	/** The index of this Derivation in the String, 1-indexed. */
 	private final int index;
@@ -25,27 +25,28 @@ public class Derivation implements Comparable<Derivation> {
 	 * 
 	 * @param str the input String that this Derivation will track
 	 */
-	public Derivation(final String str) {
-		this(str, 0);
+	public Derivation(final char ch, final int index) {
+		this.ch = new Result(true, ch, index);
+		this.index = index;
 	}
 
-	/**
-	 * Constructs a Derivation with the String that it must represent. This
-	 * Derivation takes the full string and the index that this Derivation occupies
-	 * in the string, saves its character in a Result, and constructs the next
-	 * Derivation in that Result.
-	 * 
-	 * @param str   the input String that this Derivation will track
-	 * @param index the index of the String that this Derivation will occupy
-	 */
-	private Derivation(final String str, final int index) {
-		this.index = index;
-		if (index == str.length()) {
-			ch = new Result(false, null, null);
-		} else {
-			ch = new Result(true, "" + str.charAt(index), new Derivation(str, index + 1));
-		}
-	}
+//	/**
+//	 * Constructs a Derivation with the String that it must represent. This
+//	 * Derivation takes the full string and the index that this Derivation occupies
+//	 * in the string, saves its character in a Result, and constructs the next
+//	 * Derivation in that Result.
+//	 *
+//	 * @param str   the input String that this Derivation will track
+//	 * @param index the index of the String that this Derivation will occupy
+//	 */
+//	private Derivation(final char ch, final int index) {
+//		this.index = index;
+//		if (index == str.length()) {
+//			ch = new Result(false, null, null);
+//		} else {
+//			ch = new Result(true, "" + str.charAt(index), new Derivation(str, index + 1));
+//		}
+//	}
 
 //	/**
 //	 * Provides the number of characters until the end of the String, from this

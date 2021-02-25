@@ -25,12 +25,9 @@ public class Result {
 
 	/** The sub-matches within this Result. */
 	private final List<Result> children;
-
-	/**
-	 * The Derivation that this result gives (the remaining unmatched characters
-	 * after this result is acquired).
-	 */
-	private Derivation derivation;
+	{
+		this.children = new ArrayList<>();
+	}
 
 	/**
 	 * Generates a new fail Result for quick use in pattern definitions.
@@ -38,25 +35,47 @@ public class Result {
 	 * @return a Result representing a failed match.
 	 */
 	public static final Result FAIL() {
-		return new Result(false, null, null);
+		return new Result(false, "", -1);
+	}
+
+	/**
+	 * Generates a Result with a single initial character, intended for when you
+	 * want to construct a Result with one initially matched character and then add
+	 * on new characters iteratively.
+	 * 
+	 * @param success   whether the Result indicates a successful match
+	 * @param firstData the first character matched in this Result
+	 * @param startIdx  the index at which the match for this Result begins
+	 */
+	public Result(final boolean success, final char firstData, final int startIdx) {
+		this(success, "" + firstData, startIdx);
 	}
 
 	/**
 	 * @param success
-	 * @param value
+	 * @param data
 	 * @param derivation
 	 */
-	public Result(final boolean success, final String value, final Derivation derivation) {
-		this(success, value, derivation, LeftRecursionStatus.POSSIBLE);
+	public Result(final boolean success, final String data, final int startIdx) {
+		this(success, data, startIdx, LeftRecursionStatus.POSSIBLE);
 	}
 
-	public Result(final boolean success, final String data, final Derivation derivation,
+	public Result(final boolean success, final String data, final int startIdx,
 			final LeftRecursionStatus leftRecursionStatus) {
 		this.success = success;
 		this.data = data;
-		this.derivation = derivation;
 		this.lRStatus = leftRecursionStatus;
-		this.children = new ArrayList<>();
+		this.startIdx = startIdx;
+		if (success) {
+			this.endIdx = startIdx + data.length();
+		} else {
+			this.endIdx = -1;
+		}
+	}
+
+	public void addChar(final char nextData) {
+		this.data += nextData;
+		this.endIdx++;
 	}
 
 	/**
@@ -85,20 +104,6 @@ public class Result {
 	 */
 	public void setData(final String data) {
 		this.data = data;
-	}
-
-	/**
-	 * @return the derivation
-	 */
-	public Derivation getDerivation() {
-		return derivation;
-	}
-
-	/**
-	 * @param derivation the derivation to set
-	 */
-	public void setDerivation(final Derivation derivation) {
-		this.derivation = derivation;
 	}
 
 	/**

@@ -1,6 +1,7 @@
 package patterns.general;
 
 import structure.Derivation;
+import structure.InputContext;
 import structure.Result;
 import structure.Result.LeftRecursionStatus;
 
@@ -33,34 +34,43 @@ public abstract class Pattern {
 	 * Grows left-recursive rules from a seed by iteratively re-calculating them
 	 * with more memoized results until they cannot match any more.
 	 * 
-	 * @param derivation the derivation to begin growing from. This derivation
-	 *                   should already have a seed planted for this pattern before
-	 *                   calling this method.
+	 * @param context the derivation to begin growing from. This derivation should
+	 *                already have a seed planted for this pattern before calling
+	 *                this method.
 	 * @return the final Result of growing the left-recursive Pattern, also saved in
 	 *         the Derivation.
 	 */
-	private Result growLeftRecursion(final Derivation derivation) {
+	private Result growLeftRecursion(final InputContext context, final int initialPosition) {
 		Result attempt;
+		int farthestMatchEndPos;
 		// Loop until we find a special case
 		while (true) {
+			// Reset to the beginning to check this case
+			context.setPosition(initialPosition);
+			// Check the farthest match we've gotten so far
+			farthestMatchEndPos = context.currentDeriv().resultFor(this).getEndIdx();
+
 			// Start matching from this current derivation we're given
 			// Attempt to *match* the Pattern (this one) against the Derivation
-			attempt = match(derivation);
+			attempt = match(context);
+			// Ensure that this attempt is labeled as left-recursive
+			attempt.setLRStatus(LeftRecursionStatus.DETECTED);
 
 			// If we didn't make any progress, then exit
-			if (!attempt.isSuccess()
-					|| (attempt.getDerivation().compareTo(derivation.resultFor(this).getDerivation()) < 0)) {
+			if (!attempt.isSuccess() || (context.getPosition() <= farthestMatchEndPos)) {
 				break;
 			}
 
 			// Otherwise, update the Derivation's memoized Result with the one we just
 			// calculated, and try to match again!
-//			result.setSuccess(attempt.isSuccess()); // TODO: Is this necessary?
-//			result.setDerivation(attempt.getDerivation());
-			derivation.setResultFor(this, attempt);
+			context.getDerivation(initialPosition).setResultFor(this, attempt);
 		}
 
-		return derivation.resultFor(this);
+		// Set the context to rest at the end of the farthest match we were able to find
+		context.setPosition(farthestMatchEndPos);
+
+		// Return the result for the overall match
+		return context.getDerivation(initialPosition).resultFor(this);
 	}
 
 	/**
@@ -69,19 +79,27 @@ public abstract class Pattern {
 	 * calculates the Result of the match, saves it to the Derivation for future
 	 * use, and returns it.
 	 * 
-	 * @param derivation
+	 * @param context
 	 * @return
 	 */
-	public final Result lazyMatch(final Derivation derivation) {
+	public final Result lazyMatch(final InputContext context) {
+
+		// If context is at its end, reject
+		if (context.atEnd()) {
+			return Result.FAIL();
+		}
 
 		// let m = MEMO(R,P)
 		// Let m hold the "known" result of applying this Rule at this Position
 		// Let m hold the "known" result of applying this Pattern at this Derivation
-		Result m = derivation.resultFor(this);
+		Result m = context.currentDeriv().resultFor(this);
 
 		// if m = NIL
 		// If the "known" result does not yet exist
 		if (m == null) {
+
+			// Save the initial position before matching in case we need to grow the match
+			final int initialPosition = context.getPosition();
 
 			// let lr = new LR(FALSE)
 			// Create a new LeftRecursion tracker that says this rule is suspected but not
@@ -100,16 +118,17 @@ public abstract class Pattern {
 			// failure memo
 			// Set the Result for applying this Pattern on this Derivation to be m, the
 			// failure Result
-			derivation.setResultFor(this, m);
+			final Derivation startMatch = context.currentDeriv();
+			startMatch.setResultFor(this, m);
 
 			// let ans = EVAL(R.body)
 			// Evaluate the Rule at this position, saving the answer in the field "ans"
 			// Attempt to match the Pattern on this Derivation, saving the Result in the
 			// field "ans"
-			final Result ans = match(derivation);
+			final Result ans = match(context);
 
 			ans.setLRStatus(m.getLRStatus());
-			derivation.setResultFor(this, ans);
+			startMatch.setResultFor(this, ans);
 
 			// m.ans = ans
 			// Set the memoized answer equal to the answer from evaluating the rule at this
@@ -137,7 +156,7 @@ public abstract class Pattern {
 				// re-evaluated to consume any more input
 				// return the result of growing the left-recursive Pattern until it cannot be
 				// re-evaluated to consume any more input
-				return growLeftRecursion(derivation);
+				return growLeftRecursion(context, initialPosition);
 
 			} else {
 				// Set left recursion status to impossible, since we didn't get a simultaneous
@@ -151,9 +170,14 @@ public abstract class Pattern {
 			}
 
 		} else {
+
 			// Pos = m.pos
 			// Set the current position of parsing equal to the result m's position
-			// // handled implicitly by returning the Result object
+			// If the result is a success, set the current position of the context equal to
+			// the result m's end index
+			if (m.isSuccess()) {
+				context.setPosition(m.getEndIdx());
+			}
 
 			// if m.ans is LR
 			// if the current memoised answer of the rule application is LR, then this else
@@ -179,13 +203,14 @@ public abstract class Pattern {
 				// end this iteration with a failure so that we can find a seed later on in the
 				// Pattern
 				assert !m.isSuccess();
-				return m; // TODO: Experiment with returning m vs returning Result.FAIL()
 			} else {
 				// return m.ans
 				// Return the answer of applying the rule at this position
 				// Return the Result of applying the rule at this position
-				return m;
 			}
+
+			// Return the result of applying the rule at this position
+			return m;
 
 		}
 
@@ -211,7 +236,7 @@ public abstract class Pattern {
 	 * @return a Result indicating whether the match was successful, and if so, how
 	 *         much was consumed by this match.
 	 */
-	protected abstract Result match(Derivation derivation);
+	protected abstract Result match(InputContext context);
 
 	/**
 	 * Generates (the base of) a unique hash code for this Pattern. By default, all
