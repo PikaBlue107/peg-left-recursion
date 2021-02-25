@@ -123,11 +123,6 @@ public abstract class Pattern {
 	 */
 	public final Result lazyMatch(final InputContext context) {
 
-		// If context is at its end, reject
-		if (context.isAtEnd()) {
-			return Result.FAIL();
-		}
-
 		// If this pattern has no Type or is an alias, delegate immediately to match()
 		if ((this.getType() == null) || this.isAlias()) {
 
