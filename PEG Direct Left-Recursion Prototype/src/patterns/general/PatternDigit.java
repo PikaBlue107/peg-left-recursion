@@ -26,7 +26,7 @@ public class PatternDigit extends PatternComponent {
 		// Determines if the derivation character is a digit
 		if (Character.isDigit(ch)) {
 			// Is a digit! Success
-			System.out.println("Matched [" + ch + "]");
+			context.addHistory("Matched [" + ch + "]");
 			context.advance();
 			return new Result(true, ch, context.getPosition() - 1);
 		} else {
