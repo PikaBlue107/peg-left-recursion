@@ -1,0 +1,5 @@
+# We don't want to store the compiled classes
+/bin/
+
+# We don't want to store all of the examples that are generated
+examples

@@ -3,6 +3,10 @@
  */
 package util;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.lang.management.ManagementFactory;
 
 import org.junit.Assert;
@@ -18,10 +22,12 @@ import structure.Result;
 public class PatternTestUtils {
 
 	/**
-	 * Time (in miliseconds) after which the test runner will kill any matching
+	 * Time (in milliseconds) after which the test runner will kill any matching
 	 * threads seemingly stuck in an infinite loop.
 	 */
 	private static final int TIMEOUT = 10;
+
+	private static final String PATH_EXAMPLES = "examples";
 
 	/**
 	 * Ensures that the provided pattern matches against the input string. Pattern
@@ -56,6 +62,49 @@ public class PatternTestUtils {
 	}
 
 	/**
+	 * Runs an example match, printing the results to stdout and to a file.
+	 *
+	 * @param p pattern to attempt to match
+	 * @param s input string to use
+	 */
+	public static void showExample(final Pattern p, final String s, final String caseName) {
+
+		// Build a string to save
+		final StringBuilder exampleOutput = new StringBuilder();
+
+		// Save the case information
+		if (caseName != null) {
+			exampleOutput.append("Case: " + caseName + "\n");
+		}
+		// Run the main match
+		final KillablePatternMatcher matcher = runCase(p, s);
+
+		// Save the output of the test
+		exampleOutput.append(matcher.scenario + "\n");
+		exampleOutput.append("Result tree:" + "\n");
+		exampleOutput.append(matcher.r.printResultTree() + "\n");
+		exampleOutput.append("\n");
+
+		// Print the output to stdout
+		System.out.println(exampleOutput);
+
+		// Write to a file
+		// Calculate path
+		final String folderPath = PATH_EXAMPLES + "/" + p.getType();
+		final String filePath = folderPath + "/" + caseName + ".txt";
+		// Ensure folder path is written
+		final File destinationFolder = new File(folderPath);
+		destinationFolder.mkdirs();
+		// Create a file writer, and write it out.
+		try (final BufferedWriter writer = new BufferedWriter(new FileWriter(filePath, false));) {
+			writer.append(exampleOutput);
+		} catch (final IOException e) {
+			// If the file can't be written to, complain.
+			e.printStackTrace();
+		}
+	}
+
+	/**
 	 * Hack-y method to check if we're running in the debugger. Used to only kill
 	 * matching threads if we're *not* in the Debugger.
 	 * 
@@ -85,20 +134,64 @@ public class PatternTestUtils {
 	 * @param requireFullMatch whether the result should exactly match the input
 	 *                         string
 	 */
-	@SuppressWarnings("deprecation") // we don't have any other way to forcefully kill a thread that is stuck in an
-										// infinite loop
 	private static void assertPatternAgainstExpected(final Pattern p, final String s, final boolean expectedSuccess,
 			final boolean requireFullMatch) {
 
-		final StringBuilder inputStringBuilder = new StringBuilder();
-		inputStringBuilder.append("Test case:\n").append("\tInput: [").append(s).append("]\n").append("\tPattern: ")
-				.append(p.toString()).append("\n").append("\tPattern should: ")
-				.append((expectedSuccess) ? "accept" : "reject").append("\n").append("\tExpecting full match: ")
-				.append(requireFullMatch).append("\n");
-		String inputString = inputStringBuilder.toString();
+		final KillablePatternMatcher matcher = runCase(p, s);
 
+		// If we're here, we have a valid run! Check our conditions.
+
+		// Snag an easy reference to the input string
+		final StringBuilder scenario = matcher.scenario;
+
+		// Add match expected success or failure
+		matcher.scenario.append("\tPattern should: ").append((expectedSuccess) ? "accept" : "reject").append("\n")
+				.append("\tExpecting full match: ").append(requireFullMatch).append("\n");
+
+		// Expect success or failure
+		if (expectedSuccess) {
+			// Ensure positive match
+			Assert.assertTrue(scenario + "Failure: Match did not succeed.", matcher.r.isSuccess());
+			// Ensure the match is a prefix of the original string
+			Assert.assertTrue(scenario + "Failure: Match was greater than input in length.",
+					matcher.r.getData().length() <= s.length());
+			Assert.assertEquals(scenario + "Failure: Match was not a prefix of input.",
+					s.substring(0, matcher.r.getData().length()), matcher.r.getData());
+			// Ensure match's type matches pattern's type
+			Assert.assertEquals(scenario + "Failure: Match Result's type did not match Pattern's type.", p.getType(),
+					matcher.r.getType());
+		} else {
+			// Ensure no match
+			Assert.assertFalse(scenario + "Failure: Match succeeded when it shouldn't have.", matcher.r.isSuccess());
+			// Ensure context was properly reset
+			Assert.assertEquals(scenario + "Failure: Failed match did not reset to original position.", 0,
+					matcher.context.getPosition());
+		}
+
+		// If we need a full match, ensure the context is at the end and the strings
+		// match exactly
+		if (requireFullMatch) {
+			Assert.assertTrue(scenario + "Failure: Input string was not exhausted.", matcher.context.isAtEnd());
+			Assert.assertEquals(scenario + "Failure: Result data did not match input.", s, matcher.r.getData());
+		}
+	}
+
+	/**
+	 * Runs a test case, constructing a KillablePatternMatcher and allowing it to
+	 * execute. If the matcher gets stuck in a loop, fails. If the matcher dies from
+	 * an exception, fails. Otherwise, update the matcher with the result of the
+	 * request and return the finished matcher.
+	 *
+	 * @param p the pattern to use for matching
+	 * @param s the String to attempt to match
+	 * @return the finished PatternMatcher thread with the results of the case.
+	 */
+	@SuppressWarnings("deprecation") // we don't have any other way to forcefully kill a thread that is stuck in an
+	// infinite loop
+	private static KillablePatternMatcher runCase(final Pattern p, final String s) {
 		// Create match thread to protect ourselves against infinite loops
 		final KillablePatternMatcher matcher = new KillablePatternMatcher(s, p);
+
 		try {
 			// Start the thread and give it a chance to finish
 			synchronized (matcher) {
@@ -117,7 +210,7 @@ public class PatternTestUtils {
 		// If it's stuck in an infinite loop, then fail by that reason.
 		if (matcher.isAlive() && !matcher.workDone) {
 			matcher.stop();
-			Assert.fail(inputString + "Test timed out after " + TIMEOUT + " miliseconds.");
+			Assert.fail(matcher.scenario + "Test timed out after " + TIMEOUT + " miliseconds.");
 		}
 
 		// If the exception knows its cause of death, then print that exception.
@@ -127,41 +220,15 @@ public class PatternTestUtils {
 			// reason instead.
 			System.out.println(
 					"The above exception caused the matcher thread to fail for the test with the following conditions.\n"
-							+ inputString);
-//			Assert.fail(inputString + "The given test case killed the matching thread with an unhandled exception.");
+							+ matcher.scenario);
+//					Assert.fail(inputString + "The given test case killed the matching thread with an unhandled exception.");
 			throw matcher.causeOfDeath; //
 		}
 
-		inputString += "\tMatch: [" + matcher.r.getData() + "]\n";
+		// Add the result of the match
+		matcher.scenario.append("\tMatch: [" + matcher.r.getData() + "]\n");
 
-		// If we're here, we have a valid run! Check our conditions.
-
-		// Expect success or failure
-		if (expectedSuccess) {
-			// Ensure positive match
-			Assert.assertTrue(inputString + "Match should succeed.", matcher.r.isSuccess());
-			// Ensure the match is a prefix of the original string
-			Assert.assertTrue(inputString + "Match should be less or equal to input in length.",
-					matcher.r.getData().length() <= s.length());
-			Assert.assertEquals(inputString + "Match should be a prefix of input.",
-					s.substring(0, matcher.r.getData().length()), matcher.r.getData());
-			// Ensure match's type matches pattern's type
-			Assert.assertEquals(inputString + "Match Result's type should match Pattern's type.", p.getType(),
-					matcher.r.getType());
-		} else {
-			// Ensure no match
-			Assert.assertFalse(inputString + "Match should not succeed.", matcher.r.isSuccess());
-			// Ensure context was properly reset
-			Assert.assertEquals(inputString + "Failed match should reset to original position.", 0,
-					matcher.context.getPosition());
-		}
-
-		// If we need a full match, ensure the context is at the end and the strings
-		// match exactly
-		if (requireFullMatch) {
-			Assert.assertTrue(inputString + "Input string should be exhausted.", matcher.context.isAtEnd());
-			Assert.assertEquals(inputString + "Result data should match input.", s, matcher.r.getData());
-		}
+		return matcher;
 	}
 
 	/**
@@ -181,6 +248,8 @@ public class PatternTestUtils {
 		Result r;
 		/** Stores any Exceptions that caused this matching thread's death. */
 		RuntimeException causeOfDeath;
+		/** String representing the case that this matcher was run on. */
+		StringBuilder scenario;
 
 		boolean workDone = false;
 
@@ -194,6 +263,10 @@ public class PatternTestUtils {
 		public KillablePatternMatcher(final String s, final Pattern p) {
 			context = new InputContext(s);
 			this.p = p;
+
+			scenario = new StringBuilder();
+			scenario.append("Test case:\n").append("\tInput: [").append(s).append("]\n").append("\tPattern: ")
+					.append(p.toString()).append("\n");
 		}
 
 		/**
