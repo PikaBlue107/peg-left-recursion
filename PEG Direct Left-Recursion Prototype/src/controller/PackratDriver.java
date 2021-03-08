@@ -8,7 +8,7 @@ import structure.Result;
 public class PackratDriver {
 
 	/** Test string to use for each run. */
-	private static final String TEST_STRING = "1+2";
+	private static final String TEST_STRING = "1+25+7";
 
 	/**
 	 * Main launch point of the program. Sandbox. Playground. Laboratory.
@@ -17,7 +17,7 @@ public class PackratDriver {
 	 */
 	public static void main(final String[] args) {
 
-		// Create the Derivations
+		// Create the Input context
 		final InputContext input = new InputContext(TEST_STRING);
 
 		// Create the pattern

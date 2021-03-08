@@ -3,6 +3,9 @@
  */
 package structure;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Represents the current position of the parser in the input string. Allows
  * operations on the input string such as character retrieval and position
@@ -23,6 +26,13 @@ public class InputContext {
 	 * How far the InputContext will print to either side when running toString()
 	 */
 	private int printRange;
+
+	/**
+	 * List of all "events" that have happened in the context (matching,
+	 * backtracking, etc.)
+	 */
+	private final List<String> history = new ArrayList<>();
+
 	/**
 	 * The default number of characters that toString() will print to either side.
 	 */
@@ -179,6 +189,25 @@ public class InputContext {
 	 */
 	public void setPrintRange(final int printRange) {
 		this.printRange = printRange;
+	}
+
+	/**
+	 * Adds the given entry into the context's history list.
+	 *
+	 * @param entry the entry to add to the end of the history.
+	 */
+	public void addHistory(final String entry) {
+		this.history.add(entry);
+	}
+
+	/**
+	 * Provides the context's history in Iterable form, allowing a user to construct
+	 * a string with each entry in this context's history in their desired format.
+	 * 
+	 * @return an Iterable of String objects stored in this context's history
+	 */
+	public Iterable<String> getHistory() {
+		return history;
 	}
 
 	/**

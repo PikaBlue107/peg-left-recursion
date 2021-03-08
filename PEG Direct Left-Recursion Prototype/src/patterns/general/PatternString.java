@@ -42,7 +42,7 @@ public class PatternString extends PatternComponent {
 			if (!context.isAtEnd() && (c == context.next())) {
 				// Add character to Result
 				match.addChar(c);
-				System.out.println("Matched [" + c + "]");
+				context.addHistory("Matched [" + c + "]");
 			}
 			// Else, character doesn't match.
 			else {

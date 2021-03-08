@@ -22,7 +22,7 @@ public class SimpleNumber extends Pattern {
 		char match = context.next();
 
 		// Indicate that we matched at least one number
-		System.out.println("Matched [" + match + "]");
+		context.addHistory("Matched [" + match + "]");
 
 		// While next step is a valid character
 		while (context.checkChar(Character::isDigit)) {
@@ -31,7 +31,7 @@ public class SimpleNumber extends Pattern {
 			match = context.next();
 
 			// Indicate that we matched that digit
-			System.out.println("Matched [" + match + "]");
+			context.addHistory("Matched [" + match + "]");
 
 			// Add matched character into Result
 			priorResult.addChar(match);
