@@ -69,18 +69,26 @@ public class PatternTestUtils {
 	 */
 	public static void showExample(final Pattern p, final String s, final String caseName) {
 
+		// Error checking on case name
+		if ((caseName == null) || "".equals(caseName)) {
+			throw new IllegalArgumentException("Example test needs to provide a valid caseName.");
+		}
+
+		// Run the main match
+		final KillablePatternMatcher matcher = runCase(p, s);
+
 		// Build a string to save
 		final StringBuilder exampleOutput = new StringBuilder();
 
 		// Save the case information
-		if (caseName != null) {
-			exampleOutput.append("Case: " + caseName + "\n");
-		}
-		// Run the main match
-		final KillablePatternMatcher matcher = runCase(p, s);
+		exampleOutput.append("Example case:\n\t" + caseName + "\n");
+		exampleOutput.append(matcher.scenario);
 
 		// Save the output of the test
-		exampleOutput.append(matcher.scenario + "\n");
+		exampleOutput.append("Match history: \n");
+		for (final String historyEntry : matcher.context.getHistory()) {
+			exampleOutput.append("\t" + historyEntry + "\n");
+		}
 		exampleOutput.append("Result tree:" + "\n");
 		exampleOutput.append(matcher.r.printResultTree() + "\n");
 		exampleOutput.append("\n");
@@ -216,17 +224,24 @@ public class PatternTestUtils {
 		// If the exception knows its cause of death, then print that exception.
 		if (matcher.causeOfDeath != null) {
 
-			// If it died because of an Exception or other natural cause, fail by that
-			// reason instead.
-			System.out.println(
-					"The above exception caused the matcher thread to fail for the test with the following conditions.\n"
-							+ matcher.scenario);
-//					Assert.fail(inputString + "The given test case killed the matching thread with an unhandled exception.");
-			throw matcher.causeOfDeath; //
+			// If it died because of an Exception or other natural cause, let the user know.
+			System.out.println("The matcher thread for the following test case was killed by the above exception.");
+			System.out.print(matcher.scenario);
+//			matcher.causeOfDeath.printStackTrace();
+			System.out.println();
+
+			// Re-throw the exception for that lovely red X.
+			throw matcher.causeOfDeath;
 		}
 
 		// Add the result of the match
-		matcher.scenario.append("\tMatch: [" + matcher.r.getData() + "]\n");
+		matcher.scenario.append("Test result:\n\t");
+		if (matcher.r.isSuccess()) {
+			matcher.scenario.append("Matched [" + matcher.r.getData() + "]");
+		} else {
+			matcher.scenario.append("Rejected");
+		}
+		matcher.scenario.append("\n");
 
 		return matcher;
 	}
@@ -265,8 +280,8 @@ public class PatternTestUtils {
 			this.p = p;
 
 			scenario = new StringBuilder();
-			scenario.append("Test case:\n").append("\tInput: [").append(s).append("]\n").append("\tPattern: ")
-					.append(p.toString()).append("\n");
+			scenario.append("Test scenario:\n").append("\tInput: [").append(s).append("]\n").append("\tPattern type: ")
+					.append(p.getType()).append("\n").append("\tPattern toString: ").append(p.toString()).append("\n");
 		}
 
 		/**

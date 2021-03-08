@@ -22,6 +22,7 @@ public class DefinitionExpressionTest {
 	@Test
 	public void showExampleLeftRecursion() {
 		showExample(PATTERN, "1+2", "Simple Expression");
+		showExample(PATTERN, "a", "Just not an Expression");
 	}
 
 	@Test
