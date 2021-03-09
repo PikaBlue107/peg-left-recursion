@@ -3,6 +3,9 @@
  */
 package patterns.general;
 
+import static util.PatternTestUtils.assertMatchesExact;
+import static util.PatternTestUtils.assertRejects;
+
 import org.junit.Test;
 
 /**
@@ -11,74 +14,58 @@ import org.junit.Test;
  */
 public class PatternPredicateTest {
 
-//	Pattern pattern;
+	/** Test object used for testing. */
+	Pattern pattern;
 
-//	private static final Pattern digit = new PatternPredicate();
+	/** String used in predicate. */
+	private static final String PREDICATE = "do";
 
+	/** Pattern used as predicate. */
+	private static final Pattern string = new PatternString(PREDICATE);
+
+	/**
+	 * Tests that variations of the And predicate accept strings that begin with the
+	 * predicate, but don't match any input. Strings that don't begin with the
+	 * predicate are rejected.
+	 */
 	@Test
-	public void testData() {
+	public void testAndPredicate() {
 
-//		// Test improper calls
-//		Assert.assertThrows(IllegalArgumentException.class, () -> {
-//			new PatternRepetition(null, 0, 1);
-//		});
-//		Assert.assertThrows(IllegalArgumentException.class, () -> {
-//			new PatternRepetition(digit, -1, 1);
-//		});
-//		Assert.assertThrows(IllegalArgumentException.class, () -> {
-//			new PatternRepetition(digit, 0, -2);
-//		});
+		pattern = new PatternPredicate(string, true);
+
+		assertMatchesExact(pattern, "doing", "");
+		assertMatchesExact(pattern, "double", "");
+		assertMatchesExact(pattern, "doubt", "");
+		assertMatchesExact(pattern, "do", "");
+
+		assertRejects(pattern, "da");
+		assertRejects(pattern, "oo");
+		assertRejects(pattern, "");
+		assertRejects(pattern, "d");
+		assertRejects(pattern, "ado");
 
 	}
 
+	/**
+	 * Tests that variations of the Not predicate accept strings that do not begin
+	 * with the predicate, but don't match any input. Strings that do begin with the
+	 * predicate are rejected.
+	 */
 	@Test
-	public void testStar() {
-//		// Pattern allows 0-infinity matches
-//		pattern = new PatternRepetition(digit, 0, -1);
-//
-//		PatternTestUtils.assertMatches(pattern, "");
-//		PatternTestUtils.assertMatches(pattern, "1");
-//		PatternTestUtils.assertMatches(pattern, "12");
-//		PatternTestUtils.assertMatches(pattern, "123");
-//		PatternTestUtils.assertMatches(pattern, "1234");
-	}
+	public void testNotPredicate() {
 
-	@Test
-	public void testPlus() {
-//		// Pattern allows 1-infinity matches
-//		pattern = new PatternRepetition(digit, 1, -1);
-//
-//		PatternTestUtils.assertRejects(pattern, "");
-//		PatternTestUtils.assertMatches(pattern, "1");
-//		PatternTestUtils.assertMatches(pattern, "12");
-//		PatternTestUtils.assertMatches(pattern, "123");
-//		PatternTestUtils.assertMatches(pattern, "1234");
+		pattern = new PatternPredicate(string, false);
 
-	}
+		assertRejects(pattern, "doing");
+		assertRejects(pattern, "double");
+		assertRejects(pattern, "doubt");
+		assertRejects(pattern, "do");
 
-	@Test
-	public void testRange() {
-//		// Pattern allows 1-3 matches
-//		pattern = new PatternRepetition(digit, 1, 3);
-//
-//		PatternTestUtils.assertRejects(pattern, "");
-//		PatternTestUtils.assertMatches(pattern, "1");
-//		PatternTestUtils.assertMatches(pattern, "12");
-//		PatternTestUtils.assertMatches(pattern, "123");
-//		PatternTestUtils.assertMatchesPrefix(pattern, "1234");
-
-	}
-
-	@Test
-	public void testExact() {
-//		// Pattern requires exactly 3 repetitions
-//		pattern = new PatternRepetition(digit, 3, 3);
-//
-//		PatternTestUtils.assertRejects(pattern, "");
-//		PatternTestUtils.assertRejects(pattern, "1");
-//		PatternTestUtils.assertRejects(pattern, "12");
-//		PatternTestUtils.assertMatches(pattern, "123");
-//		PatternTestUtils.assertMatchesPrefix(pattern, "1234");
+		assertMatchesExact(pattern, "da", "");
+		assertMatchesExact(pattern, "oo", "");
+		assertMatchesExact(pattern, "", "");
+		assertMatchesExact(pattern, "d", "");
+		assertMatchesExact(pattern, "ado", "");
 
 	}
 

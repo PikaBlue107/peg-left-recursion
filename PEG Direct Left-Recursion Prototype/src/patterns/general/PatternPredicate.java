@@ -56,6 +56,9 @@ public class PatternPredicate extends PatternComponent {
 		if (expectSuccess == result.isSuccess()) {
 			// Success!
 			pred.addChild(result);
+			// Okay, but undo adding the data and the end index.
+			pred.setData("");
+			pred.setEndIdx(pred.getStartIdx());
 		} else {
 			// Failure.
 			pred.setSuccess(false);
