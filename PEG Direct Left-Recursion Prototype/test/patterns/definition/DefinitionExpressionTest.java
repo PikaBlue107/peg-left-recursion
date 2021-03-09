@@ -23,6 +23,7 @@ public class DefinitionExpressionTest {
 	public void showExampleLeftRecursion() {
 		showExample(PATTERN, "1+2", "Simple Expression");
 		showExample(PATTERN, "a", "Just not an Expression");
+		showExample(PATTERN, "1+a", "Partial expression, invalid text");
 	}
 
 	@Test
