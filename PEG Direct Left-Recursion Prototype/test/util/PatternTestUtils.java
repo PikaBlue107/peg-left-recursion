@@ -35,9 +35,25 @@ public class PatternTestUtils {
 	 *
 	 * @param p pattern to attempt to match
 	 * @param s input string to use
+	 * @deprecated Users should instead use
+	 *             {@link PatternTestUtils.assertMatchesExact}.
 	 */
+	@Deprecated
 	public static void assertMatchesPrefix(final Pattern p, final String s) {
-		assertPatternAgainstExpected(p, s, true, false);
+		// null expected string indicates no expectation
+		assertPatternAgainstExpected(p, s, null, true);
+	}
+
+	/**
+	 * Ensures that the provided pattern matches against the input string. Pattern
+	 * must accept exactly the String expected.
+	 *
+	 * @param p        pattern to attempt to match
+	 * @param s        input string to use
+	 * @param expected the expected match String
+	 */
+	public static void assertMatchesExact(final Pattern p, final String s, final String expected) {
+		assertPatternAgainstExpected(p, s, expected, true);
 	}
 
 	/**
@@ -48,7 +64,8 @@ public class PatternTestUtils {
 	 * @param s input string to use
 	 */
 	public static void assertMatches(final Pattern p, final String s) {
-		assertPatternAgainstExpected(p, s, true, true);
+		// Input string and expected match string are same
+		assertPatternAgainstExpected(p, s, s, true);
 	}
 
 	/**
@@ -58,7 +75,7 @@ public class PatternTestUtils {
 	 * @param s input string to use
 	 */
 	public static void assertRejects(final Pattern p, final String s) {
-		assertPatternAgainstExpected(p, s, false, false);
+		assertPatternAgainstExpected(p, s, null, false);
 	}
 
 	/**
@@ -142,8 +159,8 @@ public class PatternTestUtils {
 	 * @param requireFullMatch whether the result should exactly match the input
 	 *                         string
 	 */
-	private static void assertPatternAgainstExpected(final Pattern p, final String s, final boolean expectedSuccess,
-			final boolean requireFullMatch) {
+	private static void assertPatternAgainstExpected(final Pattern p, final String s, final String expected,
+			final boolean expectedSuccess) {
 
 		final KillablePatternMatcher matcher = runCase(p, s);
 
@@ -154,7 +171,7 @@ public class PatternTestUtils {
 
 		// Add match expected success or failure
 		matcher.scenario.append("\tPattern should: ").append((expectedSuccess) ? "accept" : "reject").append("\n")
-				.append("\tExpecting full match: ").append(requireFullMatch).append("\n");
+				.append("\tExpected match: [").append(expected).append("]\n");
 
 		// Expect success or failure
 		if (expectedSuccess) {
@@ -176,11 +193,16 @@ public class PatternTestUtils {
 					matcher.context.getPosition());
 		}
 
-		// If we need a full match, ensure the context is at the end and the strings
-		// match exactly
-		if (requireFullMatch) {
-			Assert.assertTrue(scenario + "Failure: Input string was not exhausted.", matcher.context.isAtEnd());
-			Assert.assertEquals(scenario + "Failure: Result data did not match input.", s, matcher.r.getData());
+		// If we have a specific match we're expecting, check it
+		if (expected != null) {
+			Assert.assertEquals(scenario + "Failure: Result match string did not match expected match string.",
+					expected, matcher.r.getData());
+
+			// If the expected string is the same length as the input, the input should be
+			// exhausted
+			if (expected.length() == s.length()) {
+				Assert.assertTrue(scenario + "Failure: Input string was not exhausted.", matcher.context.isAtEnd());
+			}
 		}
 	}
 
