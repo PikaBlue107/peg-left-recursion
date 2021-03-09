@@ -82,7 +82,7 @@ public class SimpleExpression extends Pattern {
 	private Result matchPlus(final InputContext context) {
 		if (!context.isAtEnd() && context.currentDeriv().getChResult().isSuccess()
 				&& (context.currentDeriv().getChResult().getData().charAt(0) == '+')) {
-			System.out.println("Matched [" + context.currentDeriv().getChResult().getData() + "]");
+			context.addHistory("Matched [" + context.currentDeriv().getChResult().getData() + "]");
 			context.advance();
 			return new Result(true, '+', context.getPosition() - 1);
 		} else {
