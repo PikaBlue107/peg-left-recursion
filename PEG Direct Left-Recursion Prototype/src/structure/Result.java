@@ -40,8 +40,20 @@ public class Result {
 	 * 
 	 * @return a Result representing a failed match.
 	 */
+	@Deprecated
 	public static final Result FAIL() {
 		return new Result(false, "", -1);
+	}
+
+	/**
+	 * Generates a new fail Result with the given index for quick use in pattern
+	 * definitions.
+	 * 
+	 * @param idx the index that this fail result should mark
+	 * @return a Result representing a failed match.
+	 */
+	public static final Result FAIL(final int idx) {
+		return new Result(false, "", idx);
 	}
 
 	/**
