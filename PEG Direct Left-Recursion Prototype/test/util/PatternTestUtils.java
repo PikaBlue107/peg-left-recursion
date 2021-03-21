@@ -11,6 +11,7 @@ import java.lang.management.ManagementFactory;
 
 import org.junit.Assert;
 
+import event.ParseEvent;
 import patterns.general.Pattern;
 import structure.InputContext;
 import structure.Result;
@@ -103,8 +104,8 @@ public class PatternTestUtils {
 
 		// Save the output of the test
 		exampleOutput.append("Match history: \n");
-		for (final String historyEntry : matcher.context.getHistory()) {
-			exampleOutput.append("\t" + historyEntry + "\n");
+		for (final ParseEvent historyEntry : matcher.context.getHistory()) {
+			exampleOutput.append("\t" + historyEntry.toString() + "\n");
 		}
 		exampleOutput.append("Result tree:" + "\n");
 		exampleOutput.append(matcher.r.printResultTree() + "\n");
