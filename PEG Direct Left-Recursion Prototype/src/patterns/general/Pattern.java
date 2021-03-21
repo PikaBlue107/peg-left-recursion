@@ -1,5 +1,6 @@
 package patterns.general;
 
+import event.pattern.PatternMatchEvent;
 import structure.Derivation;
 import structure.InputContext;
 import structure.Result;
@@ -50,11 +51,15 @@ public abstract class Pattern {
 	 *         and alias
 	 */
 	private Result matchAndName(final InputContext context) {
+		// Make an event saying we're attempting to match this pattern
+		context.addHistory(new PatternMatchEvent(context.getPosition(), this));
 		// Retrieve the result
 		final Result r = this.match(context);
 		// Copy type and alias status to the Result
 		r.setType(getType());
 		r.setAlias(isAlias());
+		// Make an event saying whether it was accepted or rejected
+		context.addHistory(new PatternMatchEvent(r, this));
 		// Return the updated Result
 		return r;
 	}
@@ -152,7 +157,7 @@ public abstract class Pattern {
 			// and indicates that this rule might be left recursive
 			// Set m to a failure Result with a left recursion status of POSSIBLE to
 			// indicate we suspect but don't know that the Pattern might be left recursive
-			m = Result.FAIL();
+			m = Result.FAIL(initialPosition);
 
 			// MEMO(R,P) = m
 			// Set the memoized answer for applying this rule at this position to be m, the
@@ -166,7 +171,7 @@ public abstract class Pattern {
 			// Evaluate the Rule at this position, saving the answer in the field "ans"
 			// Attempt to match the Pattern on this Derivation, saving the Result in the
 			// field "ans"
-			final Result ans = match(context);
+			final Result ans = matchAndName(context);
 			ans.setType(getType());
 			ans.setAlias(isAlias());
 
