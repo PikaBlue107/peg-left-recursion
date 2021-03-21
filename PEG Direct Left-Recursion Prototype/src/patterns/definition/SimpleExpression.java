@@ -1,5 +1,6 @@
 package patterns.definition;
 
+import event.pattern.CharacterAcceptEvent;
 import patterns.general.Pattern;
 import structure.InputContext;
 import structure.Result;
@@ -82,7 +83,7 @@ public class SimpleExpression extends Pattern {
 	private Result matchPlus(final InputContext context) {
 		if (!context.isAtEnd() && context.currentDeriv().getChResult().isSuccess()
 				&& (context.currentDeriv().getChResult().getData().charAt(0) == '+')) {
-			context.addHistory("Matched [" + context.currentDeriv().getChResult().getData() + "]");
+			context.addHistory(new CharacterAcceptEvent(context.currentChar(), context.getPosition()));
 			context.advance();
 			return new Result(true, '+', context.getPosition() - 1);
 		} else {

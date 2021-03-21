@@ -3,6 +3,7 @@
  */
 package patterns.general;
 
+import event.pattern.CharacterAcceptEvent;
 import structure.InputContext;
 import structure.Result;
 
@@ -26,9 +27,10 @@ public class PatternDigit extends PatternComponent {
 		// Determines if the derivation character is a digit
 		if (Character.isDigit(ch)) {
 			// Is a digit! Success
-			context.addHistory("Matched [" + ch + "]");
+			final int startPos = context.getPosition();
+			context.addHistory(new CharacterAcceptEvent(ch, startPos));
 			context.advance();
-			return new Result(true, ch, context.getPosition() - 1);
+			return new Result(true, ch, startPos);
 		} else {
 			// Not a digit. Failure
 			return Result.FAIL();

@@ -3,6 +3,7 @@
  */
 package patterns.general;
 
+import event.pattern.CharacterAcceptEvent;
 import structure.InputContext;
 import structure.Result;
 
@@ -42,7 +43,7 @@ public class PatternString extends PatternComponent {
 			if (!context.isAtEnd() && (c == context.next())) {
 				// Add character to Result
 				match.addChar(c);
-				context.addHistory("Matched [" + c + "]");
+				context.addHistory(new CharacterAcceptEvent(c, context.getPosition() - 1));
 			}
 			// Else, character doesn't match.
 			else {
