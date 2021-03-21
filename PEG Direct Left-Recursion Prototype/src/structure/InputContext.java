@@ -6,6 +6,10 @@ package structure;
 import java.util.ArrayList;
 import java.util.List;
 
+import event.ParseEvent;
+import event.control.PositionEvent;
+import event.control.PositionEvent.PositionEventType;
+
 /**
  * Represents the current position of the parser in the input string. Allows
  * operations on the input string such as character retrieval and position
@@ -31,12 +35,15 @@ public class InputContext {
 	 * List of all "events" that have happened in the context (matching,
 	 * backtracking, etc.)
 	 */
-	private final List<String> history = new ArrayList<>();
+	private final List<ParseEvent> history = new ArrayList<>();
 
 	/**
 	 * The default number of characters that toString() will print to either side.
 	 */
 	private static final int DEFAUT_PRINT_RANGE = 10;
+
+	/** Lowercase epsilon, representing the end of the string. */
+	public static final String CHAR_EPSILON = "\u03B5";
 
 	/**
 	 * Tracks the current "position" of the Context. The character at [position] is
@@ -86,6 +93,7 @@ public class InputContext {
 	 */
 	public void setPosition(final int position) {
 		this.position = position;
+		addHistory(new PositionEvent(this, PositionEventType.RESET));
 	}
 
 	/**
@@ -98,11 +106,30 @@ public class InputContext {
 		return this.position == this.inputString.length();
 	}
 
+	public int length() {
+		return inputString.length();
+	}
+
 	/**
+	 * Retrieves the input string that this InputContext holds.
+	 * 
 	 * @return the inputString
 	 */
 	public String getInputString() {
-		return inputString;
+		return getInputString(false);
+	}
+
+	/**
+	 * Retrieves the input string, optionally adding an epsilon character to
+	 * represent the end of input.
+	 * 
+	 * @param addEpsilon whether to add a trailing epsilon character representing
+	 *                   the end of input
+	 * @return the input string that this context is holding, with an optional
+	 *         end-of-string epsilon character
+	 */
+	public String getInputString(final boolean addEpsilon) {
+		return inputString + (addEpsilon ? CHAR_EPSILON : "");
 	}
 
 	/**
@@ -144,7 +171,11 @@ public class InputContext {
 	 * @return the Context, advanced one position.
 	 */
 	public InputContext advance() {
+		if (isAtEnd()) {
+			throw new IllegalStateException("Cannot advance when already at end of input");
+		}
 		position++;
+		addHistory(new PositionEvent(this, PositionEventType.ADVANCE));
 		return this;
 	}
 
@@ -196,7 +227,7 @@ public class InputContext {
 	 *
 	 * @param entry the entry to add to the end of the history.
 	 */
-	public void addHistory(final String entry) {
+	public void addHistory(final ParseEvent entry) {
 		this.history.add(entry);
 	}
 
@@ -206,7 +237,7 @@ public class InputContext {
 	 * 
 	 * @return an Iterable of String objects stored in this context's history
 	 */
-	public Iterable<String> getHistory() {
+	public Iterable<ParseEvent> getHistory() {
 		return history;
 	}
 
