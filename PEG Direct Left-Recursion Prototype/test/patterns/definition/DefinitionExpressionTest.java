@@ -10,7 +10,7 @@ import static util.PatternTestUtils.showExample;
 import org.junit.Test;
 
 import pattern.Pattern;
-import pattern.definition.DefinitionExpression;
+import pattern.definition.DefinedExpression;
 
 /**
  * @author Melody Griesen
@@ -18,7 +18,7 @@ import pattern.definition.DefinitionExpression;
  */
 public class DefinitionExpressionTest {
 
-	private static final Pattern PATTERN = new DefinitionExpression();
+	private static final Pattern PATTERN = new DefinedExpression();
 
 	@Test
 	public void showExampleLeftRecursion() {

@@ -9,7 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import pattern.Pattern;
-import pattern.definition.DefinitionNumber;
+import pattern.definition.DefinedNumber;
 import util.PatternTestUtils;
 
 /**
@@ -18,7 +18,7 @@ import util.PatternTestUtils;
  */
 public class DefinitionNumberTest {
 
-	private static final Pattern PATTERN = new DefinitionNumber();
+	private static final Pattern PATTERN = new DefinedNumber();
 
 	@Test
 	public void showExampleLeftRecursion() {

@@ -11,11 +11,11 @@ import pattern.component.PatternString;
  * @author Melody Griesen
  *
  */
-public class DefinitionExpression extends DefinedPattern {
+public class DefinedExpression extends DefinedPattern {
 
 	/** Internal definition used when matching. */
 	private final Pattern pattern = new PatternChoice(
-			new PatternSequence(this, new PatternString("+"), new DefinitionNumber()), new DefinitionNumber());
+			new PatternSequence(this, new PatternString("+"), new DefinedNumber()), new DefinedNumber());
 	/** Pattern type to provide the display or reference name. */
 	private static final String TYPE = "Expression";
 

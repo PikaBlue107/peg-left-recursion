@@ -4,7 +4,7 @@ import pattern.Pattern;
 import pattern.component.PatternDigit;
 import pattern.component.PatternRepetition;
 
-public class DefinitionNumber extends DefinedPattern {
+public class DefinedNumber extends DefinedPattern {
 
 	/** Pattern definition states that a number is one or more Digits. */
 	private static final PatternRepetition NUMBER = new PatternRepetition(new PatternDigit(), 1, -1);

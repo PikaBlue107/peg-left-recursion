@@ -1,7 +1,7 @@
 package controller;
 
 import pattern.Pattern;
-import pattern.definition.DefinitionExpression;
+import pattern.definition.DefinedExpression;
 import structure.InputContext;
 import structure.Result;
 
@@ -18,7 +18,7 @@ public class PackratDriver {
 	private static final String TEST_STRING = "1+25+7";
 
 	/** Pattern used to match the test string. */
-	private static final Pattern MATCH_PATTERN = new DefinitionExpression();
+	private static final Pattern MATCH_PATTERN = new DefinedExpression();
 
 	/**
 	 * Main launch point of the program. Sandbox. Playground. Laboratory.
