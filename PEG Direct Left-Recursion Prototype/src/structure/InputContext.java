@@ -117,7 +117,7 @@ public class InputContext {
 	 */
 	public void setPosition(final int position) {
 		this.position = position;
-		addHistory(new PositionEvent(this, PositionEventType.RESET));
+		addHistory(new PositionEvent(this, PositionEventType.SET));
 	}
 
 	/**
@@ -348,6 +348,23 @@ public class InputContext {
 	 */
 	public Iterable<ParseEvent> getHistory() {
 		return history;
+	}
+
+	public String printHistory() {
+		// Set up string builder for history
+		final StringBuilder historyString = new StringBuilder();
+
+		// Track which step of history we're on
+		int historyIdx = 0;
+
+		// Loop over all history events, from earliest to latest
+		for (final ParseEvent historyEntry : getHistory()) {
+			// Append a new line with formatted columns for step and full event details
+			historyString.append(String.format("%4d:\t%s\n", historyIdx++, historyEntry.toString()));
+		}
+
+		// Return resulting string
+		return historyString.toString();
 	}
 
 	// Overall
