@@ -102,4 +102,13 @@ public class PatternString extends PatternComponent {
 		return true;
 	}
 
+	/**
+	 * {@inheritDoc} Always returns the exact match string of the form
+	 * "[matchString]"
+	 */
+	@Override
+	public String getDefinition(final boolean component) {
+		return "\"" + matchString + "\"";
+	}
+
 }
