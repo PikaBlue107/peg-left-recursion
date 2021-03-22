@@ -2,8 +2,8 @@ package patterns.general;
 
 import event.control.GrowingEvent;
 import event.control.GrowingEvent.GrowingEventType;
-import event.control.MemoryEvent;
-import event.control.MemoryEvent.MemoryEventType;
+import event.pattern.MetaMatchEvent;
+import event.pattern.MetaMatchEvent.MetaMatchEventType;
 import event.pattern.PatternMatchEvent;
 import structure.InputContext;
 import structure.Result;
@@ -89,17 +89,16 @@ public abstract class Pattern {
 	 */
 	private Result growLeftRecursion(final InputContext context, final int initialPosition) {
 
-		// Log entry into method
-		context.addHistory(new GrowingEvent(context, GrowingEventType.INITIATE, this, initialPosition));
-
 		// Set up fields to be used in main loop
 		Result attempt = null;
 		int farthestMatchEndPos = context.resultFor(this, initialPosition).getEndIdx();
+		int iteration = 1;
 
 		// Loop until we find a special case
 		while (true) {
 			// Log beginning of step
-			context.addHistory(new GrowingEvent(context, GrowingEventType.STEP_ATTEMPT, this, initialPosition));
+			context.addHistory(
+					new GrowingEvent(context, GrowingEventType.GROW_ATTEMPT, this, initialPosition, iteration));
 			// Reset to the beginning to check this case
 			context.setPosition(initialPosition);
 
@@ -111,24 +110,29 @@ public abstract class Pattern {
 
 			// If we didn't make any progress, then exit
 			if (!attempt.isSuccess()) {
-				context.addHistory(new GrowingEvent(context, GrowingEventType.STEP_FAIL, this, initialPosition));
+				context.addHistory(
+						new GrowingEvent(context, GrowingEventType.GROW_FAIL, this, initialPosition, iteration));
 				break;
 			} else if (context.getPosition() <= farthestMatchEndPos) {
-				context.addHistory(new GrowingEvent(context, GrowingEventType.STEP_REJECT, this, initialPosition));
+				context.addHistory(
+						new GrowingEvent(context, GrowingEventType.GROW_REJECT, this, initialPosition, iteration));
 				break;
 			}
 
 			// Add history event for succeeding this step
-			context.addHistory(new GrowingEvent(context, GrowingEventType.STEP_GROW, this, initialPosition));
+			context.addHistory(
+					new GrowingEvent(context, GrowingEventType.GROW_ACCEPT, this, initialPosition, iteration));
 			// Otherwise, update the Derivation's memoized Result with the one we just
 			// calculated, and try to match again!
 			context.setResultFor(this, attempt, initialPosition);
 			// Check the farthest match we've gotten so far
 			farthestMatchEndPos = attempt.getEndIdx();
+			// Increment the iteration counter
+			iteration++;
 		}
 
-		// Log exit from method
-		context.addHistory(new GrowingEvent(context, GrowingEventType.TERMINATE, this, initialPosition));
+		// Log exit from method. -1 ot iterations because last iteration is invalid
+		context.addHistory(new GrowingEvent(context, GrowingEventType.TERMINATE, this, initialPosition, iteration - 1));
 
 		// Set the context to rest at the end of the farthest match we were able to find
 		context.setPosition(farthestMatchEndPos);
@@ -155,6 +159,10 @@ public abstract class Pattern {
 			return this.matchAndName(context);
 		}
 
+		// Begin the full meta-match
+		// Log it in the context
+		context.addHistory(new MetaMatchEvent(context, this, context.getPosition(), MetaMatchEventType.BEGIN_PREP));
+
 		// let m = MEMO(R,P)
 		// Let m hold the "known" result of applying this Rule at this Position
 		// Let m hold the "known" result of applying this Pattern at this Derivation
@@ -163,6 +171,9 @@ public abstract class Pattern {
 		// if m = NIL
 		// If the "known" result does not yet exist
 		if (m == null) {
+
+			// Log that we're going to have to manually run a match
+			context.addHistory(new MetaMatchEvent(context, this, context.getPosition(), MetaMatchEventType.RUN_MATCH));
 
 			// Save the initial position before matching in case we need to grow the match
 			final int initialPosition = context.getPosition();
@@ -218,6 +229,9 @@ public abstract class Pattern {
 			// and it has a successful match (seed) of the recursive pattern
 			if ((ans.getLRStatus() == LeftRecursionStatus.DETECTED) && ans.isSuccess()) {
 
+				// Log that we're going to start growing this left-recursive call
+				context.addHistory(new MetaMatchEvent(context, this, ans, MetaMatchEventType.BEGIN_GROW));
+
 				// return GROW-LR(R,P,m,NIL)
 				// return the result of growing the left-recursive rule until it cannot be
 				// re-evaluated to consume any more input
@@ -238,15 +252,15 @@ public abstract class Pattern {
 
 		} else {
 
-			// Add a history event indicating that we're assuming a match
-			context.addHistory(new MemoryEvent(context, MemoryEventType.ASSUME, this, m));
+			// Log that we're going to delegate to using the saved result
+			context.addHistory(new MetaMatchEvent(context, this, m, MetaMatchEventType.ASSUME_RESULT));
 
 			// Pos = m.pos
 			// Set the current position of parsing equal to the result m's position
 			// If the result is a success, set the current position of the context equal to
 			// the result m's end index
-			if (m.isSuccess()) {
-				context.setPosition(m.getEndIdx()); // TODO: Ideally we comment this out
+			if (m.isSuccess()) { // TODO: Ideally we comment this out
+				context.setPosition(m.getEndIdx());
 			}
 
 			// if m.ans is LR
@@ -266,6 +280,11 @@ public abstract class Pattern {
 				// Mark this rule at this position as left-recursive for sure
 				// Mark this Pattern at this Derivation as left-recursive for sure
 				m.setLRStatus(LeftRecursionStatus.DETECTED);
+
+				// Log that we identified a left-recursive call
+
+				// Log that we're flagging this result as left-recursive
+				context.addHistory(new MetaMatchEvent(context, this, m, MetaMatchEventType.IDENTIFY_LR));
 
 				// return FAIL
 				// end this iteration with a failure so that we can find a seed later on in the
