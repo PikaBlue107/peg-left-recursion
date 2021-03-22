@@ -62,9 +62,7 @@ public class MemoryEvent extends ControlEvent {
 	 */
 	public MemoryEvent(final InputContext context, final MemoryEventType type, final Pattern pattern,
 			final Result result) {
-		super(context, context.getPosition(), (result == null ? 0 : result.getData().length()),
-				pattern.getType() + " = " + result);
-		this.type = type;
+		this(context, type, pattern, result, context.getPosition());
 	}
 
 	/**
@@ -80,7 +78,8 @@ public class MemoryEvent extends ControlEvent {
 	 */
 	public MemoryEvent(final InputContext context, final MemoryEventType type, final Pattern pattern,
 			final Result result, final int index) {
-		super(context, index, (result == null ? 0 : result.getData().length()), pattern.getType() + " = " + result);
+		super(context, index, (result == null ? 0 : result.getData().length()),
+				"grow(idx: " + index + ", pat:" + pattern.getType() + ") = " + result);
 		this.type = type;
 	}
 
