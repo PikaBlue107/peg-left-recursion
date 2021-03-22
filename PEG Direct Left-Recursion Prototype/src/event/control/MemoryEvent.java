@@ -23,9 +23,7 @@ public class MemoryEvent extends ControlEvent {
 		/** Memory was checked. */
 		CHECK("Check"),
 		/** Memory was saved. */
-		SAVE("Save"),
-		/** Memory was assumed as the result of a match. */
-		ASSUME("Assume");
+		SAVE("Save");
 
 		/** Stores a display-friendly name for this enum. */
 		private String displayName;
