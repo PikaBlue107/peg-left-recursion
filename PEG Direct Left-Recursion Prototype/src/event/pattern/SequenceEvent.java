@@ -1,5 +1,6 @@
 package event.pattern;
 
+import patterns.general.Pattern;
 import structure.InputContext;
 import structure.Result;
 
@@ -17,8 +18,8 @@ public class SequenceEvent extends PatternEvent {
 	 * @param sequenceIdx the numbered sequence component being attempted, e.g.
 	 *                    first component, third component, etc. (0-indexed)
 	 */
-	public SequenceEvent(final InputContext context, final int sequenceIdx) {
-		super(context, context.getPosition(), 0, "sequence step " + sequenceIdx);
+	public SequenceEvent(final InputContext context, final int sequenceIdx, final Pattern pattern) {
+		super(context, context.getPosition(), 0, "sequence step " + sequenceIdx + ": " + pattern.toString());
 		this.type = PatternEventType.ATTEMPT;
 	}
 
@@ -27,12 +28,14 @@ public class SequenceEvent extends PatternEvent {
 	 * constructing ACCEPT and REJECT SequenceEvents.
 	 * 
 	 * @param context     the InputContext used to feed to the pattern
-	 * @param matchResult the result of the match applied
 	 * @param sequenceIdx the numbered sequence component being attempted, e.g.
 	 *                    first component, third component, etc. (0-indexed)
+	 * @param matchResult the result of the match applied
 	 */
-	public SequenceEvent(final InputContext context, final Result matchResult, final int sequenceIdx) {
-		super(context, matchResult.getStartIdx(), matchResult.getData().length(), "sequence step " + sequenceIdx);
+	public SequenceEvent(final InputContext context, final int sequenceIdx, final Pattern pattern,
+			final Result matchResult) {
+		super(context, matchResult.getStartIdx(), matchResult.getData().length(),
+				"sequence step " + sequenceIdx + ": " + pattern.toString());
 		this.type = matchResult.isSuccess() ? PatternEventType.ACCEPT : PatternEventType.REJECT;
 	}
 

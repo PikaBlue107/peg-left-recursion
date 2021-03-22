@@ -31,7 +31,7 @@ public class PatternMatchEvent extends PatternEvent {
 	 * @param pattern the pattern that this Event occurs for
 	 */
 	public PatternMatchEvent(final InputContext context, final int idx, final Pattern pattern) {
-		super(context, idx, 0, pattern.getClass().getSimpleName());
+		super(context, idx, 0, pattern.toString());
 		type = PatternEventType.ATTEMPT;
 	}
 

@@ -1,5 +1,6 @@
 package event.pattern;
 
+import patterns.general.Pattern;
 import structure.InputContext;
 import structure.Result;
 
@@ -17,8 +18,8 @@ public class OrderedChoiceEvent extends PatternEvent {
 	 * @param choiceIdx the numbered ordered choice being attempted, e.g. first
 	 *                  choice, third choice, etc. (0-indexed)
 	 */
-	public OrderedChoiceEvent(final InputContext context, final int choiceIdx) {
-		super(context, context.getPosition(), 0, "ordered choice option " + choiceIdx);
+	public OrderedChoiceEvent(final InputContext context, final int choiceIdx, final Pattern pattern) {
+		super(context, context.getPosition(), 0, "ordered choice option " + choiceIdx + ": " + pattern.toString());
 		this.type = PatternEventType.ATTEMPT;
 	}
 
@@ -27,12 +28,15 @@ public class OrderedChoiceEvent extends PatternEvent {
 	 * constructing ACCEPT and REJECT OrderedChoiceEvents.
 	 * 
 	 * @param context     the InputContext used to feed to the pattern
-	 * @param matchResult the result of the match applied
 	 * @param choiceIdx   the numbered ordered choice being attempted, e.g. first
 	 *                    choice, third choice, etc. (0-indexed)
+	 * @param pattern     TODO
+	 * @param matchResult the result of the match applied
 	 */
-	public OrderedChoiceEvent(final InputContext context, final Result matchResult, final int choiceIdx) {
-		super(context, matchResult.getStartIdx(), matchResult.getData().length(), "ordered choice option " + choiceIdx);
+	public OrderedChoiceEvent(final InputContext context, final int choiceIdx, final Pattern pattern,
+			final Result matchResult) {
+		super(context, matchResult.getStartIdx(), matchResult.getData().length(),
+				"ordered choice option " + choiceIdx + ": " + pattern.toString());
 		this.type = matchResult.isSuccess() ? PatternEventType.COMMIT : PatternEventType.REJECT;
 	}
 

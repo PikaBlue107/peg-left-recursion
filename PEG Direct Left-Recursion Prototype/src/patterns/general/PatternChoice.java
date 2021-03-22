@@ -84,12 +84,12 @@ public class PatternChoice extends PatternComponent {
 		// Loop over all patterns
 		for (final Pattern p : patterns) {
 			// Log attempt to match
-			context.addHistory(new OrderedChoiceEvent(context, choiceIdx));
+			context.addHistory(new OrderedChoiceEvent(context, choiceIdx, p));
 
 			// Attempt to match this pattern
 			result = p.lazyMatch(context);
 			// Report result
-			context.addHistory(new OrderedChoiceEvent(context, result, choiceIdx));
+			context.addHistory(new OrderedChoiceEvent(context, choiceIdx, p, result));
 
 			// If success, save and return the choice result
 			if (result.isSuccess()) {

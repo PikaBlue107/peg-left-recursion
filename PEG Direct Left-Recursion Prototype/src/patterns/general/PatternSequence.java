@@ -81,11 +81,11 @@ public class PatternSequence extends PatternComponent {
 		// Loop over all patterns
 		for (final Pattern p : patterns) {
 			// Log attempt to match
-			context.addHistory(new SequenceEvent(context, sequenceIdx));
+			context.addHistory(new SequenceEvent(context, sequenceIdx, p));
 			// Attempt to match this pattern
 			result = p.lazyMatch(context);
 			// Report result
-			context.addHistory(new SequenceEvent(context, result, sequenceIdx));
+			context.addHistory(new SequenceEvent(context, sequenceIdx, p, result));
 			// If fail, return it
 			if (!result.isSuccess()) {
 				// Reset the context first
