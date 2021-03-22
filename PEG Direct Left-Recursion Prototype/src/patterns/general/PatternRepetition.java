@@ -3,6 +3,8 @@
  */
 package patterns.general;
 
+import event.pattern.PatternEvent.PatternEventType;
+import event.pattern.RepetitionEvent;
 import structure.InputContext;
 import structure.Result;
 
@@ -56,11 +58,16 @@ public class PatternRepetition extends PatternComponent {
 		// Begin iterating over the context
 		while (matches != upperBound) {
 
+			// Log attempt to match
+			context.addHistory(new RepetitionEvent(context, pattern, matches));
+
 			// Attempt to match at this iteration
 			final Result result = pattern.lazyMatch(context);
 
 			// If we succeeded in matching
 			if (result.isSuccess()) {
+				// Log that we expanded this repetition
+				context.addHistory(new RepetitionEvent(context, pattern, matches, repetition, PatternEventType.EXPAND));
 				// Increment our match count
 				matches++;
 				// Add as a child of our matches
@@ -68,6 +75,9 @@ public class PatternRepetition extends PatternComponent {
 			}
 			// Otherwise, we failed in matching
 			else {
+				// Fail this repeition
+				context.addHistory(new RepetitionEvent(context, pattern, matches, repetition, PatternEventType.REJECT));
+
 				// Did we meet the minimum count?
 				if (matches >= lowerBound) {
 					// If yes, return a success
@@ -83,7 +93,11 @@ public class PatternRepetition extends PatternComponent {
 			}
 		}
 
-		// We exited matching because we reached our maximum number of matches. Success!
+		// We exited matching because we reached our maximum number of matches.
+		// Log this to the history
+		context.addHistory(new RepetitionEvent(context, pattern, matches - 1, repetition, PatternEventType.LIMIT));
+
+		// Success!
 		return repetition;
 	}
 
