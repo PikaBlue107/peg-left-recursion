@@ -1,6 +1,6 @@
 package patterns.definition;
 
-import patterns.general.Pattern;
+import patterns.Pattern;
 import patterns.general.PatternChoice;
 import patterns.general.PatternSequence;
 import patterns.general.PatternString;

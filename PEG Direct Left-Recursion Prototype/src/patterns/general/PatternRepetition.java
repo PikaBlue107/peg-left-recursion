@@ -4,6 +4,7 @@
 package patterns.general;
 
 import event.pattern.PatternEvent.PatternEventType;
+import patterns.Pattern;
 import event.pattern.RepetitionEvent;
 import structure.InputContext;
 import structure.Result;

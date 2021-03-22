@@ -8,6 +8,8 @@ import static util.PatternTestUtils.assertRejects;
 
 import org.junit.Test;
 
+import patterns.Pattern;
+
 /**
  * @author Melody Griesen
  *

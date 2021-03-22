@@ -5,7 +5,7 @@ package patterns.definition;
 
 import org.junit.Test;
 
-import patterns.general.Pattern;
+import patterns.Pattern;
 import util.PatternTestUtils;
 
 /**

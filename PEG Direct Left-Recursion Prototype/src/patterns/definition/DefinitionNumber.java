@@ -1,6 +1,6 @@
 package patterns.definition;
 
-import patterns.general.Pattern;
+import patterns.Pattern;
 import patterns.general.PatternDigit;
 import patterns.general.PatternRepetition;
 

@@ -9,7 +9,7 @@ import static util.PatternTestUtils.showExample;
 
 import org.junit.Test;
 
-import patterns.general.Pattern;
+import patterns.Pattern;
 
 /**
  * @author Melody Griesen
@@ -21,9 +21,10 @@ public class DefinitionExpressionTest {
 
 	@Test
 	public void showExampleLeftRecursion() {
-		showExample(PATTERN, "1+2", "Simple Expression");
-		showExample(PATTERN, "a", "Just not an Expression");
-		showExample(PATTERN, "1+a", "Partial expression, invalid text");
+		showExample(PATTERN, "1+2", "Valid - Simple Expression");
+		showExample(PATTERN, "8+13+217", "Valid - Complex expression");
+		showExample(PATTERN, "a", "Invalid - Just not an Expression");
+		showExample(PATTERN, "1+a", "Invalid - Partial expression, invalid text");
 	}
 
 	@Test

@@ -11,7 +11,7 @@ import java.lang.management.ManagementFactory;
 
 import org.junit.Assert;
 
-import patterns.general.Pattern;
+import patterns.Pattern;
 import structure.InputContext;
 import structure.Result;
 

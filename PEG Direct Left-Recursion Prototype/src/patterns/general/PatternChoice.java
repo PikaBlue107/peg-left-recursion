@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import event.pattern.OrderedChoiceEvent;
+import patterns.Pattern;
 import structure.InputContext;
 import structure.Result;
 

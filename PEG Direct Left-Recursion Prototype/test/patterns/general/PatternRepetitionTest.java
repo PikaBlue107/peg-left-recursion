@@ -6,6 +6,7 @@ package patterns.general;
 import org.junit.Assert;
 import org.junit.Test;
 
+import patterns.Pattern;
 import util.PatternTestUtils;
 
 /**

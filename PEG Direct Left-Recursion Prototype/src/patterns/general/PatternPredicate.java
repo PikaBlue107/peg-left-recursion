@@ -3,6 +3,7 @@
  */
 package patterns.general;
 
+import patterns.Pattern;
 import structure.InputContext;
 import structure.Result;
 

@@ -3,10 +3,12 @@
  */
 package patterns.definition;
 
+import static util.PatternTestUtils.showExample;
+
 import org.junit.Before;
 import org.junit.Test;
 
-import patterns.general.Pattern;
+import patterns.Pattern;
 import util.PatternTestUtils;
 
 /**
@@ -16,6 +18,14 @@ import util.PatternTestUtils;
 public class DefinitionNumberTest {
 
 	private static final Pattern PATTERN = new DefinitionNumber();
+
+	@Test
+	public void showExampleLeftRecursion() {
+		showExample(PATTERN, "1", "Valid - Simple Number");
+		showExample(PATTERN, "65535", "Valid - Complex Number");
+		showExample(PATTERN, "12a", "Valid - Partial number, invalid text");
+		showExample(PATTERN, "a", "Invalid - Just not a number");
+	}
 
 	/**
 	 * @throws java.lang.Exception

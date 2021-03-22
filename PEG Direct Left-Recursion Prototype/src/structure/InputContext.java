@@ -13,7 +13,7 @@ import event.control.MemoryEvent;
 import event.control.MemoryEvent.MemoryEventType;
 import event.control.PositionEvent;
 import event.control.PositionEvent.PositionEventType;
-import patterns.general.Pattern;
+import patterns.Pattern;
 
 /**
  * Represents the current position of the parser in the input string. Allows

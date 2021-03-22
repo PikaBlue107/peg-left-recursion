@@ -3,7 +3,7 @@
  */
 package event.control;
 
-import patterns.general.Pattern;
+import patterns.Pattern;
 import structure.InputContext;
 
 /**

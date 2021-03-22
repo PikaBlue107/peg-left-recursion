@@ -3,6 +3,8 @@
  */
 package patterns.general;
 
+import patterns.Pattern;
+
 /**
  * Allows for components of Patterns that skip memoization and result printing
  * to be built by extending from this class.

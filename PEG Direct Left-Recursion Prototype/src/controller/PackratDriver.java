@@ -1,7 +1,7 @@
 package controller;
 
+import patterns.Pattern;
 import patterns.definition.DefinitionExpression;
-import patterns.general.Pattern;
 import structure.InputContext;
 import structure.Result;
 
