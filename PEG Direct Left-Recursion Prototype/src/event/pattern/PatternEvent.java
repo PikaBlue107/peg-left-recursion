@@ -57,12 +57,8 @@ public abstract class PatternEvent extends ParseEvent {
 		}
 	}
 
-	public PatternEvent(final InputContext context, final int startIdx, final int endIdx, final String detail) {
-		super(context, startIdx, endIdx, detail);
-	}
-
-	public PatternEvent(final String affected, final int startIdx, final int endIdx, final String detail) {
-		super(affected, startIdx, endIdx, detail);
+	public PatternEvent(final InputContext context, final int startIdx, final int length, final String detail) {
+		super(context, startIdx, length, detail);
 	}
 
 }

@@ -1,6 +1,7 @@
 package event.pattern;
 
 import patterns.general.Pattern;
+import structure.InputContext;
 import structure.Result;
 
 public class PatternMatchEvent extends PatternEvent {
@@ -16,8 +17,8 @@ public class PatternMatchEvent extends PatternEvent {
 	 * @param detail
 	 * @param type
 	 */
-	public PatternMatchEvent(final Result matchResult, final Pattern pattern) {
-		super(matchResult.getData(), matchResult.getStartIdx(), matchResult.getData().length(),
+	public PatternMatchEvent(final InputContext context, final Result matchResult, final Pattern pattern) {
+		super(context, matchResult.getStartIdx(), matchResult.getData().length(),
 				"for pattern " + pattern.getClass().getSimpleName());
 		this.type = matchResult.isSuccess() ? PatternEventType.ACCEPT : PatternEventType.REJECT;
 	}
@@ -29,8 +30,8 @@ public class PatternMatchEvent extends PatternEvent {
 	 * @param idx     the index at which this pattern is attempted
 	 * @param pattern the pattern that this Event occurs for
 	 */
-	public PatternMatchEvent(final int idx, final Pattern pattern) {
-		super("", idx, idx, pattern.getClass().getSimpleName());
+	public PatternMatchEvent(final InputContext context, final int idx, final Pattern pattern) {
+		super(context, idx, 0, pattern.getClass().getSimpleName());
 		type = PatternEventType.ATTEMPT;
 	}
 

@@ -47,24 +47,16 @@ public abstract class ParseEvent {
 	/** The extra details of this ParseEvent. If null, won't be printed. */
 	private final String detail;
 
-	/**
-	 * Constructs this ParseEvent with the given range and detail. If detail is
-	 * null, will skip printing it.
-	 * 
-	 * @param affected the substring that this event occurs over
-	 * @param startIdx the first index of the input string that this Event occurs
-	 *                 over
-	 * @param endIdx   the last index of the input string that this Event occurs
-	 *                 over
-	 * @param detail   optional clarifying details about this ParseEvent
-	 */
-	public ParseEvent(final String affected, final int startIdx, final int endIdx, final String detail) {
-		// Set fields directly
-		this.startIdx = startIdx;
-		this.endIdx = endIdx;
-		this.detail = detail;
-		this.affected = affected;
-	}
+	// Constants
+
+	/** Number of characters to print the event name */
+	private static final int TOSTRING_WIDTH_NAME = 25;
+
+	/** Number of characters to print the event name */
+	private static final int TOSTRING_WIDTH_TYPE = 10;
+
+	/** Number of characters to print the event name */
+	private static final int TOSTRING_WIDTH_POSITION = 23;
 
 	/**
 	 * Constructs this ParseEvent with the given range and detail. If detail is
@@ -80,11 +72,9 @@ public abstract class ParseEvent {
 	public ParseEvent(final InputContext context, final int startIdx, final int length, final String detail) {
 		// Set fields directly
 		this.startIdx = startIdx;
-		this.endIdx = length;
+		this.endIdx = startIdx + length;
 		this.detail = detail;
-		// Gather substring
 		this.affected = context.getInputString(true).substring(startIdx, startIdx + length);
-
 	}
 
 	/**
@@ -172,7 +162,7 @@ public abstract class ParseEvent {
 		if (startIdx == endIdx) {
 			return "index " + startIdx;
 		} else {
-			return "index " + startIdx + " through " + endIdx;
+			return "indices " + startIdx + "-" + endIdx;
 		}
 	}
 
@@ -204,7 +194,44 @@ public abstract class ParseEvent {
 	 */
 	@Override
 	public String toString() {
-		return getEventName() + " " + getType() + " at " + getLocation() + ", \"" + getAffectedPart() + "\""
-				+ (getDetail() == null ? "" : ": " + getDetail());
+		final StringBuilder builder = new StringBuilder();
+
+		// Add name
+		builder.append(getEventName());
+		// Padding
+		pad(builder, TOSTRING_WIDTH_NAME);
+
+		// Add type
+		builder.append(getType());
+		// Padding
+		pad(builder, TOSTRING_WIDTH_NAME + TOSTRING_WIDTH_TYPE);
+
+		// Add index
+		builder.append(" at ").append(getLocation());
+
+		// If affected part isn't empty, add it
+		if (!"".equals(getAffectedPart())) {
+			builder.append(", \"").append(getAffectedPart()).append("\"");
+		}
+
+		// If there's more to print afterwards
+		if (getDetail() != null) {
+			// Colon
+			builder.append(": ");
+			// Padding
+			pad(builder, TOSTRING_WIDTH_NAME + TOSTRING_WIDTH_TYPE + TOSTRING_WIDTH_POSITION);
+
+			// If detail isn't null, add it
+			builder.append(getDetail());
+		}
+
+		// Return final string
+		return builder.toString();
+	}
+
+	private void pad(final StringBuilder builder, final int ideal) {
+		while ((builder.length()) < ideal) {
+			builder.append(" ");
+		}
 	}
 }

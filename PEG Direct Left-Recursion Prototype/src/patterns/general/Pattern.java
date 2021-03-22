@@ -53,14 +53,14 @@ public abstract class Pattern {
 	 */
 	private Result matchAndName(final InputContext context) {
 		// Make an event saying we're attempting to match this pattern
-		context.addHistory(new PatternMatchEvent(context.getPosition(), this));
+		context.addHistory(new PatternMatchEvent(context, context.getPosition(), this));
 		// Retrieve the result
 		final Result r = this.match(context);
 		// Copy type and alias status to the Result
 		r.setType(getType());
 		r.setAlias(isAlias());
 		// Make an event saying whether it was accepted or rejected
-		context.addHistory(new PatternMatchEvent(r, this));
+		context.addHistory(new PatternMatchEvent(context, r, this));
 		// Return the updated Result
 		return r;
 	}

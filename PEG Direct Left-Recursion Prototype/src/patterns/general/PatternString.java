@@ -43,7 +43,7 @@ public class PatternString extends PatternComponent {
 			if (!context.isAtEnd() && (c == context.next())) {
 				// Add character to Result
 				match.addChar(c);
-				context.addHistory(new CharacterAcceptEvent(c, context.getPosition() - 1));
+				context.addHistory(new CharacterAcceptEvent(context, context.getPosition() - 1));
 			}
 			// Else, character doesn't match.
 			else {

@@ -28,7 +28,7 @@ public class PatternDigit extends PatternComponent {
 		if (Character.isDigit(ch)) {
 			// Is a digit! Success
 			final int startPos = context.getPosition();
-			context.addHistory(new CharacterAcceptEvent(ch, startPos));
+			context.addHistory(new CharacterAcceptEvent(context, startPos));
 			context.advance();
 			return new Result(true, ch, startPos);
 		} else {
