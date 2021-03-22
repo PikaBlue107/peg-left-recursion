@@ -1,5 +1,6 @@
 package patterns.definition;
 
+import event.pattern.CharacterAcceptEvent;
 import patterns.general.Pattern;
 import structure.InputContext;
 import structure.Result;
@@ -11,9 +12,8 @@ public class SimpleNumber extends Pattern {
 
 	@Override
 	protected Result match(final InputContext context) {
-		if (!context.currentDeriv().getChResult().isSuccess()
-				|| !Character.isDigit(context.currentDeriv().getChResult().getData().charAt(0))) {
-			return Result.FAIL();
+		if (context.isAtEnd() || !Character.isDigit(context.currentChar())) {
+			return Result.FAIL(context.getPosition());
 		}
 
 		final Result priorResult = new Result(true, context.currentChar(), context.getPosition());
@@ -22,7 +22,7 @@ public class SimpleNumber extends Pattern {
 		char match = context.next();
 
 		// Indicate that we matched at least one number
-		context.addHistory("Matched [" + match + "]");
+		context.addHistory(new CharacterAcceptEvent(context, context.getPosition() - 1));
 
 		// While next step is a valid character
 		while (context.checkChar(Character::isDigit)) {
@@ -31,7 +31,7 @@ public class SimpleNumber extends Pattern {
 			match = context.next();
 
 			// Indicate that we matched that digit
-			context.addHistory("Matched [" + match + "]");
+			context.addHistory(new CharacterAcceptEvent(context, context.getPosition() - 1));
 
 			// Add matched character into Result
 			priorResult.addChar(match);
@@ -62,6 +62,15 @@ public class SimpleNumber extends Pattern {
 	@Override
 	public String getType() {
 		return TYPE;
+	}
+
+	@Override
+	public String getDefinition(final boolean component) {
+		if (component) {
+			return getType();
+		} else {
+			return "[0-9]+";
+		}
 	}
 
 }

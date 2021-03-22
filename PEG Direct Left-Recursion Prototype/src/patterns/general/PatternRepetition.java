@@ -3,6 +3,8 @@
  */
 package patterns.general;
 
+import event.pattern.PatternEvent.PatternEventType;
+import event.pattern.RepetitionEvent;
 import structure.InputContext;
 import structure.Result;
 
@@ -56,11 +58,16 @@ public class PatternRepetition extends PatternComponent {
 		// Begin iterating over the context
 		while (matches != upperBound) {
 
+			// Log attempt to match
+			context.addHistory(new RepetitionEvent(context, pattern, matches));
+
 			// Attempt to match at this iteration
 			final Result result = pattern.lazyMatch(context);
 
 			// If we succeeded in matching
 			if (result.isSuccess()) {
+				// Log that we expanded this repetition
+				context.addHistory(new RepetitionEvent(context, pattern, matches, repetition, PatternEventType.EXPAND));
 				// Increment our match count
 				matches++;
 				// Add as a child of our matches
@@ -68,6 +75,9 @@ public class PatternRepetition extends PatternComponent {
 			}
 			// Otherwise, we failed in matching
 			else {
+				// Fail this repeition
+				context.addHistory(new RepetitionEvent(context, pattern, matches, repetition, PatternEventType.REJECT));
+
 				// Did we meet the minimum count?
 				if (matches >= lowerBound) {
 					// If yes, return a success
@@ -78,12 +88,16 @@ public class PatternRepetition extends PatternComponent {
 					// Reset the context
 					context.setPosition(repetition.getStartIdx());
 					// Return a failure.
-					return Result.FAIL();
+					return Result.FAIL(context.getPosition());
 				}
 			}
 		}
 
-		// We exited matching because we reached our maximum number of matches. Success!
+		// We exited matching because we reached our maximum number of matches.
+		// Log this to the history
+		context.addHistory(new RepetitionEvent(context, pattern, matches - 1, repetition, PatternEventType.LIMIT));
+
+		// Success!
 		return repetition;
 	}
 
@@ -133,6 +147,63 @@ public class PatternRepetition extends PatternComponent {
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * {@inheritDoc} Surrounds repeated pattern in token boundaries, and appends a
+	 * repetition indicator (one of '+', '+', '*', or a form of {n,m})
+	 */
+	@Override
+	public String getDefinition(final boolean component) {
+
+		// Use string builder for definition
+		final StringBuilder definition = new StringBuilder();
+
+		// Start by encapsulating repeated pattern in token boundary parenthesis
+		definition.append("(");
+		definition.append(pattern.getDefinition(true));
+		definition.append(")");
+
+		// Detect cases for repetition indicator
+		// {0,1} := ?
+		if ((lowerBound == 0) && (upperBound == 1)) {
+			definition.append("?");
+		}
+		// {0,inf} := *
+		else if ((lowerBound == 0) && (upperBound == -1)) {
+			definition.append("*");
+		}
+		// {1,inf} := +
+		else if ((lowerBound == 1) && (upperBound == -1)) {
+			definition.append("+");
+		}
+		// some form of {n,m}
+		else {
+			// Always start with bracket
+			definition.append("{");
+
+			// If the lower bound is 0, skip it; otherwise, print it
+			if (lowerBound != 0) {
+				definition.append(lowerBound);
+			}
+
+			// If bounds don't match
+			if (lowerBound != upperBound) {
+				// Add comma
+				definition.append(",");
+				// If upper bound isn't inf, add
+				if (upperBound != -1) {
+					definition.append(upperBound);
+				}
+			}
+
+			// Always end with bracket
+			definition.append("}");
+		}
+
+		// Provide finished result
+		return definition.toString();
+
 	}
 
 }

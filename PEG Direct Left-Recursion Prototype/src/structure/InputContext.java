@@ -4,7 +4,16 @@
 package structure;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import event.ParseEvent;
+import event.control.MemoryEvent;
+import event.control.MemoryEvent.MemoryEventType;
+import event.control.PositionEvent;
+import event.control.PositionEvent.PositionEventType;
+import patterns.general.Pattern;
 
 /**
  * Represents the current position of the parser in the input string. Allows
@@ -16,27 +25,14 @@ import java.util.List;
  */
 public class InputContext {
 
-	/** Indexable array of Derivations, each holding metadata about its position. */
-	private final Derivation[] inputData;
+	/*
+	 * ----------------------------- FIELDS -------------------------------
+	 */
+
+	// Parse fields
 
 	/** Original input string, stored for useful methods like substring. */
 	private final String inputString;
-
-	/**
-	 * How far the InputContext will print to either side when running toString()
-	 */
-	private int printRange;
-
-	/**
-	 * List of all "events" that have happened in the context (matching,
-	 * backtracking, etc.)
-	 */
-	private final List<String> history = new ArrayList<>();
-
-	/**
-	 * The default number of characters that toString() will print to either side.
-	 */
-	private static final int DEFAUT_PRINT_RANGE = 10;
 
 	/**
 	 * Tracks the current "position" of the Context. The character at [position] is
@@ -48,6 +44,37 @@ public class InputContext {
 		position = 0;
 	}
 
+	/** The Growing Map of Results identified by Pattern. */
+	private Map<Integer, Map<Pattern, Result>> patterns;
+	{
+		this.patterns = new HashMap<>();
+	}
+
+	// Display fields
+
+	/**
+	 * List of all "events" that have happened in the context (matching,
+	 * backtracking, etc.)
+	 */
+	private final List<ParseEvent> history = new ArrayList<>();
+
+	/**
+	 * How far the InputContext will print to either side when running toString()
+	 */
+	private int printRange;
+
+	/**
+	 * The default number of characters that toString() will print to either side.
+	 */
+	private static final int DEFAUT_PRINT_RANGE = 10;
+
+	/** Lowercase epsilon, representing the end of the string. */
+	public static final String CHAR_EPSILON = "\u03B5";
+
+	/*
+	 * ----------------------------- CONSTRUCTORS -------------------------------
+	 */
+
 	/**
 	 * Constructs an {@link InputContext} object with all necessary metadata for
 	 * each index.
@@ -58,21 +85,25 @@ public class InputContext {
 		// Save the raw string
 		this.inputString = input;
 
-		// Ensure the inputData can hold the full String plus 1 null entry
-		inputData = new Derivation[input.length() + 1];
-
-		// For each character of the input String, create a Derivation object with all
-		// necessary data
+		// For each character of the input String, create an empty HashMap for the
+		// growing map
 		for (int i = 0; i < input.length(); i++) {
-			inputData[i] = new Derivation(input.charAt(i), i);
+			// Set an empty hash map for each index
+			patterns.put(i, new HashMap<>());
 		}
 
-		// For the last index, set it to an empty Derivation
-		inputData[input.length()] = new Derivation('\0', input.length());
+		// For the last index, set it to an empty map
+		patterns.put(input.length(), new HashMap<>());
 
 		// Start the print range off at the default
 		printRange = DEFAUT_PRINT_RANGE;
 	}
+
+	/*
+	 * ----------------------------- BEHAVIOR -------------------------------
+	 */
+
+	// Position
 
 	/**
 	 * @return the position
@@ -86,6 +117,7 @@ public class InputContext {
 	 */
 	public void setPosition(final int position) {
 		this.position = position;
+		addHistory(new PositionEvent(this, PositionEventType.SET));
 	}
 
 	/**
@@ -98,11 +130,59 @@ public class InputContext {
 		return this.position == this.inputString.length();
 	}
 
+	public int length() {
+		return inputString.length();
+	}
+
 	/**
+	 * Advances the InputContext by one step and returns the same Context to check.
+	 *
+	 * @return the Context, advanced one position.
+	 * @throws IllegalStateException if already at the end of the input string
+	 */
+	public InputContext advance() {
+		if (isAtEnd()) {
+			throw new IllegalStateException("Cannot advance when already at end of input");
+		}
+		position++;
+		addHistory(new PositionEvent(this, PositionEventType.ADVANCE));
+		return this;
+	}
+
+	/**
+	 * Advances the InputContext by one step and returns the previously current
+	 * character.
+	 *
+	 * @return the previous character
+	 */
+	public char next() {
+		final char c = currentChar();
+		advance();
+		return c;
+	}
+
+	// Input string
+
+	/**
+	 * Retrieves the input string that this InputContext holds.
+	 *
 	 * @return the inputString
 	 */
 	public String getInputString() {
-		return inputString;
+		return getInputString(false);
+	}
+
+	/**
+	 * Retrieves the input string, optionally adding an epsilon character to
+	 * represent the end of input.
+	 * 
+	 * @param addEpsilon whether to add a trailing epsilon character representing
+	 *                   the end of input
+	 * @return the input string that this context is holding, with an optional
+	 *         end-of-string epsilon character
+	 */
+	public String getInputString(final boolean addEpsilon) {
+		return inputString + (addEpsilon ? CHAR_EPSILON : "");
 	}
 
 	/**
@@ -119,57 +199,115 @@ public class InputContext {
 	}
 
 	/**
-	 * Returns the Derivation at a given index.
-	 *
-	 * @param idx the index to be inspected
-	 * @return the Derivation at that index, holding the character and associated
-	 *         data
+	 * TODO: Document
+	 * 
+	 * @param checker
+	 * @return
 	 */
-	public Derivation getDerivation(final int idx) {
-		return inputData[idx];
-	}
-
-	/**
-	 * Returns the currently active Derivation.
-	 *
-	 * @return the Derivation for the next character to be consumed.
-	 */
-	public Derivation currentDeriv() {
-		return inputData[position];
-	}
-
-	/**
-	 * Advances the InputContext by one step and returns the same Context to check.
-	 *
-	 * @return the Context, advanced one position.
-	 */
-	public InputContext advance() {
-		position++;
-		return this;
-	}
-
-	/**
-	 * Advances the InputContext by one step and returns the previously current
-	 * character.
-	 *
-	 * @return the previous character
-	 */
-	public char next() {
-		final char c = currentChar();
-		advance();
-		return c;
-	}
-
 	public boolean checkChar(final CharCheckable checker) {
 		if (isAtEnd()) {
 			return false;
 		}
-		return checker.check(currentDeriv().getChResult().getData().charAt(0));
+		return checker.check(currentChar());
 	}
 
+	/**
+	 * TODO: Document
+	 *
+	 * @author Melody Griesen
+	 *
+	 */
 	public interface CharCheckable {
+		/**
+		 * TODO: Document
+		 *
+		 * @param c
+		 * @return
+		 */
 		boolean check(char c);
 	}
+
+	// Growing Map Results
+
+	// Setters
+
+	/**
+	 * Saves the Result for a given Pattern at the current index in the growing map
+	 * of this InputContext.
+	 * 
+	 * @param pattern the pattern that will be used to access this result
+	 * @param result  the result that the given Pattern achieves
+	 * @return the previous Result stored at the location in the growing map
+	 */
+	public Result setResultFor(final Pattern pattern, final Result result) {
+		return setResultFor(pattern, result, getPosition());
+	}
+
+	/**
+	 * Saves the Result for a given Pattern in the growing map of this InputContext.
+	 * 
+	 * @param pattern the pattern that will be used to access this result
+	 * @param result  the result that the given Pattern achieves
+	 * @param index   the index at which to save the result
+	 * @return the previous Result stored at the location in the growing map
+	 */
+	public Result setResultFor(final Pattern pattern, final Result result, final int index) {
+		addHistory(new MemoryEvent(this, MemoryEventType.SAVE, pattern, result, index));
+		return patterns.get(index).put(pattern, result);
+	}
+
+	// Getters
+
+	/**
+	 * Retrieves the Result that the Growing Map knows of at the current position
+	 * for the specified pattern.
+	 * 
+	 * @param p the pattern that should be used to retrieve a growing result
+	 * @return the Result (if known) for the given Pattern, otherwise null if the
+	 *         pattern's result is not known.
+	 */
+	public Result resultFor(final Pattern p) {
+		return resultFor(p, getPosition());
+	}
+
+	/**
+	 * Retrieves the Result that the Growing Map knows of at the specified position
+	 * for the specified pattern.
+	 *
+	 * @param p     the pattern that should be used to retrieve a growing result
+	 * @param index the index that should be used to retrieve a growing result
+	 * @return the Result saved for the specified index and pattern
+	 */
+	public Result resultFor(final Pattern p, final int index) {
+		final Result r = this.patterns.get(index).get(p);
+		addHistory(new MemoryEvent(this, MemoryEventType.CHECK, p, r, index));
+		return r;
+	}
+
+	/**
+	 * Determines if the Growing Map has already saved the Result for the given
+	 * Pattern.
+	 * 
+	 * @param p the Pattern to check
+	 * @return true if Pattern has a saved Result, else false
+	 */
+	public boolean hasSaved(final Pattern p) {
+		return resultFor(p) != null;
+	}
+
+	/**
+	 * Determines if the Growing Map has already saved the Result for the given
+	 * Pattern and index.
+	 * 
+	 * @param p     the Pattern to check
+	 * @param index the index to check
+	 * @return true if Pattern has a saved Result, else false
+	 */
+	public boolean hasSaved(final Pattern p, final int index) {
+		return resultFor(p, index) != null;
+	}
+
+	// Print range
 
 	/**
 	 * Retrieves the print range, a display setting indicating how far on either
@@ -191,12 +329,14 @@ public class InputContext {
 		this.printRange = printRange;
 	}
 
+	// History
+
 	/**
 	 * Adds the given entry into the context's history list.
 	 *
 	 * @param entry the entry to add to the end of the history.
 	 */
-	public void addHistory(final String entry) {
+	public void addHistory(final ParseEvent entry) {
 		this.history.add(entry);
 	}
 
@@ -206,9 +346,28 @@ public class InputContext {
 	 * 
 	 * @return an Iterable of String objects stored in this context's history
 	 */
-	public Iterable<String> getHistory() {
+	public Iterable<ParseEvent> getHistory() {
 		return history;
 	}
+
+	public String printHistory() {
+		// Set up string builder for history
+		final StringBuilder historyString = new StringBuilder();
+
+		// Track which step of history we're on
+		int historyIdx = 0;
+
+		// Loop over all history events, from earliest to latest
+		for (final ParseEvent historyEntry : getHistory()) {
+			// Append a new line with formatted columns for step and full event details
+			historyString.append(String.format("%4d:\t%s\n", historyIdx++, historyEntry.toString()));
+		}
+
+		// Return resulting string
+		return historyString.toString();
+	}
+
+	// Overall
 
 	/**
 	 * Generates a String displaying the current position of the InputContext to the

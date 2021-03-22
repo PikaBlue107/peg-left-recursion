@@ -1,6 +1,10 @@
 package patterns.general;
 
-import structure.Derivation;
+import event.control.GrowingEvent;
+import event.control.GrowingEvent.GrowingEventType;
+import event.pattern.MetaMatchEvent;
+import event.pattern.MetaMatchEvent.MetaMatchEventType;
+import event.pattern.PatternMatchEvent;
 import structure.InputContext;
 import structure.Result;
 import structure.Result.LeftRecursionStatus;
@@ -50,24 +54,48 @@ public abstract class Pattern {
 	 *         and alias
 	 */
 	private Result matchAndName(final InputContext context) {
+		// Make an event saying we're attempting to match this pattern
+		context.addHistory(new PatternMatchEvent(context, context.getPosition(), this));
 		// Retrieve the result
 		final Result r = this.match(context);
 		// Copy type and alias status to the Result
 		r.setType(getType());
 		r.setAlias(isAlias());
+		// Make an event saying whether it was accepted or rejected
+		context.addHistory(new PatternMatchEvent(context, r, this));
 		// Return the updated Result
 		return r;
 	}
 
 	/**
-	 * Requires that subclasses declare their Type (the name that they are referred
-	 * to as in Result printouts and pattern references). If a Pattern's Type is
-	 * null, then it doesn't have a display name, indicating that it should be
-	 * skipped in the Results tree printout and not considered for memoization.
+	 * Declares the pattern Type (the name that this Pattern is referred to as in
+	 * Result printouts and pattern references). If a Pattern's Type is null, then
+	 * it doesn't have a display name, indicating that it should be skipped in the
+	 * Results tree printout and not considered for memoization.
 	 *
 	 * @return the Pattern's display type
 	 */
 	public abstract String getType();
+
+	/**
+	 * Declares the pattern Definition (the string representing the form that this
+	 * Pattern accepts). This should use the Rosie RPL syntax.
+	 * 
+	 * @return a string indicating what the Pattern matches
+	 */
+	public String getDefinition() {
+		return getDefinition(false);
+	}
+
+	/**
+	 * Declares the pattern Definition (the string representing the form that this
+	 * Pattern accepts). This should use the Rosie RPL syntax.
+	 * 
+	 * @param component whether this pattern is a component of another pattern
+	 *                  definition
+	 * @return a string indicating what the Pattern matches
+	 */
+	public abstract String getDefinition(boolean component);
 
 	/**
 	 * Grows left-recursive rules from a seed by iteratively re-calculating them
@@ -80,14 +108,19 @@ public abstract class Pattern {
 	 *         the Derivation.
 	 */
 	private Result growLeftRecursion(final InputContext context, final int initialPosition) {
-		Result attempt;
-		int farthestMatchEndPos;
+
+		// Set up fields to be used in main loop
+		Result attempt = null;
+		int farthestMatchEndPos = context.resultFor(this, initialPosition).getEndIdx();
+		int iteration = 1;
+
 		// Loop until we find a special case
 		while (true) {
+			// Log beginning of step
+			context.addHistory(
+					new GrowingEvent(context, GrowingEventType.GROW_ATTEMPT, this, initialPosition, iteration));
 			// Reset to the beginning to check this case
 			context.setPosition(initialPosition);
-			// Check the farthest match we've gotten so far
-			farthestMatchEndPos = context.currentDeriv().resultFor(this).getEndIdx();
 
 			// Start matching from this current derivation we're given
 			// Attempt to *match* the Pattern (this one) against the Derivation
@@ -96,20 +129,36 @@ public abstract class Pattern {
 			attempt.setLRStatus(LeftRecursionStatus.DETECTED);
 
 			// If we didn't make any progress, then exit
-			if (!attempt.isSuccess() || (context.getPosition() <= farthestMatchEndPos)) {
+			if (!attempt.isSuccess()) {
+				context.addHistory(
+						new GrowingEvent(context, GrowingEventType.GROW_FAIL, this, initialPosition, iteration));
+				break;
+			} else if (context.getPosition() <= farthestMatchEndPos) {
+				context.addHistory(
+						new GrowingEvent(context, GrowingEventType.GROW_REJECT, this, initialPosition, iteration));
 				break;
 			}
 
+			// Add history event for succeeding this step
+			context.addHistory(
+					new GrowingEvent(context, GrowingEventType.GROW_ACCEPT, this, initialPosition, iteration));
 			// Otherwise, update the Derivation's memoized Result with the one we just
 			// calculated, and try to match again!
-			context.getDerivation(initialPosition).setResultFor(this, attempt);
+			context.setResultFor(this, attempt, initialPosition);
+			// Check the farthest match we've gotten so far
+			farthestMatchEndPos = attempt.getEndIdx();
+			// Increment the iteration counter
+			iteration++;
 		}
+
+		// Log exit from method. -1 ot iterations because last iteration is invalid
+		context.addHistory(new GrowingEvent(context, GrowingEventType.TERMINATE, this, initialPosition, iteration - 1));
 
 		// Set the context to rest at the end of the farthest match we were able to find
 		context.setPosition(farthestMatchEndPos);
 
 		// Return the result for the overall match
-		return context.getDerivation(initialPosition).resultFor(this);
+		return context.resultFor(this, initialPosition);
 	}
 
 	/**
@@ -130,14 +179,21 @@ public abstract class Pattern {
 			return this.matchAndName(context);
 		}
 
+		// Begin the full meta-match
+		// Log it in the context
+		context.addHistory(new MetaMatchEvent(context, this, context.getPosition(), MetaMatchEventType.BEGIN_PREP));
+
 		// let m = MEMO(R,P)
 		// Let m hold the "known" result of applying this Rule at this Position
 		// Let m hold the "known" result of applying this Pattern at this Derivation
-		Result m = context.currentDeriv().resultFor(this);
+		Result m = context.resultFor(this);
 
 		// if m = NIL
 		// If the "known" result does not yet exist
 		if (m == null) {
+
+			// Log that we're going to have to manually run a match
+			context.addHistory(new MetaMatchEvent(context, this, context.getPosition(), MetaMatchEventType.RUN_MATCH));
 
 			// Save the initial position before matching in case we need to grow the match
 			final int initialPosition = context.getPosition();
@@ -152,26 +208,25 @@ public abstract class Pattern {
 			// and indicates that this rule might be left recursive
 			// Set m to a failure Result with a left recursion status of POSSIBLE to
 			// indicate we suspect but don't know that the Pattern might be left recursive
-			m = Result.FAIL();
+			m = Result.FAIL(initialPosition);
 
 			// MEMO(R,P) = m
 			// Set the memoized answer for applying this rule at this position to be m, the
 			// failure memo
 			// Set the Result for applying this Pattern on this Derivation to be m, the
 			// failure Result
-			final Derivation startMatch = context.currentDeriv();
-			startMatch.setResultFor(this, m);
+			context.setResultFor(this, m);
 
 			// let ans = EVAL(R.body)
 			// Evaluate the Rule at this position, saving the answer in the field "ans"
 			// Attempt to match the Pattern on this Derivation, saving the Result in the
 			// field "ans"
-			final Result ans = match(context);
+			final Result ans = matchAndName(context);
 			ans.setType(getType());
 			ans.setAlias(isAlias());
 
 			ans.setLRStatus(m.getLRStatus());
-			startMatch.setResultFor(this, ans);
+			context.setResultFor(this, ans, initialPosition);
 
 			// m.ans = ans
 			// Set the memoized answer equal to the answer from evaluating the rule at this
@@ -194,6 +249,9 @@ public abstract class Pattern {
 			// and it has a successful match (seed) of the recursive pattern
 			if ((ans.getLRStatus() == LeftRecursionStatus.DETECTED) && ans.isSuccess()) {
 
+				// Log that we're going to start growing this left-recursive call
+				context.addHistory(new MetaMatchEvent(context, this, ans, MetaMatchEventType.BEGIN_GROW));
+
 				// return GROW-LR(R,P,m,NIL)
 				// return the result of growing the left-recursive rule until it cannot be
 				// re-evaluated to consume any more input
@@ -214,11 +272,14 @@ public abstract class Pattern {
 
 		} else {
 
+			// Log that we're going to delegate to using the saved result
+			context.addHistory(new MetaMatchEvent(context, this, m, MetaMatchEventType.ASSUME_RESULT));
+
 			// Pos = m.pos
 			// Set the current position of parsing equal to the result m's position
 			// If the result is a success, set the current position of the context equal to
 			// the result m's end index
-			if (m.isSuccess()) {
+			if (m.isSuccess()) { // TODO: Ideally we comment this out
 				context.setPosition(m.getEndIdx());
 			}
 
@@ -239,6 +300,11 @@ public abstract class Pattern {
 				// Mark this rule at this position as left-recursive for sure
 				// Mark this Pattern at this Derivation as left-recursive for sure
 				m.setLRStatus(LeftRecursionStatus.DETECTED);
+
+				// Log that we identified a left-recursive call
+
+				// Log that we're flagging this result as left-recursive
+				context.addHistory(new MetaMatchEvent(context, this, m, MetaMatchEventType.IDENTIFY_LR));
 
 				// return FAIL
 				// end this iteration with a failure so that we can find a seed later on in the
@@ -306,6 +372,14 @@ public abstract class Pattern {
 			return false;
 		}
 		return true;
+	}
+
+	/**
+	 * Provides the type and definition for this Pattern.
+	 */
+	@Override
+	public String toString() {
+		return getType() + " <- " + getDefinition();
 	}
 
 // Figure 2 from Warth's "Packrat Parsers Can Support Left Recursion"

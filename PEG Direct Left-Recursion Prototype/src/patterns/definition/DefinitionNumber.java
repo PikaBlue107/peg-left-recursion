@@ -4,7 +4,7 @@ import patterns.general.Pattern;
 import patterns.general.PatternDigit;
 import patterns.general.PatternRepetition;
 
-public class DefinitionNumber extends PatternDefinition {
+public class DefinitionNumber extends DefinedPattern {
 
 	/** Pattern definition states that a number is one or more Digits. */
 	private static final PatternRepetition NUMBER = new PatternRepetition(new PatternDigit(), 1, -1);
@@ -13,7 +13,7 @@ public class DefinitionNumber extends PatternDefinition {
 	private static final String TYPE = "Number";
 
 	@Override
-	protected Pattern getDefinition() {
+	protected Pattern getPattern() {
 		return NUMBER;
 	}
 

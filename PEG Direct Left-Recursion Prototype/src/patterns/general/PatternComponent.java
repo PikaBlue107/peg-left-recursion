@@ -17,12 +17,21 @@ package patterns.general;
 public abstract class PatternComponent extends Pattern {
 
 	/**
+	 * Declares all Pattern Components to be aliases, thus having a name but being
+	 * filtered from the main result display.
+	 */
+	@Override
+	public boolean isAlias() {
+		return true;
+	}
+
+	/**
 	 * Signals to Pattern that this object should not be considered for memoization
 	 * or produce Results that should be printed in the output tree.
 	 */
 	@Override
 	public String getType() {
-		return null;
+		return this.getClass().getSimpleName();
 	}
 
 }
