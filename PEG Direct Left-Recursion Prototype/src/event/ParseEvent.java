@@ -11,7 +11,6 @@ package event;
  * PatternEvents
  *  - Accept / reject pattern
  *  - Accept single character
- * 
  *  - Accept sequence component
  *  - Commit / reject ordered choice
  *  - Expand / close / fail repetition
@@ -37,6 +36,8 @@ import structure.InputContext;
  */
 public abstract class ParseEvent {
 
+	// TODO: New feature - timestamps for profiling?
+
 	/** The portion of the input string that this Event occurs over. */
 	private final String affected;
 
@@ -55,10 +56,10 @@ public abstract class ParseEvent {
 	private static final int TOSTRING_WIDTH_NAME = 25;
 
 	/** Number of characters to print the event name */
-	private static final int TOSTRING_WIDTH_TYPE = 12;
+	private static final int TOSTRING_WIDTH_TYPE = 18;
 
 	/** Number of characters to print the event name */
-	private static final int TOSTRING_WIDTH_POSITION = 23;
+	private static final int TOSTRING_WIDTH_POSITION = 25;
 
 	/**
 	 * Constructs this ParseEvent with the given range and detail. If detail is
@@ -197,32 +198,34 @@ public abstract class ParseEvent {
 	@Override
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
+		int target = 0;
 
 		// Add name
 		builder.append(getEventName());
 		// Padding
-		pad(builder, TOSTRING_WIDTH_NAME);
-
-		// Add type
-		builder.append(getType());
-		// Padding
-		pad(builder, TOSTRING_WIDTH_NAME + TOSTRING_WIDTH_TYPE);
+		target += TOSTRING_WIDTH_NAME;
+		pad(builder, target);
 
 		// Add index
 		builder.append(" at ").append(getLocation());
-
 		// If affected part isn't empty, add it
 		if (!"".equals(getAffectedPart())) {
 			builder.append(", \"").append(getAffectedPart()).append("\"");
 		}
+		// Add colon
+		builder.append(":");
+		// Padding
+		target += TOSTRING_WIDTH_POSITION;
+		pad(builder, target);
+
+		// Add type
+		builder.append(getType());
+		// Padding
+		target += TOSTRING_WIDTH_TYPE;
+		pad(builder, target);
 
 		// If there's more to print afterwards
 		if (getDetail() != null) {
-			// Colon
-			builder.append(": ");
-			// Padding
-			pad(builder, TOSTRING_WIDTH_NAME + TOSTRING_WIDTH_TYPE + TOSTRING_WIDTH_POSITION);
-
 			// If detail isn't null, add it
 			builder.append(getDetail());
 		}
