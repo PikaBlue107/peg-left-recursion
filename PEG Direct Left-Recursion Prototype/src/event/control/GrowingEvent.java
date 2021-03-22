@@ -19,16 +19,14 @@ public class GrowingEvent extends ControlEvent {
 	 *
 	 */
 	public enum GrowingEventType {
-		/** Recursion growing was initiated. */
-		INITIATE("Initiate"),
 		/** Recursion growing for one step was attempted. */
-		STEP_ATTEMPT("Attempt Step"),
+		GROW_ATTEMPT("Attempt Grow"),
 		/** Recursion growing for one step failed because the match failed. */
-		STEP_FAIL("Fail Step"),
+		GROW_FAIL("Fail Grow"),
 		/** Recursion growing for one step was rejected because the match shortened. */
-		STEP_REJECT("Reject Step"),
+		GROW_REJECT("Reject Grow"),
 		/** Recursion growing for one step was grown. */
-		STEP_GROW("Grow Step"),
+		GROW_ACCEPT("Accept Grow"),
 		/** Recursion growing was terminated. */
 		TERMINATE("Terminate");
 
@@ -61,14 +59,20 @@ public class GrowingEvent extends ControlEvent {
 	 * Creates a GrowingEvent based on the provided context, type, pattern, and
 	 * index.
 	 * 
-	 * @param context the InputContext storing the saved results
-	 * @param type    whether this memory event is a check, a save, or an assume
-	 * @param pattern the pattern that this memory event is using
-	 * @param index   the index at which this growing step is happening
+	 * @param context   the InputContext storing the saved results
+	 * @param type      whether this memory event is a check, a save, or an assume
+	 * @param pattern   the pattern that this memory event is using
+	 * @param index     the index at which this growing step is happening
+	 * @param iteration the number of this iteration, 1-indexed i.e. 1st iteration,
+	 *                  2nd iteration, etc. For a TERMINATE growing event, should be
+	 *                  the total number of *valid* iterations.
 	 */
-	public GrowingEvent(final InputContext context, final GrowingEventType type, final Pattern pattern,
-			final int index) {
-		super(context, index, 0, "for pattern " + pattern.getType());
+	public GrowingEvent(final InputContext context, final GrowingEventType type, final Pattern pattern, final int index,
+			final int iteration) {
+		super(context, index, 0,
+				"for pattern " + pattern.getType()
+						+ (type == GrowingEventType.TERMINATE ? " (total # valid grow iterations: " + iteration + ")"
+								: " (iteration #" + iteration + ")"));
 		this.type = type;
 	}
 
