@@ -35,6 +35,19 @@ public class PatternRepetitionTest {
 	}
 
 	@Test
+	public void testExamples() {
+		// Pattern allows 1-3 matches
+		pattern = new PatternRepetition(digit, 1, 3);
+
+		PatternTestUtils.showExample(pattern, "", "Below lower bound");
+		PatternTestUtils.showExample(pattern, "1", "Lower bound");
+		PatternTestUtils.showExample(pattern, "12", "Within bounds");
+		PatternTestUtils.showExample(pattern, "123", "Upper bound");
+		PatternTestUtils.showExample(pattern, "1234", "Beyond upper bound");
+
+	}
+
+	@Test
 	public void testStar() {
 		// Pattern allows 0-infinity matches
 		pattern = new PatternRepetition(digit, 0, -1);

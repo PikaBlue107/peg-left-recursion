@@ -103,9 +103,7 @@ public class PatternTestUtils {
 
 		// Save the output of the test
 		exampleOutput.append("Match history: \n");
-		for (final String historyEntry : matcher.context.getHistory()) {
-			exampleOutput.append("\t" + historyEntry + "\n");
-		}
+		exampleOutput.append(matcher.context.printHistory());
 		exampleOutput.append("Result tree:" + "\n");
 		exampleOutput.append(matcher.r.printResultTree() + "\n");
 		exampleOutput.append("\n");

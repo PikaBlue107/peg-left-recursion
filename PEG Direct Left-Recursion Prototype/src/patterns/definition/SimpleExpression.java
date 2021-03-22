@@ -1,5 +1,6 @@
 package patterns.definition;
 
+import event.pattern.CharacterAcceptEvent;
 import patterns.general.Pattern;
 import structure.InputContext;
 import structure.Result;
@@ -33,8 +34,7 @@ public class SimpleExpression extends Pattern {
 
 		final Result expression = new Result(true, result.getData(), result.getStartIdx());
 		expression.setType("Expression");
-		expression.addChild(result); // TODO: Restructure addChild() to automatically add in data and index
-										// information. Possibly a new constructor as well?
+		expression.addChild(result);
 		return expression;
 	}
 
@@ -81,11 +81,11 @@ public class SimpleExpression extends Pattern {
 
 	private Result matchPlus(final InputContext context) {
 		if (!context.isAtEnd() && (context.currentChar() == '+')) {
-			context.addHistory("Matched [" + context.currentChar() + "]");
+			context.addHistory(new CharacterAcceptEvent(context, context.getPosition()));
 			context.advance();
 			return new Result(true, '+', context.getPosition() - 1);
 		} else {
-			return Result.FAIL();
+			return Result.FAIL(context.getPosition());
 		}
 	}
 

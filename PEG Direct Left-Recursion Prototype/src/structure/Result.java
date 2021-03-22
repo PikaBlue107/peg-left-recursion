@@ -36,12 +36,14 @@ public class Result {
 	}
 
 	/**
-	 * Generates a new fail Result for quick use in pattern definitions.
+	 * Generates a new fail Result with the given index for quick use in pattern
+	 * definitions.
 	 * 
+	 * @param idx the index that this fail result should mark
 	 * @return a Result representing a failed match.
 	 */
-	public static final Result FAIL() {
-		return new Result(false, "", -1);
+	public static final Result FAIL(final int idx) {
+		return new Result(false, "", idx);
 	}
 
 	/**
@@ -72,11 +74,7 @@ public class Result {
 		this.data = data;
 		this.lRStatus = leftRecursionStatus;
 		this.startIdx = startIdx;
-		if (success) {
-			this.endIdx = startIdx + data.length();
-		} else {
-			this.endIdx = -1;
-		}
+		this.endIdx = startIdx + data.length();
 	}
 
 	public void addChar(final char nextData) {

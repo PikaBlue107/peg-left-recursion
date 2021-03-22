@@ -6,6 +6,7 @@ package patterns.general;
 import java.util.ArrayList;
 import java.util.List;
 
+import event.pattern.OrderedChoiceEvent;
 import structure.InputContext;
 import structure.Result;
 
@@ -78,11 +79,17 @@ public class PatternChoice extends PatternComponent {
 		// Run through the list of patterns to match
 		// Keep track of the previous pattern's result
 		Result result;
+		// Choice index for event reporting
+		int choiceIdx = 0;
 		// Loop over all patterns
 		for (final Pattern p : patterns) {
+			// Log attempt to match
+			context.addHistory(new OrderedChoiceEvent(context, choiceIdx, p));
 
 			// Attempt to match this pattern
 			result = p.lazyMatch(context);
+			// Report result
+			context.addHistory(new OrderedChoiceEvent(context, choiceIdx, p, result));
 
 			// If success, save and return the choice result
 			if (result.isSuccess()) {
@@ -92,10 +99,12 @@ public class PatternChoice extends PatternComponent {
 
 			// Otherwise, try the next pattern instead. Reset the context!
 			context.setPosition(choice.getStartIdx());
+			// Increment choice index for next step
+			choiceIdx++;
 		}
 
 		// Looped over all patterns successfully, none matched. Send it back!
-		return Result.FAIL();
+		return Result.FAIL(context.getPosition());
 	}
 
 	/**

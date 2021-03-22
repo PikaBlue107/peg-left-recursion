@@ -8,6 +8,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import event.ParseEvent;
+import event.control.MemoryEvent;
+import event.control.MemoryEvent.MemoryEventType;
+import event.control.PositionEvent;
+import event.control.PositionEvent.PositionEventType;
 import patterns.general.Pattern;
 
 /**
@@ -51,7 +56,7 @@ public class InputContext {
 	 * List of all "events" that have happened in the context (matching,
 	 * backtracking, etc.)
 	 */
-	private final List<String> history = new ArrayList<>();
+	private final List<ParseEvent> history = new ArrayList<>();
 
 	/**
 	 * How far the InputContext will print to either side when running toString()
@@ -62,6 +67,9 @@ public class InputContext {
 	 * The default number of characters that toString() will print to either side.
 	 */
 	private static final int DEFAUT_PRINT_RANGE = 10;
+
+	/** Lowercase epsilon, representing the end of the string. */
+	public static final String CHAR_EPSILON = "\u03B5";
 
 	/*
 	 * ----------------------------- CONSTRUCTORS -------------------------------
@@ -109,6 +117,7 @@ public class InputContext {
 	 */
 	public void setPosition(final int position) {
 		this.position = position;
+		addHistory(new PositionEvent(this, PositionEventType.SET));
 	}
 
 	/**
@@ -121,13 +130,22 @@ public class InputContext {
 		return this.position == this.inputString.length();
 	}
 
+	public int length() {
+		return inputString.length();
+	}
+
 	/**
 	 * Advances the InputContext by one step and returns the same Context to check.
 	 *
 	 * @return the Context, advanced one position.
+	 * @throws IllegalStateException if already at the end of the input string
 	 */
 	public InputContext advance() {
+		if (isAtEnd()) {
+			throw new IllegalStateException("Cannot advance when already at end of input");
+		}
 		position++;
+		addHistory(new PositionEvent(this, PositionEventType.ADVANCE));
 		return this;
 	}
 
@@ -146,10 +164,25 @@ public class InputContext {
 	// Input string
 
 	/**
+	 * Retrieves the input string that this InputContext holds.
+	 *
 	 * @return the inputString
 	 */
 	public String getInputString() {
-		return inputString;
+		return getInputString(false);
+	}
+
+	/**
+	 * Retrieves the input string, optionally adding an epsilon character to
+	 * represent the end of input.
+	 * 
+	 * @param addEpsilon whether to add a trailing epsilon character representing
+	 *                   the end of input
+	 * @return the input string that this context is holding, with an optional
+	 *         end-of-string epsilon character
+	 */
+	public String getInputString(final boolean addEpsilon) {
+		return inputString + (addEpsilon ? CHAR_EPSILON : "");
 	}
 
 	/**
@@ -219,6 +252,7 @@ public class InputContext {
 	 * @return the previous Result stored at the location in the growing map
 	 */
 	public Result setResultFor(final Pattern pattern, final Result result, final int index) {
+		addHistory(new MemoryEvent(this, MemoryEventType.SAVE, pattern, result, index));
 		return patterns.get(index).put(pattern, result);
 	}
 
@@ -245,7 +279,9 @@ public class InputContext {
 	 * @return the Result saved for the specified index and pattern
 	 */
 	public Result resultFor(final Pattern p, final int index) {
-		return this.patterns.get(index).get(p);
+		final Result r = this.patterns.get(index).get(p);
+		addHistory(new MemoryEvent(this, MemoryEventType.CHECK, p, r, index));
+		return r;
 	}
 
 	/**
@@ -300,7 +336,7 @@ public class InputContext {
 	 *
 	 * @param entry the entry to add to the end of the history.
 	 */
-	public void addHistory(final String entry) {
+	public void addHistory(final ParseEvent entry) {
 		this.history.add(entry);
 	}
 
@@ -310,8 +346,25 @@ public class InputContext {
 	 * 
 	 * @return an Iterable of String objects stored in this context's history
 	 */
-	public Iterable<String> getHistory() {
+	public Iterable<ParseEvent> getHistory() {
 		return history;
+	}
+
+	public String printHistory() {
+		// Set up string builder for history
+		final StringBuilder historyString = new StringBuilder();
+
+		// Track which step of history we're on
+		int historyIdx = 0;
+
+		// Loop over all history events, from earliest to latest
+		for (final ParseEvent historyEntry : getHistory()) {
+			// Append a new line with formatted columns for step and full event details
+			historyString.append(String.format("%4d:\t%s\n", historyIdx++, historyEntry.toString()));
+		}
+
+		// Return resulting string
+		return historyString.toString();
 	}
 
 	// Overall

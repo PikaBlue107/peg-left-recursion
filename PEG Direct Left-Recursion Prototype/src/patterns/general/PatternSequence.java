@@ -6,6 +6,7 @@ package patterns.general;
 import java.util.ArrayList;
 import java.util.List;
 
+import event.pattern.SequenceEvent;
 import structure.InputContext;
 import structure.Result;
 
@@ -75,10 +76,16 @@ public class PatternSequence extends PatternComponent {
 		// Keep track of the previous pattern's result
 		final Result sequence = new Result(true, "", context.getPosition());
 		Result result;
+		// Sequence index for event reporting
+		int sequenceIdx = 0;
 		// Loop over all patterns
 		for (final Pattern p : patterns) {
+			// Log attempt to match
+			context.addHistory(new SequenceEvent(context, sequenceIdx, p));
 			// Attempt to match this pattern
 			result = p.lazyMatch(context);
+			// Report result
+			context.addHistory(new SequenceEvent(context, sequenceIdx, p, result));
 			// If fail, return it
 			if (!result.isSuccess()) {
 				// Reset the context first
@@ -88,6 +95,8 @@ public class PatternSequence extends PatternComponent {
 			}
 			// Otherwise, add its contents into the Result
 			sequence.addChild(result);
+			// Increment sequence index for next step
+			sequenceIdx++;
 		}
 
 		// Looped over all patterns successfully. Send result!
