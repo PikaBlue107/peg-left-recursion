@@ -19,7 +19,7 @@ public class CharacterAcceptEvent extends PatternEvent {
 	 * @param idx     the index of the accepted character in the input string
 	 */
 	public CharacterAcceptEvent(final InputContext context, final int idx) {
-		super(context, idx, 1, null);
+		super(context, idx, 1, "character '" + context.getInputString().charAt(idx) + "'");
 	}
 
 	/**
