@@ -326,6 +326,14 @@ public abstract class Pattern {
 		return true;
 	}
 
+	/**
+	 * Provides the type and definition for this Pattern.
+	 */
+	@Override
+	public String toString() {
+		return getType() + " <- " + getDefinition();
+	}
+
 // Figure 2 from Warth's "Packrat Parsers Can Support Left Recursion"
 //	/**
 //	 * Lazily matches this pattern onto the provided Derivation. If the Derivation
