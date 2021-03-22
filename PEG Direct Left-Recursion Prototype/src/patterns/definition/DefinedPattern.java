@@ -11,7 +11,7 @@ import structure.Result;
  * @author Melody Griesen
  *
  */
-public abstract class PatternDefinition extends Pattern {
+public abstract class DefinedPattern extends Pattern {
 
 	/**
 	 * Implements the match() method by requiring a Pattern definition to be
@@ -20,7 +20,7 @@ public abstract class PatternDefinition extends Pattern {
 	@Override
 	protected Result match(final InputContext context) {
 		// Delegate to the pattern we created.
-		return getDefinition().lazyMatch(context);
+		return getPattern().lazyMatch(context);
 	}
 
 	/**
@@ -28,7 +28,29 @@ public abstract class PatternDefinition extends Pattern {
 	 * 
 	 * @return the Pattern that shall be used to determine matching.
 	 */
-	protected abstract Pattern getDefinition();
+	protected abstract Pattern getPattern();
+
+	/**
+	 * {@inheritDoc} If component, returns pattern type. If non-component, delegates
+	 * to inner pattern's definition.
+	 * 
+	 * @param component whether this pattern is a component of another pattern
+	 *                  definition
+	 * @return a string indicating what the Pattern matches
+	 */
+	@Override
+	public String getDefinition(final boolean component) {
+		// If component of another definition
+		if (component) {
+			// Return this defined pattern's name
+			return getType();
+		}
+		// If this pattern is the top-level definition
+		else {
+			// Return the full definition from the pattern stored
+			return getPattern().getDefinition(true);
+		}
+	}
 
 	/**
 	 * Implements hashCode to compare based on ID, as definitions should *always* be
@@ -55,7 +77,7 @@ public abstract class PatternDefinition extends Pattern {
 		if (getClass() != obj.getClass()) {
 			return false;
 		}
-		final PatternDefinition other = (PatternDefinition) obj;
+		final DefinedPattern other = (DefinedPattern) obj;
 		if (this.getID() != other.getID()) {
 			return false;
 		}

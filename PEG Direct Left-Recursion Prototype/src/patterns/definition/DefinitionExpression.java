@@ -11,7 +11,7 @@ import patterns.general.PatternString;
  * @author Melody Griesen
  *
  */
-public class DefinitionExpression extends PatternDefinition {
+public class DefinitionExpression extends DefinedPattern {
 
 	/** Internal definition used when matching. */
 	private final Pattern pattern = new PatternChoice(
@@ -20,7 +20,7 @@ public class DefinitionExpression extends PatternDefinition {
 	private static final String TYPE = "Expression";
 
 	@Override
-	protected Pattern getDefinition() {
+	protected Pattern getPattern() {
 		return pattern;
 	}
 

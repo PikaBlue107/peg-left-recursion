@@ -115,4 +115,13 @@ public class SimpleExpression extends Pattern {
 		return TYPE;
 	}
 
+	@Override
+	public String getDefinition(final boolean component) {
+		if (component) {
+			return getType();
+		} else {
+			return "Expression \"+\" Number";
+		}
+	}
+
 }

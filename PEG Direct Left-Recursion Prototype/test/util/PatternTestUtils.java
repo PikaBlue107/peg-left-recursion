@@ -301,7 +301,8 @@ public class PatternTestUtils {
 
 			scenario = new StringBuilder();
 			scenario.append("Test scenario:\n").append("\tInput: [").append(s).append("]\n").append("\tPattern type: ")
-					.append(p.getType()).append("\n").append("\tPattern toString: ").append(p.toString()).append("\n");
+					.append(p.getType()).append("\n").append("\tPattern definition: ").append(p.getDefinition())
+					.append("\n");
 		}
 
 		/**

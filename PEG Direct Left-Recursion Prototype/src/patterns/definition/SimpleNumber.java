@@ -64,4 +64,13 @@ public class SimpleNumber extends Pattern {
 		return TYPE;
 	}
 
+	@Override
+	public String getDefinition(final boolean component) {
+		if (component) {
+			return getType();
+		} else {
+			return "[0-9]+";
+		}
+	}
+
 }
