@@ -135,4 +135,61 @@ public class PatternRepetition extends PatternComponent {
 		return true;
 	}
 
+	/**
+	 * {@inheritDoc} Surrounds repeated pattern in token boundaries, and appends a
+	 * repetition indicator (one of '+', '+', '*', or a form of {n,m})
+	 */
+	@Override
+	public String getDefinition(final boolean component) {
+
+		// Use string builder for definition
+		final StringBuilder definition = new StringBuilder();
+
+		// Start by encapsulating repeated pattern in token boundary parenthesis
+		definition.append("(");
+		definition.append(pattern.getDefinition(true));
+		definition.append(")");
+
+		// Detect cases for repetition indicator
+		// {0,1} := ?
+		if ((lowerBound == 0) && (upperBound == 1)) {
+			definition.append("?");
+		}
+		// {0,inf} := *
+		else if ((lowerBound == 0) && (upperBound == -1)) {
+			definition.append("*");
+		}
+		// {1,inf} := +
+		else if ((lowerBound == 1) && (upperBound == -1)) {
+			definition.append("+");
+		}
+		// some form of {n,m}
+		else {
+			// Always start with bracket
+			definition.append("{");
+
+			// If the lower bound is 0, skip it; otherwise, print it
+			if (lowerBound != 0) {
+				definition.append(lowerBound);
+			}
+
+			// If bounds don't match
+			if (lowerBound != upperBound) {
+				// Add comma
+				definition.append(",");
+				// If upper bound isn't inf, add
+				if (upperBound != -1) {
+					definition.append(upperBound);
+				}
+			}
+
+			// Always end with bracket
+			definition.append("}");
+		}
+
+		// Provide finished result
+		return definition.toString();
+
+	}
+
 }
