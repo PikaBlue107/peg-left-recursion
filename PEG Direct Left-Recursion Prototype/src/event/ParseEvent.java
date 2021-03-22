@@ -53,7 +53,7 @@ public abstract class ParseEvent {
 	private static final int TOSTRING_WIDTH_NAME = 25;
 
 	/** Number of characters to print the event name */
-	private static final int TOSTRING_WIDTH_TYPE = 10;
+	private static final int TOSTRING_WIDTH_TYPE = 12;
 
 	/** Number of characters to print the event name */
 	private static final int TOSTRING_WIDTH_POSITION = 23;

@@ -1,5 +1,7 @@
 package patterns.general;
 
+import event.control.GrowingEvent;
+import event.control.GrowingEvent.GrowingEventType;
 import event.control.MemoryEvent;
 import event.control.MemoryEvent.MemoryEventType;
 import event.pattern.PatternMatchEvent;
@@ -86,14 +88,20 @@ public abstract class Pattern {
 	 *         the Derivation.
 	 */
 	private Result growLeftRecursion(final InputContext context, final int initialPosition) {
-		Result attempt;
-		int farthestMatchEndPos;
+
+		// Log entry into method
+		context.addHistory(new GrowingEvent(context, GrowingEventType.INITIATE, this, initialPosition));
+
+		// Set up fields to be used in main loop
+		Result attempt = null;
+		int farthestMatchEndPos = context.resultFor(this, initialPosition).getEndIdx();
+
 		// Loop until we find a special case
 		while (true) {
+			// Log beginning of step
+			context.addHistory(new GrowingEvent(context, GrowingEventType.STEP_ATTEMPT, this, initialPosition));
 			// Reset to the beginning to check this case
 			context.setPosition(initialPosition);
-			// Check the farthest match we've gotten so far
-			farthestMatchEndPos = context.resultFor(this).getEndIdx();
 
 			// Start matching from this current derivation we're given
 			// Attempt to *match* the Pattern (this one) against the Derivation
@@ -102,14 +110,25 @@ public abstract class Pattern {
 			attempt.setLRStatus(LeftRecursionStatus.DETECTED);
 
 			// If we didn't make any progress, then exit
-			if (!attempt.isSuccess() || (context.getPosition() <= farthestMatchEndPos)) {
+			if (!attempt.isSuccess()) {
+				context.addHistory(new GrowingEvent(context, GrowingEventType.STEP_FAIL, this, initialPosition));
+				break;
+			} else if (context.getPosition() <= farthestMatchEndPos) {
+				context.addHistory(new GrowingEvent(context, GrowingEventType.STEP_REJECT, this, initialPosition));
 				break;
 			}
 
+			// Add history event for succeeding this step
+			context.addHistory(new GrowingEvent(context, GrowingEventType.STEP_GROW, this, initialPosition));
 			// Otherwise, update the Derivation's memoized Result with the one we just
 			// calculated, and try to match again!
 			context.setResultFor(this, attempt, initialPosition);
+			// Check the farthest match we've gotten so far
+			farthestMatchEndPos = attempt.getEndIdx();
 		}
+
+		// Log exit from method
+		context.addHistory(new GrowingEvent(context, GrowingEventType.TERMINATE, this, initialPosition));
 
 		// Set the context to rest at the end of the farthest match we were able to find
 		context.setPosition(farthestMatchEndPos);
