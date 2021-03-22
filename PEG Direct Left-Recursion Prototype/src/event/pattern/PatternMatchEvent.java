@@ -18,8 +18,7 @@ public class PatternMatchEvent extends PatternEvent {
 	 * @param type
 	 */
 	public PatternMatchEvent(final InputContext context, final Result matchResult, final Pattern pattern) {
-		super(context, matchResult.getStartIdx(), matchResult.getData().length(),
-				"for pattern " + pattern.getClass().getSimpleName());
+		super(context, matchResult.getStartIdx(), matchResult.getData().length(), pattern.getClass().getSimpleName());
 		this.type = matchResult.isSuccess() ? PatternEventType.ACCEPT : PatternEventType.REJECT;
 	}
 
