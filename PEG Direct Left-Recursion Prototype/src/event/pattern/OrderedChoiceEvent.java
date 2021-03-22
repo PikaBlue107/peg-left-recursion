@@ -33,7 +33,7 @@ public class OrderedChoiceEvent extends PatternEvent {
 	 */
 	public OrderedChoiceEvent(final InputContext context, final Result matchResult, final int choiceIdx) {
 		super(context, matchResult.getStartIdx(), matchResult.getData().length(), "ordered choice option " + choiceIdx);
-		this.type = matchResult.isSuccess() ? PatternEventType.ACCEPT : PatternEventType.REJECT;
+		this.type = matchResult.isSuccess() ? PatternEventType.COMMIT : PatternEventType.REJECT;
 	}
 
 	/**

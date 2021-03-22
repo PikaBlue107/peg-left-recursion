@@ -33,7 +33,7 @@ public abstract class PatternEvent extends ParseEvent {
 		/** Repetition was expanded. */
 		EXPAND("Expand"),
 		/** Repetition was capped at max length. */
-		CLOSE("Close");
+		LIMIT("Limit");
 
 		/** Stores a display-friendly name for this enum. */
 		private String displayName;
