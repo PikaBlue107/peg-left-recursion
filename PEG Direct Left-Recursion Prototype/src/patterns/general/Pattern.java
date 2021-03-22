@@ -1,7 +1,6 @@
 package patterns.general;
 
 import event.pattern.PatternMatchEvent;
-import structure.Derivation;
 import structure.InputContext;
 import structure.Result;
 import structure.Result.LeftRecursionStatus;
@@ -92,7 +91,7 @@ public abstract class Pattern {
 			// Reset to the beginning to check this case
 			context.setPosition(initialPosition);
 			// Check the farthest match we've gotten so far
-			farthestMatchEndPos = context.currentDeriv().resultFor(this).getEndIdx();
+			farthestMatchEndPos = context.resultFor(this).getEndIdx();
 
 			// Start matching from this current derivation we're given
 			// Attempt to *match* the Pattern (this one) against the Derivation
@@ -107,14 +106,14 @@ public abstract class Pattern {
 
 			// Otherwise, update the Derivation's memoized Result with the one we just
 			// calculated, and try to match again!
-			context.getDerivation(initialPosition).setResultFor(this, attempt);
+			context.setResultFor(this, attempt, initialPosition);
 		}
 
 		// Set the context to rest at the end of the farthest match we were able to find
 		context.setPosition(farthestMatchEndPos);
 
 		// Return the result for the overall match
-		return context.getDerivation(initialPosition).resultFor(this);
+		return context.resultFor(this, initialPosition);
 	}
 
 	/**
@@ -138,7 +137,7 @@ public abstract class Pattern {
 		// let m = MEMO(R,P)
 		// Let m hold the "known" result of applying this Rule at this Position
 		// Let m hold the "known" result of applying this Pattern at this Derivation
-		Result m = context.currentDeriv().resultFor(this);
+		Result m = context.resultFor(this);
 
 		// if m = NIL
 		// If the "known" result does not yet exist
@@ -164,8 +163,7 @@ public abstract class Pattern {
 			// failure memo
 			// Set the Result for applying this Pattern on this Derivation to be m, the
 			// failure Result
-			final Derivation startMatch = context.currentDeriv();
-			startMatch.setResultFor(this, m);
+			context.setResultFor(this, m);
 
 			// let ans = EVAL(R.body)
 			// Evaluate the Rule at this position, saving the answer in the field "ans"
@@ -176,7 +174,7 @@ public abstract class Pattern {
 			ans.setAlias(isAlias());
 
 			ans.setLRStatus(m.getLRStatus());
-			startMatch.setResultFor(this, ans);
+			context.setResultFor(this, ans, initialPosition);
 
 			// m.ans = ans
 			// Set the memoized answer equal to the answer from evaluating the rule at this

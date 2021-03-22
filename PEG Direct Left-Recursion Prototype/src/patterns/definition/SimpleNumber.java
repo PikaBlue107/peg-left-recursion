@@ -12,8 +12,7 @@ public class SimpleNumber extends Pattern {
 
 	@Override
 	protected Result match(final InputContext context) {
-		if (!context.currentDeriv().getChResult().isSuccess()
-				|| !Character.isDigit(context.currentDeriv().getChResult().getData().charAt(0))) {
+		if (context.isAtEnd() || !Character.isDigit(context.currentChar())) {
 			return Result.FAIL();
 		}
 
