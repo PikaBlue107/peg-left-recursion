@@ -20,7 +20,7 @@ public class PatternDigit extends PatternComponent {
 	protected Result match(final InputContext context) {
 		// Ensure input remaining
 		if (context.isAtEnd()) {
-			return Result.FAIL();
+			return Result.FAIL(context.getPosition());
 		}
 		// Retrieve character
 		final char ch = context.currentChar();
@@ -33,7 +33,7 @@ public class PatternDigit extends PatternComponent {
 			return new Result(true, ch, startPos);
 		} else {
 			// Not a digit. Failure
-			return Result.FAIL();
+			return Result.FAIL(context.getPosition());
 		}
 	}
 }

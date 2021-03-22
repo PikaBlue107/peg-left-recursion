@@ -13,7 +13,7 @@ public class SimpleNumber extends Pattern {
 	@Override
 	protected Result match(final InputContext context) {
 		if (context.isAtEnd() || !Character.isDigit(context.currentChar())) {
-			return Result.FAIL();
+			return Result.FAIL(context.getPosition());
 		}
 
 		final Result priorResult = new Result(true, context.currentChar(), context.getPosition());

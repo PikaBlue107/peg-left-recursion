@@ -95,7 +95,7 @@ public class PatternChoice extends PatternComponent {
 		}
 
 		// Looped over all patterns successfully, none matched. Send it back!
-		return Result.FAIL();
+		return Result.FAIL(context.getPosition());
 	}
 
 	/**

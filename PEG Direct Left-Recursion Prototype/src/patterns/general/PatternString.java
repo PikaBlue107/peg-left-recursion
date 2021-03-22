@@ -51,7 +51,7 @@ public class PatternString extends PatternComponent {
 				// Reset context back to start
 				context.setPosition(initialPosition);
 				// Return failure
-				return Result.FAIL();
+				return Result.FAIL(context.getPosition());
 			}
 		}
 

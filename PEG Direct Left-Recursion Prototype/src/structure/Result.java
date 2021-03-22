@@ -36,16 +36,6 @@ public class Result {
 	}
 
 	/**
-	 * Generates a new fail Result for quick use in pattern definitions.
-	 * 
-	 * @return a Result representing a failed match.
-	 */
-	@Deprecated
-	public static final Result FAIL() {
-		return new Result(false, "", -1);
-	}
-
-	/**
 	 * Generates a new fail Result with the given index for quick use in pattern
 	 * definitions.
 	 * 
@@ -84,11 +74,7 @@ public class Result {
 		this.data = data;
 		this.lRStatus = leftRecursionStatus;
 		this.startIdx = startIdx;
-		if (success) {
-			this.endIdx = startIdx + data.length();
-		} else {
-			this.endIdx = -1;
-		}
+		this.endIdx = startIdx + data.length();
 	}
 
 	public void addChar(final char nextData) {

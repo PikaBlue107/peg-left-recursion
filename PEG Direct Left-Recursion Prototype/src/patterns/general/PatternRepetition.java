@@ -78,7 +78,7 @@ public class PatternRepetition extends PatternComponent {
 					// Reset the context
 					context.setPosition(repetition.getStartIdx());
 					// Return a failure.
-					return Result.FAIL();
+					return Result.FAIL(context.getPosition());
 				}
 			}
 		}
