@@ -135,4 +135,32 @@ public class PatternChoice extends PatternComponent {
 		return true;
 	}
 
+	/**
+	 * {@inheritDoc} Represents each choice in the form ( [definition] ) / (
+	 * [definition] )
+	 */
+	@Override
+	public String getDefinition(final boolean component) {
+
+		// Use StringBuilder to compile definition
+		final StringBuilder definition = new StringBuilder();
+
+		// Loop over all patterns we have
+		for (final Pattern p : patterns) {
+
+			// Append grouped sub-definition
+			definition.append("(");
+			definition.append(p.getDefinition(true));
+			definition.append(")");
+
+			// If non-final element, append ordered choice operator
+			if (p != patterns.get(patterns.size() - 1)) {
+				definition.append(" / ");
+			}
+		}
+
+		// Return final definition string
+		return definition.toString();
+	}
+
 }
