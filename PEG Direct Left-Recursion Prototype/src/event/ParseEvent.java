@@ -10,14 +10,16 @@ package event;
  * 
  * PatternEvents
  *  - Accept / reject pattern
+ *  - Accept single character
+ * 
+ *  - Accept sequence component
  *  - Commit / reject ordered choice
  *  - Expand / close / fail repetition
- *  - Accept sequence component
- *  - Accept single character
  * 
  * ControlEvents
  *  - Position events (reset / advance position)
  *  - Save / use with memory
+ *  - Growing events (initiate / attempt step / reject step / fail step / grow step / terminate)
  * 
  * @formatter:on
  */
