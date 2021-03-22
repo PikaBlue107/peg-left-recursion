@@ -70,7 +70,7 @@ public class MetaMatchEvent extends PatternEvent {
 	 */
 	public MetaMatchEvent(final InputContext context, final Pattern pattern, final int index,
 			final MetaMatchEventType type) {
-		super(context, index, 0, "for pattern " + pattern.getType());
+		super(context, index, 0, "for " + pattern.getType());
 		this.type = type;
 	}
 
@@ -84,7 +84,11 @@ public class MetaMatchEvent extends PatternEvent {
 	 */
 	public MetaMatchEvent(final InputContext context, final Pattern pattern, final Result result,
 			final MetaMatchEventType type) {
-		super(context, result.getStartIdx(), result.getData().length(), "for pattern " + pattern.getType());
+		super(context, result.getStartIdx(), result.getData().length(),
+				(type == MetaMatchEventType.ASSUME_RESULT
+						? "that pattern " + pattern.getType()
+								+ (result.isSuccess() ? " matches \"" + result.getData() + "\"" : " does not match")
+						: "for " + pattern.getType()));
 		this.type = type;
 	}
 
