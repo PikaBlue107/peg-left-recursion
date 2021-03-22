@@ -1,7 +1,7 @@
 /**
  * 
  */
-package patterns.general;
+package pattern.component;
 
 import event.pattern.CharacterAcceptEvent;
 import structure.InputContext;

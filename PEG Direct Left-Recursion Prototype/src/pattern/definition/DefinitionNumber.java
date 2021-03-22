@@ -1,8 +1,8 @@
-package patterns.definition;
+package pattern.definition;
 
-import patterns.Pattern;
-import patterns.general.PatternDigit;
-import patterns.general.PatternRepetition;
+import pattern.Pattern;
+import pattern.component.PatternDigit;
+import pattern.component.PatternRepetition;
 
 public class DefinitionNumber extends DefinedPattern {
 

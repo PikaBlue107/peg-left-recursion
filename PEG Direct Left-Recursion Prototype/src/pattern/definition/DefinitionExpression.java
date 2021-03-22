@@ -1,9 +1,9 @@
-package patterns.definition;
+package pattern.definition;
 
-import patterns.Pattern;
-import patterns.general.PatternChoice;
-import patterns.general.PatternSequence;
-import patterns.general.PatternString;
+import pattern.Pattern;
+import pattern.component.PatternChoice;
+import pattern.component.PatternSequence;
+import pattern.component.PatternString;
 
 /**
  * expr <- { expr + num / num }

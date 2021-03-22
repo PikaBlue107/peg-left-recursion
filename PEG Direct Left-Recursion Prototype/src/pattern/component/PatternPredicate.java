@@ -1,9 +1,9 @@
 /**
  * 
  */
-package patterns.general;
+package pattern.component;
 
-import patterns.Pattern;
+import pattern.Pattern;
 import structure.InputContext;
 import structure.Result;
 

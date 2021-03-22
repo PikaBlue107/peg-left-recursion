@@ -9,7 +9,8 @@ import static util.PatternTestUtils.showExample;
 
 import org.junit.Test;
 
-import patterns.Pattern;
+import pattern.Pattern;
+import pattern.definition.DefinitionExpression;
 
 /**
  * @author Melody Griesen

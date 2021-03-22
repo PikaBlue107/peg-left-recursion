@@ -8,7 +8,9 @@ import static util.PatternTestUtils.assertRejects;
 
 import org.junit.Test;
 
-import patterns.Pattern;
+import pattern.Pattern;
+import pattern.component.PatternPredicate;
+import pattern.component.PatternString;
 
 /**
  * @author Melody Griesen

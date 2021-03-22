@@ -5,7 +5,8 @@ package patterns.definition;
 
 import org.junit.Test;
 
-import patterns.Pattern;
+import pattern.Pattern;
+import pattern.definition.SimpleExpression;
 import util.PatternTestUtils;
 
 /**

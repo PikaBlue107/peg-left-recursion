@@ -1,9 +1,9 @@
 /**
  * 
  */
-package patterns.general;
+package pattern.component;
 
-import patterns.Pattern;
+import pattern.Pattern;
 
 /**
  * Allows for components of Patterns that skip memoization and result printing

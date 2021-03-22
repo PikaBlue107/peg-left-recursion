@@ -1,9 +1,9 @@
 /**
  * 
  */
-package patterns.definition;
+package pattern.definition;
 
-import patterns.Pattern;
+import pattern.Pattern;
 import structure.InputContext;
 import structure.Result;
 

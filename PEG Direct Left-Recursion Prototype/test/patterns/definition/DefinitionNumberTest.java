@@ -8,7 +8,8 @@ import static util.PatternTestUtils.showExample;
 import org.junit.Before;
 import org.junit.Test;
 
-import patterns.Pattern;
+import pattern.Pattern;
+import pattern.definition.DefinitionNumber;
 import util.PatternTestUtils;
 
 /**

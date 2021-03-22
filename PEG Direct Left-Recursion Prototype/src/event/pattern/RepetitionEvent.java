@@ -3,7 +3,7 @@
  */
 package event.pattern;
 
-import patterns.Pattern;
+import pattern.Pattern;
 import structure.InputContext;
 import structure.Result;
 

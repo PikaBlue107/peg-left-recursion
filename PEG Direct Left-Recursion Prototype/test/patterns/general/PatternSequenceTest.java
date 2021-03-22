@@ -6,7 +6,10 @@ package patterns.general;
 import org.junit.Before;
 import org.junit.Test;
 
-import patterns.Pattern;
+import pattern.Pattern;
+import pattern.component.PatternDigit;
+import pattern.component.PatternSequence;
+import pattern.component.PatternString;
 import util.PatternTestUtils;
 
 /**

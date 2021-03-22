@@ -6,7 +6,8 @@ package patterns.definition;
 import org.junit.Before;
 import org.junit.Test;
 
-import patterns.Pattern;
+import pattern.Pattern;
+import pattern.definition.SimpleNumber;
 import util.PatternTestUtils;
 
 /**

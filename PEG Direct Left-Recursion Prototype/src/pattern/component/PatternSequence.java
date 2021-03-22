@@ -1,13 +1,13 @@
 /**
  * 
  */
-package patterns.general;
+package pattern.component;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import event.pattern.SequenceEvent;
-import patterns.Pattern;
+import pattern.Pattern;
 import structure.InputContext;
 import structure.Result;
 

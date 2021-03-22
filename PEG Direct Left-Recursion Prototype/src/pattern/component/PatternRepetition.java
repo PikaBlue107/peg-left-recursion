@@ -1,10 +1,10 @@
 /**
  * 
  */
-package patterns.general;
+package pattern.component;
 
 import event.pattern.PatternEvent.PatternEventType;
-import patterns.Pattern;
+import pattern.Pattern;
 import event.pattern.RepetitionEvent;
 import structure.InputContext;
 import structure.Result;

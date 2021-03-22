@@ -6,7 +6,9 @@ package patterns.general;
 import org.junit.Assert;
 import org.junit.Test;
 
-import patterns.Pattern;
+import pattern.Pattern;
+import pattern.component.PatternDigit;
+import pattern.component.PatternRepetition;
 import util.PatternTestUtils;
 
 /**

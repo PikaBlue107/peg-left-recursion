@@ -1,7 +1,7 @@
-package patterns.definition;
+package pattern.definition;
 
 import event.pattern.CharacterAcceptEvent;
-import patterns.Pattern;
+import pattern.Pattern;
 import structure.InputContext;
 import structure.Result;
 

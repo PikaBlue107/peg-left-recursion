@@ -1,4 +1,4 @@
-package patterns;
+package pattern;
 
 import event.control.GrowingEvent;
 import event.control.GrowingEvent.GrowingEventType;

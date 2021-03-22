@@ -2,7 +2,8 @@ package patterns.general;
 
 import org.junit.Test;
 
-import patterns.Pattern;
+import pattern.Pattern;
+import pattern.component.PatternDigit;
 import util.PatternTestUtils;
 
 public class PatternDigitTest {
