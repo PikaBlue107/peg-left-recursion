@@ -104,8 +104,9 @@ public class PatternTestUtils {
 
 		// Save the output of the test
 		exampleOutput.append("Match history: \n");
+		int num = 0;
 		for (final ParseEvent historyEntry : matcher.context.getHistory()) {
-			exampleOutput.append("\t" + historyEntry.toString() + "\n");
+			exampleOutput.append(String.format("%4d:\t%s\n", num++, historyEntry.toString()));
 		}
 		exampleOutput.append("Result tree:" + "\n");
 		exampleOutput.append(matcher.r.printResultTree() + "\n");
