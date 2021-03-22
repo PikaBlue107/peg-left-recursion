@@ -71,4 +71,12 @@ public class PatternPredicate extends PatternComponent {
 		return pred;
 	}
 
+	/**
+	 * {@inheritDoc} Prepends > or ! based on expected success.
+	 */
+	@Override
+	public String getDefinition(final boolean component) {
+		return (expectSuccess ? ">" : "!") + pattern.getDefinition(true);
+	}
+
 }

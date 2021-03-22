@@ -34,4 +34,12 @@ public class PatternDigit extends PatternComponent {
 			return Result.FAIL();
 		}
 	}
+
+	/**
+	 * {@inheritDoc} Returns character set for 0-9.
+	 */
+	@Override
+	public String getDefinition(final boolean component) {
+		return "[0-9]";
+	}
 }
