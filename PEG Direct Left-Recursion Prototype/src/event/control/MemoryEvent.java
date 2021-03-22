@@ -5,6 +5,7 @@ package event.control;
 
 import patterns.general.Pattern;
 import structure.InputContext;
+import structure.Result;
 
 /**
  * @author Melody Griesen
@@ -18,7 +19,7 @@ public class MemoryEvent extends ControlEvent {
 	 * @author Melody Griesen
 	 *
 	 */
-	public enum MemoryEventTYpe {
+	public enum MemoryEventType {
 		/** Memory was checked. */
 		CHECK("Check"),
 		/** Memory was saved. */
@@ -34,7 +35,7 @@ public class MemoryEvent extends ControlEvent {
 		 *
 		 * @param name the name to display for this Enum value
 		 */
-		MemoryEventTYpe(final String name) {
+		MemoryEventType(final String name) {
 			displayName = name;
 		}
 
@@ -49,7 +50,7 @@ public class MemoryEvent extends ControlEvent {
 	}
 
 	/** Which sub-type this event falls under. */
-	private final MemoryEventTYpe type;
+	private final MemoryEventType type;
 
 	/**
 	 * Creates a MemoryEvent to be logged for checking, saving, or assuming a match
@@ -59,11 +60,29 @@ public class MemoryEvent extends ControlEvent {
 	 * @param context the InputContext storing the saved results
 	 * @param type    whether this memory event is a check, a save, or an assume
 	 * @param pattern the pattern that this memory event is using
-	 * @param result  the string saved in memory (may be null)
+	 * @param result  the Result saved in memory (may be null)
 	 */
-	public MemoryEvent(final InputContext context, final MemoryEventTYpe type, final Pattern pattern,
-			final String result) {
-		super(context, context.getPosition(), result.length(), pattern.getType() + " = " + result);
+	public MemoryEvent(final InputContext context, final MemoryEventType type, final Pattern pattern,
+			final Result result) {
+		super(context, context.getPosition(), (result == null ? 0 : result.getData().length()),
+				pattern.getType() + " = " + result);
+		this.type = type;
+	}
+
+	/**
+	 * Creates a MemoryEvent to be logged for checking, saving, or assuming a match
+	 * in memory. Should be called *before* making any position changes as part of
+	 * an ASSUME operation.
+	 * 
+	 * @param context the InputContext storing the saved results
+	 * @param type    whether this memory event is a check, a save, or an assume
+	 * @param pattern the pattern that this memory event is using
+	 * @param result  the Result saved in memory (may be null)
+	 * @param index   the index at whilch the MemoryEvent is occurring
+	 */
+	public MemoryEvent(final InputContext context, final MemoryEventType type, final Pattern pattern,
+			final Result result, final int index) {
+		super(context, index, (result == null ? 0 : result.getData().length()), pattern.getType() + " = " + result);
 		this.type = type;
 	}
 

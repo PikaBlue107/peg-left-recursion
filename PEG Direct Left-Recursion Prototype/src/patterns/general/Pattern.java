@@ -1,5 +1,7 @@
 package patterns.general;
 
+import event.control.MemoryEvent;
+import event.control.MemoryEvent.MemoryEventType;
 import event.pattern.PatternMatchEvent;
 import structure.InputContext;
 import structure.Result;
@@ -217,12 +219,15 @@ public abstract class Pattern {
 
 		} else {
 
+			// Add a history event indicating that we're assuming a match
+			context.addHistory(new MemoryEvent(context, MemoryEventType.ASSUME, this, m));
+
 			// Pos = m.pos
 			// Set the current position of parsing equal to the result m's position
 			// If the result is a success, set the current position of the context equal to
 			// the result m's end index
 			if (m.isSuccess()) {
-				context.setPosition(m.getEndIdx());
+				context.setPosition(m.getEndIdx()); // TODO: Ideally we comment this out
 			}
 
 			// if m.ans is LR

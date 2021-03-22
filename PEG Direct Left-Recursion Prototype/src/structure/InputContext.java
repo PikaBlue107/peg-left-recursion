@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 import event.ParseEvent;
+import event.control.MemoryEvent;
+import event.control.MemoryEvent.MemoryEventType;
 import event.control.PositionEvent;
 import event.control.PositionEvent.PositionEventType;
 import patterns.general.Pattern;
@@ -250,6 +252,7 @@ public class InputContext {
 	 * @return the previous Result stored at the location in the growing map
 	 */
 	public Result setResultFor(final Pattern pattern, final Result result, final int index) {
+		addHistory(new MemoryEvent(this, MemoryEventType.SAVE, pattern, result, index));
 		return patterns.get(index).put(pattern, result);
 	}
 
@@ -276,7 +279,9 @@ public class InputContext {
 	 * @return the Result saved for the specified index and pattern
 	 */
 	public Result resultFor(final Pattern p, final int index) {
-		return this.patterns.get(index).get(p);
+		final Result r = this.patterns.get(index).get(p);
+		addHistory(new MemoryEvent(this, MemoryEventType.CHECK, p, r, index));
+		return r;
 	}
 
 	/**
