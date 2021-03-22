@@ -20,8 +20,8 @@ public class PositionEvent extends ControlEvent {
 	public enum PositionEventType {
 		/** Context was advanced. */
 		ADVANCE("Advance"),
-		/** Context was reset. */
-		RESET("Reset");
+		/** Context position was manually set. */
+		SET("Set");
 
 		/** Stores a display-friendly name for this enum. */
 		private String displayName;
@@ -49,7 +49,7 @@ public class PositionEvent extends ControlEvent {
 	private final PositionEventType type;
 
 	public PositionEvent(final InputContext context, final PositionEventType type) {
-		super(context, context.getPosition(), 1, null);
+		super(context, context.getPosition(), 1, "position to index " + context.getPosition());
 		this.type = type;
 	}
 
