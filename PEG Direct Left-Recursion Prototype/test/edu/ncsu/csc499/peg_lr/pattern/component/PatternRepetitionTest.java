@@ -7,8 +7,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import edu.ncsu.csc499.peg_lr.pattern.Pattern;
-import edu.ncsu.csc499.peg_lr.pattern.component.PatternDigit;
-import edu.ncsu.csc499.peg_lr.pattern.component.PatternRepetition;
 import edu.ncsu.csc499.peg_lr.util.PatternTestUtils;
 
 /**
@@ -34,19 +32,6 @@ public class PatternRepetitionTest {
 		Assert.assertThrows(IllegalArgumentException.class, () -> {
 			new PatternRepetition(digit, 0, -2);
 		});
-
-	}
-
-	@Test
-	public void testExamples() {
-		// Pattern allows 1-3 matches
-		pattern = new PatternRepetition(digit, 1, 3);
-
-		PatternTestUtils.showExample(pattern, "", "Below lower bound");
-		PatternTestUtils.showExample(pattern, "1", "Lower bound");
-		PatternTestUtils.showExample(pattern, "12", "Within bounds");
-		PatternTestUtils.showExample(pattern, "123", "Upper bound");
-		PatternTestUtils.showExample(pattern, "1234", "Beyond upper bound");
 
 	}
 
