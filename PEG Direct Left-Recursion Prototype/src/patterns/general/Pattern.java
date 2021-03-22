@@ -59,14 +59,34 @@ public abstract class Pattern {
 	}
 
 	/**
-	 * Requires that subclasses declare their Type (the name that they are referred
-	 * to as in Result printouts and pattern references). If a Pattern's Type is
-	 * null, then it doesn't have a display name, indicating that it should be
-	 * skipped in the Results tree printout and not considered for memoization.
+	 * Declares the pattern Type (the name that this Pattern is referred to as in
+	 * Result printouts and pattern references). If a Pattern's Type is null, then
+	 * it doesn't have a display name, indicating that it should be skipped in the
+	 * Results tree printout and not considered for memoization.
 	 *
 	 * @return the Pattern's display type
 	 */
 	public abstract String getType();
+
+	/**
+	 * Declares the pattern Definition (the string representing the form that this
+	 * Pattern accepts). This should use the Rosie RPL syntax.
+	 * 
+	 * @return a string indicating what the Pattern matches
+	 */
+	public String getDefinition() {
+		return getDefinition(false);
+	}
+
+	/**
+	 * Declares the pattern Definition (the string representing the form that this
+	 * Pattern accepts). This should use the Rosie RPL syntax.
+	 * 
+	 * @param component whether this pattern is a component of another pattern
+	 *                  definition
+	 * @return a string indicating what the Pattern matches
+	 */
+	public abstract String getDefinition(boolean component);
 
 	/**
 	 * Grows left-recursive rules from a seed by iteratively re-calculating them
