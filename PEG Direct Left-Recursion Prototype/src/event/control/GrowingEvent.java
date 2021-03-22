@@ -70,7 +70,7 @@ public class GrowingEvent extends ControlEvent {
 	public GrowingEvent(final InputContext context, final GrowingEventType type, final Pattern pattern, final int index,
 			final int iteration) {
 		super(context, index, 0,
-				"for pattern " + pattern.getType()
+				"for " + pattern.getType()
 						+ (type == GrowingEventType.TERMINATE ? " (total # valid grow iterations: " + iteration + ")"
 								: " (iteration #" + iteration + ")"));
 		this.type = type;
