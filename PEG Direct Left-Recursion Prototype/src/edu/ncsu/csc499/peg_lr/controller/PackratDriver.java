@@ -1,5 +1,7 @@
 package edu.ncsu.csc499.peg_lr.controller;
 
+import edu.ncsu.csc499.peg_lr.event.ParseEvent;
+import edu.ncsu.csc499.peg_lr.event.control.ControlEvent;
 import edu.ncsu.csc499.peg_lr.pattern.Pattern;
 import edu.ncsu.csc499.peg_lr.pattern.definition.DefinedExpression;
 import edu.ncsu.csc499.peg_lr.structure.InputContext;
@@ -26,8 +28,8 @@ public class PackratDriver {
 	 * @param args command-line arguments, unused.
 	 */
 	public static void main(final String[] args) {
-//		doMatch(TEST_STRING, MATCH_PATTERN);
-		System.out.println(InputContext.CHAR_EPSILON);
+		doMatch(TEST_STRING, MATCH_PATTERN);
+//		System.out.println(InputContext.CHAR_EPSILON);
 	}
 
 	/**
@@ -54,5 +56,11 @@ public class PackratDriver {
 		System.out.println("Full tree:");
 		System.out.println(result.printResultTree(true));
 		System.out.println("\n\n\n\n\n");
+
+		// Print out just the history events having to do with the growing map
+		int historyIdx = 0;
+		for (final ParseEvent e : input.getHistory(ControlEvent.class)) {
+			System.out.printf("%4d:\t%s\n", historyIdx++, e.toString());
+		}
 	}
 }
