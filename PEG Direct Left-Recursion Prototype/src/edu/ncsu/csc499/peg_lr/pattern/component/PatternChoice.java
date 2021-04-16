@@ -173,4 +173,37 @@ public class PatternChoice extends PatternComponent {
 		return definition.toString();
 	}
 
+	/**
+	 * {@inheritDoc} Returns a copied list of all ordered choices in this pattern.
+	 */
+	@Override
+	public List<Pattern> getPatternComponents() {
+		return new ArrayList<>(patterns);
+	}
+
+	/**
+	 * {@inheritDoc} Returns a copied list of all ordered choices in this pattern.
+	 */
+	@Override
+	public List<Pattern> getPossibleLeftmostPatterns() {
+		return new ArrayList<>(patterns);
+	}
+
+	/**
+	 * {@inheritDoc} Returns true if any of its choices are nullable.
+	 */
+	@Override
+	public boolean isNullable() {
+		// Iterate over our choices
+		for (final Pattern choice : patterns) {
+			// If this pattern is nullable
+			if (choice.isNullable()) {
+				// The overall pattern is nullable
+				return true;
+			}
+		}
+		// If none of our choices are nullable, then we aren't either.
+		return false;
+	}
+
 }
