@@ -1,10 +1,12 @@
 package edu.ncsu.csc499.peg_lr.pattern;
 
+import java.util.List;
+
 import edu.ncsu.csc499.peg_lr.event.control.GrowingEvent;
 import edu.ncsu.csc499.peg_lr.event.control.GrowingEvent.GrowingEventType;
 import edu.ncsu.csc499.peg_lr.event.pattern.MetaMatchEvent;
-import edu.ncsu.csc499.peg_lr.event.pattern.PatternMatchEvent;
 import edu.ncsu.csc499.peg_lr.event.pattern.MetaMatchEvent.MetaMatchEventType;
+import edu.ncsu.csc499.peg_lr.event.pattern.PatternMatchEvent;
 import edu.ncsu.csc499.peg_lr.structure.InputContext;
 import edu.ncsu.csc499.peg_lr.structure.Result;
 import edu.ncsu.csc499.peg_lr.structure.Result.LeftRecursionStatus;
@@ -23,6 +25,101 @@ public abstract class Pattern {
 	public Pattern() {
 		// Assign ID
 		id = nextPatternId++;
+	}
+
+	/**
+	 * Determines whether this Pattern is left-recursive. This Pattern is
+	 * left-recursive if one of its productions begins with this same object.
+	 * 
+	 * @return true if this pattern is left recursive, else false.
+	 */
+	public boolean isLeftRecursive() {
+		// Just check this pattern's components for left-recursion. We don't want to
+		// check it against itself immediately!
+		return isSubMatchLeftRecursiveOf(this);
+	}
+
+	/**
+	 * Determines whether this Pattern is left-recursive with respect to the given
+	 * pattern. This Pattern is left-recursive if one of its productions begins with
+	 * the target object.
+	 * 
+	 * @param pattern the pattern to compare against this one for left recursion
+	 * @return true if this pattern is left recursive, else false.
+	 */
+	public boolean isLeftRecursiveOf(final Pattern pattern) {
+		// If this is the pattern itself, we know it's left recursive.
+		if (this == pattern) {
+			return true;
+		}
+
+		// Otherwise, check its components for left recursion
+		return isSubMatchLeftRecursiveOf(pattern);
+	}
+
+	/**
+	 * Checks all possible leftmost submatches of this pattern to see if they may be
+	 * left-recursive of a given pattern.
+	 *
+	 * @param pattern the pattern to compare against this one for left recursion
+	 * @return true if this pattern contains a left recursive component, else false.
+	 */
+	private boolean isSubMatchLeftRecursiveOf(final Pattern pattern) {
+
+		// Get the list of all sub-patterns that could possibly be the first sub-match
+		// of this pattern
+		final List<Pattern> components = getPossibleLeftmostPatterns();
+
+		// Run through this list. If any of those patterns are left-recursive of this
+		// one, then we have an overall LR pattern.
+		for (final Pattern possibleLeftmost : components) {
+			if (possibleLeftmost.isLeftRecursiveOf(pattern)) {
+				return true;
+			}
+		}
+
+		// None of the possible leftmost patterns are left recursive.
+		// Thus, this pattern isn't left recursive.
+		return false;
+	}
+
+	/**
+	 * Retrieves all sub-Patterns that make up this parent Pattern.
+	 *
+	 * @return a List of sub-patterns that are used to express this pattern. The
+	 *         List may be empty for Patterns that are entirely independent.
+	 */
+	public abstract List<Pattern> getPatternComponents();
+
+	/**
+	 * Retrieves a subset of all sub-patterns that make up this parent Pattern. The
+	 * Patterns in the set are only those that may end up as the left-most pattern
+	 * in this pattern's definition.
+	 * 
+	 * For example, in an ordered choice, all patterns are included. In a sequence,
+	 * the leftmost pattern is included; if that pattern is nullable, the one after
+	 * it is also included, and so on for the rest of the sequence.
+	 *
+	 * @return
+	 */
+	public abstract List<Pattern> getPossibleLeftmostPatterns();
+
+	/**
+	 * Determines whether this pattern can successfully match the empty string
+	 * \u03B5 (epsilon).
+	 *
+	 * @return true if this pattern can match a 0-length string, else false
+	 */
+	public abstract boolean isNullable();
+
+	/**
+	 * Determines if this Pattern should be skipped in left-recursion memoization
+	 * events and in the results tree.
+	 *
+	 * @return true if the pattern is either an alias or has no type
+	 */
+	public boolean isInvisible() {
+		return this.isAlias() || (this.getType() == null);
 	}
 
 	/**
