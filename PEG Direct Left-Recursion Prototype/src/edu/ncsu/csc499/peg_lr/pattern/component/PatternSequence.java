@@ -169,4 +169,54 @@ public class PatternSequence extends PatternComponent {
 		return definition.toString();
 	}
 
+	/**
+	 * {@inheritDoc} Retrieves the list of sequence components.
+	 */
+	@Override
+	public List<Pattern> getPatternComponents() {
+		return new ArrayList<>(patterns);
+	}
+
+	/**
+	 * {@inheritDoc} Retrieves the first sequence pattern, and all subsequent
+	 * patterns that are preceded by all nullable patterns.
+	 */
+	@Override
+	public List<Pattern> getPossibleLeftmostPatterns() {
+		final List<Pattern> possibleLeftmostList = new ArrayList<>();
+
+		// Loop over all patterns in the sequence. Add all patterns with only nullable
+		// patterns prior to it.
+		for (final Pattern pattern : patterns) {
+			// Add this pattern to the list
+			possibleLeftmostList.add(pattern);
+
+			// If it's not nullable, we don't have to add any more
+			if (!pattern.isNullable()) {
+				break;
+			}
+		}
+
+		// Return the list of possible leftmost patterns
+		return possibleLeftmostList;
+	}
+
+	/**
+	 * {@inheritDoc} Returns true only if all elements in the sequence are nullable.
+	 */
+	@Override
+	public boolean isNullable() {
+		// Loop over the sequence
+		for (final Pattern pattern : patterns) {
+			// If this pattern is not nullable
+			if (!pattern.isNullable()) {
+				// The overall sequence isn't nullable
+				return false;
+			}
+		}
+
+		// All of our patterns are nullable, so the sequence is too.
+		return true;
+	}
+
 }
