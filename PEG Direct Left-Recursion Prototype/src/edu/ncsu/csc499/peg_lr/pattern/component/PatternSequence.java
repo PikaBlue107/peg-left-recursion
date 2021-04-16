@@ -208,6 +208,10 @@ public class PatternSequence extends PatternComponent {
 	public boolean isNullable() {
 		// Loop over the sequence
 		for (final Pattern pattern : patterns) {
+			// If this pattern is left-recursive, skip it
+			if (pattern.isLeftRecursive()) {
+				continue;
+			}
 			// If this pattern is not nullable
 			if (!pattern.isNullable()) {
 				// The overall sequence isn't nullable
