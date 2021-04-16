@@ -3,7 +3,6 @@
  */
 package edu.ncsu.csc499.peg_lr.pattern.component;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import edu.ncsu.csc499.peg_lr.event.pattern.CharacterAcceptEvent;
@@ -121,7 +120,7 @@ public class PatternString extends PatternComponent {
 	 */
 	@Override
 	public List<Pattern> getPatternComponents() {
-		return new ArrayList<>();
+		return List.of();
 	}
 
 	/**
@@ -129,7 +128,7 @@ public class PatternString extends PatternComponent {
 	 */
 	@Override
 	public List<Pattern> getPossibleLeftmostPatterns() {
-		return new ArrayList<>();
+		return List.of();
 	}
 
 	/**
