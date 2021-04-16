@@ -3,6 +3,8 @@
  */
 package edu.ncsu.csc499.peg_lr.pattern.definition;
 
+import java.util.List;
+
 import edu.ncsu.csc499.peg_lr.pattern.Pattern;
 import edu.ncsu.csc499.peg_lr.structure.InputContext;
 import edu.ncsu.csc499.peg_lr.structure.Result;
@@ -50,6 +52,30 @@ public abstract class DefinedPattern extends Pattern {
 			// Return the full definition from the pattern stored
 			return getPattern().getDefinition(true);
 		}
+	}
+
+	/**
+	 * {@inheritDoc} Returns the definition for this DefinedPattern.
+	 */
+	@Override
+	public List<Pattern> getPatternComponents() {
+		return List.of(getPattern());
+	}
+
+	/**
+	 * {@inheritDoc} Returns the definition for this DefinedPattern.
+	 */
+	@Override
+	public List<Pattern> getPossibleLeftmostPatterns() {
+		return List.of(getPattern());
+	}
+
+	/**
+	 * {@inheritDoc} Delegates to this pattern's definition for nullability.
+	 */
+	@Override
+	public boolean isNullable() {
+		return getPattern().isNullable();
 	}
 
 	/**
