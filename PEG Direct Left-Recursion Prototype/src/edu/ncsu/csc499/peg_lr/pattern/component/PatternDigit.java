@@ -3,7 +3,11 @@
  */
 package edu.ncsu.csc499.peg_lr.pattern.component;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.ncsu.csc499.peg_lr.event.pattern.CharacterAcceptEvent;
+import edu.ncsu.csc499.peg_lr.pattern.Pattern;
 import edu.ncsu.csc499.peg_lr.structure.InputContext;
 import edu.ncsu.csc499.peg_lr.structure.Result;
 
@@ -43,5 +47,29 @@ public class PatternDigit extends PatternComponent {
 	@Override
 	public String getDefinition(final boolean component) {
 		return "[0-9]";
+	}
+
+	/**
+	 * {@inheritDoc} This is always nothing for a single PatternDigit.
+	 */
+	@Override
+	public List<Pattern> getPatternComponents() {
+		return new ArrayList<>();
+	}
+
+	/**
+	 * {@inheritDoc} This is always nothing for a single PatternDigit.
+	 */
+	@Override
+	public List<Pattern> getPossibleLeftmostPatterns() {
+		return new ArrayList<>();
+	}
+
+	/**
+	 * {@inheritDoc} This is always false for a single PatternDigit.
+	 */
+	@Override
+	public boolean isNullable() {
+		return false;
 	}
 }
