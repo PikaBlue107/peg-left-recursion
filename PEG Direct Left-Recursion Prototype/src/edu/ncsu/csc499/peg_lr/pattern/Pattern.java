@@ -47,7 +47,7 @@ public abstract class Pattern {
 	 * @param pattern the pattern to compare against this one for left recursion
 	 * @return true if this pattern is left recursive, else false.
 	 */
-	public boolean isLeftRecursiveOf(final Pattern pattern) {
+	private boolean isLeftRecursiveOf(final Pattern pattern) {
 		// If this is the pattern itself, we know it's left recursive.
 		if (this == pattern) {
 			return true;
