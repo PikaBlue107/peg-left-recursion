@@ -1,5 +1,6 @@
 package edu.ncsu.csc499.peg_lr.pattern;
 
+import java.util.Iterator;
 import java.util.List;
 
 import edu.ncsu.csc499.peg_lr.event.control.GrowingEvent;
@@ -68,11 +69,16 @@ public abstract class Pattern {
 
 		// Get the list of all sub-patterns that could possibly be the first sub-match
 		// of this pattern
-		final List<Pattern> components = getPossibleLeftmostPatterns();
+		final Iterator<Pattern> components = getPossibleLeftmostPatterns();
 
 		// Run through this list. If any of those patterns are left-recursive of this
 		// one, then we have an overall LR pattern.
-		for (final Pattern possibleLeftmost : components) {
+		Pattern possibleLeftmost;
+		// While there's still more elements to check
+		while (components.hasNext()){
+			// Calculate and retrieve the next possibly left recursive element
+			possibleLeftmost = components.next();
+			// If it's left recursive, then we are too.
 			if (possibleLeftmost.isLeftRecursiveOf(pattern)) {
 				return true;
 			}
@@ -102,7 +108,7 @@ public abstract class Pattern {
 	 *
 	 * @return
 	 */
-	public abstract List<Pattern> getPossibleLeftmostPatterns();
+	public abstract Iterator<Pattern> getPossibleLeftmostPatterns();
 
 	/**
 	 * Determines whether this pattern can successfully match the empty string
