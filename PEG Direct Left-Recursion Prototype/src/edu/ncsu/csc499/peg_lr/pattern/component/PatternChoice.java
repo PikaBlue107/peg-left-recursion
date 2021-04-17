@@ -4,6 +4,7 @@
 package edu.ncsu.csc499.peg_lr.pattern.component;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import edu.ncsu.csc499.peg_lr.event.pattern.OrderedChoiceEvent;
@@ -185,8 +186,8 @@ public class PatternChoice extends PatternComponent {
 	 * {@inheritDoc} Returns a copied list of all ordered choices in this pattern.
 	 */
 	@Override
-	public List<Pattern> getPossibleLeftmostPatterns() {
-		return new ArrayList<>(patterns);
+	public Iterator<Pattern> getPossibleLeftmostPatterns() {
+		return new ArrayList<Pattern>(patterns).iterator();
 	}
 
 	/**

@@ -3,6 +3,7 @@
  */
 package edu.ncsu.csc499.peg_lr.pattern.component;
 
+import java.util.Iterator;
 import java.util.List;
 
 import edu.ncsu.csc499.peg_lr.pattern.Pattern;
@@ -94,8 +95,8 @@ public class PatternPredicate extends PatternComponent {
 	 * {@inheritDoc} Returns the predicate's match pattern.
 	 */
 	@Override
-	public List<Pattern> getPossibleLeftmostPatterns() {
-		return List.of(pattern);
+	public Iterator<Pattern> getPossibleLeftmostPatterns() {
+		return List.of(pattern).iterator();
 	}
 
 	/**

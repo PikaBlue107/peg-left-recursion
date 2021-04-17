@@ -3,6 +3,7 @@
  */
 package edu.ncsu.csc499.peg_lr.pattern.definition;
 
+import java.util.Iterator;
 import java.util.List;
 
 import edu.ncsu.csc499.peg_lr.pattern.Pattern;
@@ -66,8 +67,8 @@ public abstract class DefinedPattern extends Pattern {
 	 * {@inheritDoc} Returns the definition for this DefinedPattern.
 	 */
 	@Override
-	public List<Pattern> getPossibleLeftmostPatterns() {
-		return List.of(getPattern());
+	public Iterator<Pattern> getPossibleLeftmostPatterns() {
+		return List.of(getPattern()).iterator();
 	}
 
 	/**

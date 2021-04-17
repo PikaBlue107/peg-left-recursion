@@ -3,6 +3,7 @@
  */
 package edu.ncsu.csc499.peg_lr.pattern.component;
 
+import java.util.Iterator;
 import java.util.List;
 
 import edu.ncsu.csc499.peg_lr.event.pattern.CharacterAcceptEvent;
@@ -60,8 +61,8 @@ public class PatternDigit extends PatternComponent {
 	 * {@inheritDoc} This is always nothing for a single PatternDigit.
 	 */
 	@Override
-	public List<Pattern> getPossibleLeftmostPatterns() {
-		return List.of();
+	public Iterator<Pattern> getPossibleLeftmostPatterns() {
+		return List.<Pattern>of().iterator();
 	}
 
 	/**
