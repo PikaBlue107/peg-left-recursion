@@ -95,7 +95,7 @@ public class PatternPredicate extends PatternComponent {
 	 * {@inheritDoc} Returns the predicate's match pattern.
 	 */
 	@Override
-	public Iterator<Pattern> getPossibleLeftmostPatterns() {
+	protected Iterator<Pattern> getPossibleLeftmostComponents() {
 		return List.of(pattern).iterator();
 	}
 

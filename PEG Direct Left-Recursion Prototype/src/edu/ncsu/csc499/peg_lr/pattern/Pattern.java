@@ -69,7 +69,7 @@ public abstract class Pattern {
 
 		// Get the list of all sub-patterns that could possibly be the first sub-match
 		// of this pattern
-		final Iterator<Pattern> components = getPossibleLeftmostPatterns();
+		final Iterator<Pattern> components = getPossibleLeftmostComponents();
 
 		// Run through this list. If any of those patterns are left-recursive of this
 		// one, then we have an overall LR pattern.
@@ -108,7 +108,7 @@ public abstract class Pattern {
 	 *
 	 * @return
 	 */
-	public abstract Iterator<Pattern> getPossibleLeftmostPatterns();
+	protected abstract Iterator<Pattern> getPossibleLeftmostComponents();
 
 	/**
 	 * Determines whether this pattern can successfully match the empty string

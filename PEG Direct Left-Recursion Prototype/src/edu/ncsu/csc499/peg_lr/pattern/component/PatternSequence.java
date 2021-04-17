@@ -184,7 +184,7 @@ public class PatternSequence extends PatternComponent {
 	 * patterns that are preceded by all nullable patterns.
 	 */
 	@Override
-	public Iterator<Pattern> getPossibleLeftmostPatterns() {
+	protected Iterator<Pattern> getPossibleLeftmostComponents() {
 		
 		// Return a custom Iterator over the patterns in this sequence.
 		// Elements are returned from next() if all leftward elements are nullable.

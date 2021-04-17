@@ -186,7 +186,7 @@ public class PatternChoice extends PatternComponent {
 	 * {@inheritDoc} Returns a copied list of all ordered choices in this pattern.
 	 */
 	@Override
-	public Iterator<Pattern> getPossibleLeftmostPatterns() {
+	protected Iterator<Pattern> getPossibleLeftmostComponents() {
 		return new ArrayList<Pattern>(patterns).iterator();
 	}
 

@@ -128,7 +128,7 @@ public class PatternString extends PatternComponent {
 	 * {@inheritDoc} This is always nothing for a PatternString.
 	 */
 	@Override
-	public Iterator<Pattern> getPossibleLeftmostPatterns() {
+	protected Iterator<Pattern> getPossibleLeftmostComponents() {
 		return List.<Pattern>of().iterator();
 	}
 

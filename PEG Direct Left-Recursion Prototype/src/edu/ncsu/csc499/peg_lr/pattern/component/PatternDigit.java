@@ -61,7 +61,7 @@ public class PatternDigit extends PatternComponent {
 	 * {@inheritDoc} This is always nothing for a single PatternDigit.
 	 */
 	@Override
-	public Iterator<Pattern> getPossibleLeftmostPatterns() {
+	protected Iterator<Pattern> getPossibleLeftmostComponents() {
 		return List.<Pattern>of().iterator();
 	}
 

@@ -225,7 +225,7 @@ public class PatternRepetition extends PatternComponent {
 	 * {@inheritDoc} Returns the single repeated component of this repetition.
 	 */
 	@Override
-	public Iterator<Pattern> getPossibleLeftmostPatterns() {
+	protected Iterator<Pattern> getPossibleLeftmostComponents() {
 		return List.of(pattern).iterator();
 	}
 

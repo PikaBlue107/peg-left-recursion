@@ -67,7 +67,7 @@ public abstract class DefinedPattern extends Pattern {
 	 * {@inheritDoc} Returns the definition for this DefinedPattern.
 	 */
 	@Override
-	public Iterator<Pattern> getPossibleLeftmostPatterns() {
+	protected Iterator<Pattern> getPossibleLeftmostComponents() {
 		return List.of(getPattern()).iterator();
 	}
 
