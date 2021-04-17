@@ -276,7 +276,7 @@ public abstract class Pattern {
 	public final Result lazyMatch(final InputContext context) {
 
 		// If this pattern has no Type or is an alias, delegate immediately to match()
-		if ((this.getType() == null) || this.isAlias()) {
+		if (this.isInvisible()) {
 
 			// Skip left-recursion and memoization
 			return this.matchAndName(context);
