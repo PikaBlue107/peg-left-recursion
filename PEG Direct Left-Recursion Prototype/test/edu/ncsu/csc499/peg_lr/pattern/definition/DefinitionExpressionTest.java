@@ -56,8 +56,8 @@ public class DefinitionExpressionTest {
 	@Test
 	public void testProperties() {
 		Assert.assertTrue(PATTERN.isLeftRecursive());
-//		Assert.assertFalse(PATTERN.isNullable());
-//		Assert.assertFalse(PATTERN.isInvisible());
+		Assert.assertFalse(PATTERN.isNullable());
+		Assert.assertFalse(PATTERN.isInvisible());
 	}
 
 }

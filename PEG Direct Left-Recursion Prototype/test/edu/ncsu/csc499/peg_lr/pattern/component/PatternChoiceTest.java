@@ -3,13 +3,12 @@
  */
 package edu.ncsu.csc499.peg_lr.pattern.component;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import edu.ncsu.csc499.peg_lr.pattern.Pattern;
-import edu.ncsu.csc499.peg_lr.pattern.component.PatternChoice;
-import edu.ncsu.csc499.peg_lr.pattern.component.PatternDigit;
-import edu.ncsu.csc499.peg_lr.pattern.component.PatternString;
+import edu.ncsu.csc499.peg_lr.pattern.definition.DefinedPattern;
 import edu.ncsu.csc499.peg_lr.util.PatternTestUtils;
 
 /**
@@ -93,4 +92,75 @@ public class PatternChoiceTest {
 		PatternTestUtils.assertRejects(pattern, "thre");
 	}
 
+	@Test
+	public void testNullable() {
+		// A choice of 2 non-nullable elements is itself non-nullable
+		Assert.assertFalse(new PatternChoice(new PatternString("a"), new PatternDigit()).isNullable());
+
+		// A choice of 1 nullable and 1 non-nullable element is nullable
+		Assert.assertTrue(new PatternChoice(new PatternString(""), new PatternDigit()).isNullable());
+		Assert.assertTrue(new PatternChoice(new PatternDigit(), new PatternString("")).isNullable());
+
+		// A choice of 2 nullable elements is itself nullable
+		Assert.assertTrue(new PatternChoice(new PatternString(""), new PatternString("")).isNullable());
+	}
+
+	@Test
+	public void testLeftRecursive() {
+		// Any choice should be valid to hold an instance of left recursion
+
+		// First choice should hold left recursion
+		final Pattern firstChoiceLR = new DefinedPattern() {
+
+			private final Pattern pat = new PatternChoice(this, new PatternDigit());
+
+			@Override
+			protected Pattern getPattern() {
+				return pat;
+			}
+
+			@Override
+			public String getType() {
+				return "TestFirstChoiceLR";
+			}
+
+		};
+		Assert.assertTrue(firstChoiceLR.isLeftRecursive());
+
+		// Second choice should also hold left recursion
+		final Pattern secondChoiceLR = new DefinedPattern() {
+
+			private final Pattern pat = new PatternChoice(new PatternDigit(), this);
+
+			@Override
+			protected Pattern getPattern() {
+				return pat;
+			}
+
+			@Override
+			public String getType() {
+				return "TestSecondChoiceLR";
+			}
+
+		};
+		Assert.assertTrue(secondChoiceLR.isLeftRecursive());
+
+		// The pattern isn't left recursive on its own
+		Assert.assertFalse(new PatternChoice(new PatternDigit(), new PatternString("")).isLeftRecursive());
+		final Pattern notLRDefinition = new DefinedPattern() {
+
+			private final Pattern pat = new PatternChoice(new PatternDigit(), new PatternString(""));
+
+			@Override
+			public String getType() {
+				return "TestNotLRDefinition";
+			}
+
+			@Override
+			protected Pattern getPattern() {
+				return pat;
+			}
+		};
+		Assert.assertFalse(notLRDefinition.isLeftRecursive());
+	}
 }
