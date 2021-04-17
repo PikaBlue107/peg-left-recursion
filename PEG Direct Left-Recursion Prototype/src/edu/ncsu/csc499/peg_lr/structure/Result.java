@@ -43,7 +43,7 @@ public class Result {
 	 * @return a Result representing a failed match.
 	 */
 	public static final Result FAIL(final int idx) {
-		final Result fail = new Result("", idx);
+		final Result fail = new Result(idx);
 		fail.setAlias(false);
 		fail.setSuccess(false);
 		fail.setLRStatus(LeftRecursionStatus.IMPOSSIBLE);

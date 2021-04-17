@@ -42,7 +42,7 @@ public class SimpleExpression extends Pattern {
 	private Result tryFullExpression(final InputContext context) {
 
 		// Create the possible Result found by matching this Expression
-		final Result expression = new Result("", context.getPosition());
+		final Result expression = new Result(context.getPosition());
 		expression.setType("Expression");
 
 		// Create a placeholder for the Results returned by each sub-match

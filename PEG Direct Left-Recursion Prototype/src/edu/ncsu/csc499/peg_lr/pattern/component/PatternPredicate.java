@@ -48,7 +48,7 @@ public class PatternPredicate extends PatternComponent {
 	protected Result match(final InputContext context) {
 
 		// Create a Result for the predication
-		final Result pred = new Result("", context.getPosition());
+		final Result pred = new Result(context.getPosition());
 
 		// Save the start position
 		final int startPos = context.getPosition();

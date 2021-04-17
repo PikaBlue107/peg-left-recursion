@@ -39,7 +39,7 @@ public class PatternString extends PatternComponent {
 		final int initialPosition = context.getPosition();
 
 		// Use iterative solution
-		final Result match = new Result("", initialPosition);
+		final Result match = new Result(initialPosition);
 
 		// Loop for each character of the target string
 		for (final char c : matchString.toCharArray()) {
