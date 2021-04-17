@@ -312,6 +312,7 @@ public abstract class Pattern {
 			// Set m to a failure Result with a left recursion status of POSSIBLE to
 			// indicate we suspect but don't know that the Pattern might be left recursive
 			m = Result.FAIL(initialPosition);
+			m.setLRStatus(LeftRecursionStatus.POSSIBLE);
 
 			// MEMO(R,P) = m
 			// Set the memoized answer for applying this rule at this position to be m, the

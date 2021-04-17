@@ -58,7 +58,7 @@ public class PatternRepetition extends PatternComponent {
 	@Override
 	protected Result match(final InputContext context) {
 		// Create an overall result to track starting position
-		final Result repetition = new Result(true, "", context.getPosition());
+		final Result repetition = new Result(context.getPosition());
 		// Track the number of successful iterations
 		int matches = 0;
 

@@ -33,7 +33,7 @@ public class SimpleExpression extends Pattern {
 			return result;
 		}
 
-		final Result expression = new Result(true, result.getData(), result.getStartIdx());
+		final Result expression = new Result(result.getStartIdx());
 		expression.setType("Expression");
 		expression.addChild(result);
 		return expression;
@@ -42,7 +42,7 @@ public class SimpleExpression extends Pattern {
 	private Result tryFullExpression(final InputContext context) {
 
 		// Create the possible Result found by matching this Expression
-		final Result expression = new Result(true, "", context.getPosition());
+		final Result expression = new Result(context.getPosition());
 		expression.setType("Expression");
 
 		// Create a placeholder for the Results returned by each sub-match
@@ -84,7 +84,7 @@ public class SimpleExpression extends Pattern {
 		if (!context.isAtEnd() && (context.currentChar() == '+')) {
 			context.addHistory(new CharacterAcceptEvent(context, context.getPosition()));
 			context.advance();
-			return new Result(true, '+', context.getPosition() - 1);
+			return new Result('+', context.getPosition() - 1);
 		} else {
 			return Result.FAIL(context.getPosition());
 		}

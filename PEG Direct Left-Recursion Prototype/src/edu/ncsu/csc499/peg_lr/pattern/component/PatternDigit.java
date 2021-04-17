@@ -34,7 +34,7 @@ public class PatternDigit extends PatternComponent {
 			final int startPos = context.getPosition();
 			context.addHistory(new CharacterAcceptEvent(context, startPos));
 			context.advance();
-			return new Result(true, ch, startPos);
+			return new Result(ch, startPos);
 		} else {
 			// Not a digit. Failure
 			return Result.FAIL(context.getPosition());
