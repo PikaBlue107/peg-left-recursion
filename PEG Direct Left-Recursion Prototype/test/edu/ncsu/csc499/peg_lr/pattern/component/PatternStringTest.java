@@ -3,11 +3,11 @@
  */
 package edu.ncsu.csc499.peg_lr.pattern.component;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import edu.ncsu.csc499.peg_lr.pattern.Pattern;
-import edu.ncsu.csc499.peg_lr.pattern.component.PatternString;
 import edu.ncsu.csc499.peg_lr.util.PatternTestUtils;
 
 /**
@@ -51,6 +51,22 @@ public class PatternStringTest {
 		PatternTestUtils.assertRejects(pattern, "");
 		PatternTestUtils.assertRejects(pattern, "asdf");
 		PatternTestUtils.assertRejects(pattern, TARGET_STRING.substring(0, TARGET_STRING.length() - 1));
+	}
+
+	@Test
+	public void testProperties() {
+
+		// An empty string should be invisible, nullable, and not left recursive.
+		pattern = new PatternString("");
+		Assert.assertTrue(pattern.isHidden());
+		Assert.assertTrue(pattern.isNullable());
+		Assert.assertFalse(pattern.isLeftRecursive());
+
+		// A non-empty string should be invisible, nullable, and not left recursive.
+		pattern = new PatternString("asdf");
+		Assert.assertTrue(pattern.isHidden());
+		Assert.assertFalse(pattern.isNullable());
+		Assert.assertFalse(pattern.isLeftRecursive());
 	}
 
 }

@@ -4,6 +4,7 @@
 package edu.ncsu.csc499.peg_lr.pattern.component;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import edu.ncsu.csc499.peg_lr.event.pattern.OrderedChoiceEvent;
@@ -171,6 +172,39 @@ public class PatternChoice extends PatternComponent {
 
 		// Return final definition string
 		return definition.toString();
+	}
+
+	/**
+	 * {@inheritDoc} Returns a copied list of all ordered choices in this pattern.
+	 */
+	@Override
+	public List<Pattern> getPatternComponents() {
+		return new ArrayList<>(patterns);
+	}
+
+	/**
+	 * {@inheritDoc} Returns a copied list of all ordered choices in this pattern.
+	 */
+	@Override
+	protected Iterator<Pattern> getPossibleLeftmostComponents() {
+		return new ArrayList<Pattern>(patterns).iterator();
+	}
+
+	/**
+	 * {@inheritDoc} Returns true if any of its choices are nullable.
+	 */
+	@Override
+	public boolean isNullable() {
+		// Iterate over our choices
+		for (final Pattern choice : patterns) {
+			// If this pattern is nullable
+			if (choice.isNullable()) {
+				// The overall pattern is nullable
+				return true;
+			}
+		}
+		// If none of our choices are nullable, then we aren't either.
+		return false;
 	}
 
 }

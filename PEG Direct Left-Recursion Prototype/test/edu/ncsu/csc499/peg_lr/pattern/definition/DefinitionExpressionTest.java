@@ -7,10 +7,10 @@ import static edu.ncsu.csc499.peg_lr.util.PatternTestUtils.assertMatches;
 import static edu.ncsu.csc499.peg_lr.util.PatternTestUtils.assertRejects;
 import static edu.ncsu.csc499.peg_lr.util.PatternTestUtils.showExample;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import edu.ncsu.csc499.peg_lr.pattern.Pattern;
-import edu.ncsu.csc499.peg_lr.pattern.definition.DefinedExpression;
 
 /**
  * @author Melody Griesen
@@ -51,6 +51,13 @@ public class DefinitionExpressionTest {
 		assertRejects(PATTERN, " ");
 		assertRejects(PATTERN, "-");
 		assertRejects(PATTERN, "+5");
+	}
+
+	@Test
+	public void testProperties() {
+		Assert.assertTrue(PATTERN.isLeftRecursive());
+		Assert.assertFalse(PATTERN.isNullable());
+		Assert.assertFalse(PATTERN.isHidden());
 	}
 
 }

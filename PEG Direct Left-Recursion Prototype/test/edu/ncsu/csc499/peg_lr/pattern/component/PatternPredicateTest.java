@@ -6,11 +6,11 @@ package edu.ncsu.csc499.peg_lr.pattern.component;
 import static edu.ncsu.csc499.peg_lr.util.PatternTestUtils.assertMatchesExact;
 import static edu.ncsu.csc499.peg_lr.util.PatternTestUtils.assertRejects;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import edu.ncsu.csc499.peg_lr.pattern.Pattern;
-import edu.ncsu.csc499.peg_lr.pattern.component.PatternPredicate;
-import edu.ncsu.csc499.peg_lr.pattern.component.PatternString;
+import edu.ncsu.csc499.peg_lr.pattern.definition.DefinedPattern;
 
 /**
  * @author Melody Griesen
@@ -71,6 +71,77 @@ public class PatternPredicateTest {
 		assertMatchesExact(pattern, "d", "");
 		assertMatchesExact(pattern, "ado", "");
 
+	}
+
+	@Test
+	public void testNullable() {
+		// A predicate with a non-nullable pattern is nullable
+		Assert.assertTrue(new PatternPredicate(new PatternDigit(), true).isNullable());
+		Assert.assertTrue(new PatternPredicate(new PatternDigit(), false).isNullable());
+
+		// A predicate with a nullable pattern is nullable
+		Assert.assertTrue(new PatternPredicate(new PatternString(""), true).isNullable());
+		Assert.assertTrue(new PatternPredicate(new PatternString(""), false).isNullable());
+	}
+
+	@Test
+	public void testLeftRecursive() {
+		// A predicate should be able to be left-recursive
+
+		// First choice should hold left recursion
+		// If it's false
+		final Pattern recursiveFalsePredicate = new DefinedPattern() {
+
+			private final Pattern pat = new PatternPredicate(this, true);
+
+			@Override
+			protected Pattern getPattern() {
+				return pat;
+			}
+
+			@Override
+			public String getType() {
+				return "TestFirstChoiceLR";
+			}
+
+		};
+		Assert.assertTrue(recursiveFalsePredicate.isLeftRecursive());
+
+		// And if it's true
+		final Pattern recursiveTruePredicate = new DefinedPattern() {
+
+			private final Pattern pat = new PatternPredicate(this, true);
+
+			@Override
+			protected Pattern getPattern() {
+				return pat;
+			}
+
+			@Override
+			public String getType() {
+				return "TestFirstChoiceLR";
+			}
+
+		};
+		Assert.assertTrue(recursiveTruePredicate.isLeftRecursive());
+
+		// The pattern isn't left recursive on its own
+		Assert.assertFalse(new PatternPredicate(new PatternDigit(), true).isLeftRecursive());
+		final Pattern notLRDefinition = new DefinedPattern() {
+
+			private final Pattern pat = new PatternPredicate(new PatternString(""), false);
+
+			@Override
+			public String getType() {
+				return "TestNotLRDefinition";
+			}
+
+			@Override
+			protected Pattern getPattern() {
+				return pat;
+			}
+		};
+		Assert.assertFalse(notLRDefinition.isLeftRecursive());
 	}
 
 }

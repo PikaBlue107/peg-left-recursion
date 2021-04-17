@@ -5,6 +5,7 @@ import edu.ncsu.csc499.peg_lr.pattern.Pattern;
 import edu.ncsu.csc499.peg_lr.structure.InputContext;
 import edu.ncsu.csc499.peg_lr.structure.Result;
 
+@Deprecated
 public class SimpleNumber extends Pattern {
 
 	/** The Type of this pattern (display/reference name) */

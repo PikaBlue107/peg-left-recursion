@@ -3,7 +3,11 @@
  */
 package edu.ncsu.csc499.peg_lr.pattern.component;
 
+import java.util.Iterator;
+import java.util.List;
+
 import edu.ncsu.csc499.peg_lr.event.pattern.CharacterAcceptEvent;
+import edu.ncsu.csc499.peg_lr.pattern.Pattern;
 import edu.ncsu.csc499.peg_lr.structure.InputContext;
 import edu.ncsu.csc499.peg_lr.structure.Result;
 
@@ -110,6 +114,31 @@ public class PatternString extends PatternComponent {
 	@Override
 	public String getDefinition(final boolean component) {
 		return "\"" + matchString + "\"";
+	}
+
+	/**
+	 * {@inheritDoc} This is always nothing for a PatternString.
+	 */
+	@Override
+	public List<Pattern> getPatternComponents() {
+		return List.of();
+	}
+
+	/**
+	 * {@inheritDoc} This is always nothing for a PatternString.
+	 */
+	@Override
+	protected Iterator<Pattern> getPossibleLeftmostComponents() {
+		return List.<Pattern>of().iterator();
+	}
+
+	/**
+	 * {@inheritDoc} This is only false if this PatternString's string is the empty
+	 * string.
+	 */
+	@Override
+	public boolean isNullable() {
+		return matchString.equals("");
 	}
 
 }

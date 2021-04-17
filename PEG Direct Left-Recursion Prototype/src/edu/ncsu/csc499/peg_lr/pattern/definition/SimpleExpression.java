@@ -5,6 +5,7 @@ import edu.ncsu.csc499.peg_lr.pattern.Pattern;
 import edu.ncsu.csc499.peg_lr.structure.InputContext;
 import edu.ncsu.csc499.peg_lr.structure.Result;
 
+@Deprecated
 public class SimpleExpression extends Pattern {
 
 	private static final SimpleNumber num = new SimpleNumber();
