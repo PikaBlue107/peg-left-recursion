@@ -4,7 +4,9 @@
 package edu.ncsu.csc499.peg_lr.pattern.component;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import edu.ncsu.csc499.peg_lr.event.pattern.SequenceEvent;
 import edu.ncsu.csc499.peg_lr.pattern.Pattern;
@@ -167,6 +169,86 @@ public class PatternSequence extends PatternComponent {
 
 		// Return final definition string
 		return definition.toString();
+	}
+
+	/**
+	 * {@inheritDoc} Retrieves the list of sequence components.
+	 */
+	@Override
+	public List<Pattern> getPatternComponents() {
+		return new ArrayList<>(patterns);
+	}
+
+	/**
+	 * {@inheritDoc} Retrieves the first sequence pattern, and all subsequent
+	 * patterns that are preceded by all nullable patterns.
+	 */
+	@Override
+	protected Iterator<Pattern> getPossibleLeftmostComponents() {
+		
+		// Return a custom Iterator over the patterns in this sequence.
+		// Elements are returned from next() if all leftward elements are nullable.
+		return new Iterator<Pattern>() {
+			
+			/** List to return elements from */
+			List<Pattern> sequenceComponents = patterns;
+			
+			/** Current position in the list */
+			int idx = 0;
+			
+			/**
+			 * The next element is returnable if it's at the front of the list, or
+			 * the element to its left is nullable
+			 * 
+			 * @return true if the iterator is at the front of the list, or if the
+			 * previous element is nullable.
+			 */
+			@Override
+			public boolean hasNext() {
+				return idx == 0 || patterns.get(idx - 1).isNullable();
+			}
+			
+			/**
+			 * If there is another element to retrieve, returns it and advances the
+			 * iterator one position.
+			 * 
+			 * @return the next possibly left-recursive element in the list
+			 * @throws NoSuchElementException if there are no more left-recursive
+			 * elements in the list
+			 */
+			@Override
+			public Pattern next() {
+				// Check for no more elements
+				if (!hasNext()) {
+					throw new NoSuchElementException("No more left-recursive elements in sequence");
+				}
+				
+				// Return the next element and increment the position
+				return sequenceComponents.get(idx++);
+			}
+		};
+	}
+
+	/**
+	 * {@inheritDoc} Returns true only if all elements in the sequence are nullable.
+	 */
+	@Override
+	public boolean isNullable() {
+		// Loop over the sequence
+		for (final Pattern pattern : patterns) {
+			// If this pattern is left-recursive, skip it
+			if (pattern.isLeftRecursive()) {
+				continue;
+			}
+			// If this pattern is not nullable
+			if (!pattern.isNullable()) {
+				// The overall sequence isn't nullable
+				return false;
+			}
+		}
+
+		// All of our patterns are nullable, so the sequence is too.
+		return true;
 	}
 
 }

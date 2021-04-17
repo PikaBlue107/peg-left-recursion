@@ -5,11 +5,11 @@ package edu.ncsu.csc499.peg_lr.pattern.definition;
 
 import static edu.ncsu.csc499.peg_lr.util.PatternTestUtils.showExample;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import edu.ncsu.csc499.peg_lr.pattern.Pattern;
-import edu.ncsu.csc499.peg_lr.pattern.definition.DefinedNumber;
 import edu.ncsu.csc499.peg_lr.util.PatternTestUtils;
 
 /**
@@ -48,6 +48,13 @@ public class DefinitionNumberTest {
 		PatternTestUtils.assertRejects(PATTERN, "a");
 		PatternTestUtils.assertRejects(PATTERN, " ");
 		PatternTestUtils.assertRejects(PATTERN, "-");
+	}
+
+	@Test
+	public void testProperties() {
+		Assert.assertFalse(PATTERN.isLeftRecursive());
+		Assert.assertFalse(PATTERN.isNullable());
+		Assert.assertFalse(PATTERN.isHidden());
 	}
 
 }

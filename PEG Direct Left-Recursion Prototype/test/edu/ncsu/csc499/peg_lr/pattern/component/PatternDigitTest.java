@@ -1,9 +1,9 @@
 package edu.ncsu.csc499.peg_lr.pattern.component;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import edu.ncsu.csc499.peg_lr.pattern.Pattern;
-import edu.ncsu.csc499.peg_lr.pattern.component.PatternDigit;
 import edu.ncsu.csc499.peg_lr.util.PatternTestUtils;
 
 public class PatternDigitTest {
@@ -27,6 +27,13 @@ public class PatternDigitTest {
 		PatternTestUtils.assertRejects(PATTERN, "zero");
 		PatternTestUtils.assertRejects(PATTERN, "+");
 		PatternTestUtils.assertRejects(PATTERN, "!");
+	}
+
+	@Test
+	public void testProperties() {
+		Assert.assertFalse(PATTERN.isNullable());
+		Assert.assertTrue(PATTERN.isHidden());
+		Assert.assertFalse(PATTERN.isLeftRecursive());
 	}
 
 }

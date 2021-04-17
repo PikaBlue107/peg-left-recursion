@@ -3,8 +3,11 @@
  */
 package edu.ncsu.csc499.peg_lr.pattern.component;
 
-import edu.ncsu.csc499.peg_lr.event.pattern.RepetitionEvent;
+import java.util.Iterator;
+import java.util.List;
+
 import edu.ncsu.csc499.peg_lr.event.pattern.PatternEvent.PatternEventType;
+import edu.ncsu.csc499.peg_lr.event.pattern.RepetitionEvent;
 import edu.ncsu.csc499.peg_lr.pattern.Pattern;
 import edu.ncsu.csc499.peg_lr.structure.InputContext;
 import edu.ncsu.csc499.peg_lr.structure.Result;
@@ -39,6 +42,9 @@ public class PatternRepetition extends PatternComponent {
 		}
 		if (upperBound < -1) {
 			throw new IllegalArgumentException("Upper bound for Repetition cannot be below -1!");
+		}
+		if ((upperBound == -1) && pattern.isNullable()) {
+			throw new IllegalArgumentException("Cannot allow infinite repetition of a nullable pattern.");
 		}
 		this.pattern = pattern;
 		this.lowerBound = lowerBound;
@@ -205,6 +211,31 @@ public class PatternRepetition extends PatternComponent {
 		// Provide finished result
 		return definition.toString();
 
+	}
+
+	/**
+	 * {@inheritDoc} Returns the single repeated component of this repetition.
+	 */
+	@Override
+	public List<Pattern> getPatternComponents() {
+		return List.of(pattern);
+	}
+
+	/**
+	 * {@inheritDoc} Returns the single repeated component of this repetition.
+	 */
+	@Override
+	protected Iterator<Pattern> getPossibleLeftmostComponents() {
+		return List.of(pattern).iterator();
+	}
+
+	/**
+	 * {@inheritDoc} A repetition is nullable if it allows 0 repetitions, or if its
+	 * repetition is nullable.
+	 */
+	@Override
+	public boolean isNullable() {
+		return (lowerBound == 0) || pattern.isNullable();
 	}
 
 }

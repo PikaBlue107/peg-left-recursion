@@ -3,6 +3,9 @@
  */
 package edu.ncsu.csc499.peg_lr.pattern.component;
 
+import java.util.Iterator;
+import java.util.List;
+
 import edu.ncsu.csc499.peg_lr.pattern.Pattern;
 import edu.ncsu.csc499.peg_lr.structure.InputContext;
 import edu.ncsu.csc499.peg_lr.structure.Result;
@@ -78,6 +81,30 @@ public class PatternPredicate extends PatternComponent {
 	@Override
 	public String getDefinition(final boolean component) {
 		return (expectSuccess ? ">" : "!") + pattern.getDefinition(true);
+	}
+
+	/**
+	 * {@inheritDoc} Returns the predicate's match pattern.
+	 */
+	@Override
+	public List<Pattern> getPatternComponents() {
+		return List.of(pattern);
+	}
+
+	/**
+	 * {@inheritDoc} Returns the predicate's match pattern.
+	 */
+	@Override
+	protected Iterator<Pattern> getPossibleLeftmostComponents() {
+		return List.of(pattern).iterator();
+	}
+
+	/**
+	 * {@inheritDoc} Always returns true, as a predicate does not consume any input.
+	 */
+	@Override
+	public boolean isNullable() {
+		return true;
 	}
 
 }
