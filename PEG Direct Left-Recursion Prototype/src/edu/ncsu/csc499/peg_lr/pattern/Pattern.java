@@ -75,7 +75,7 @@ public abstract class Pattern {
 		// one, then we have an overall LR pattern.
 		Pattern possibleLeftmost;
 		// While there's still more elements to check
-		while (components.hasNext()){
+		while (components.hasNext()) {
 			// Calculate and retrieve the next possibly left recursive element
 			possibleLeftmost = components.next();
 			// If it's left recursive, then we are too.
