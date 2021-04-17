@@ -76,7 +76,7 @@ public class PatternChoice extends PatternComponent {
 	@Override
 	protected Result match(final InputContext context) {
 		// Track the initial starting position
-		final Result choice = new Result(true, "", context.getPosition());
+		final Result choice = new Result("", context.getPosition());
 
 		// Run through the list of patterns to match
 		// Keep track of the previous pattern's result

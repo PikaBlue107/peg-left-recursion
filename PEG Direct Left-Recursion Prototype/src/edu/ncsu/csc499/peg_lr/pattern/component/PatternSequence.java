@@ -77,7 +77,7 @@ public class PatternSequence extends PatternComponent {
 	protected Result match(final InputContext context) {
 		// Run through the list of patterns to match
 		// Keep track of the previous pattern's result
-		final Result sequence = new Result(true, "", context.getPosition());
+		final Result sequence = new Result("", context.getPosition());
 		Result result;
 		// Sequence index for event reporting
 		int sequenceIdx = 0;

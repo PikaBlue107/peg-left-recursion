@@ -43,43 +43,99 @@ public class Result {
 	 * @return a Result representing a failed match.
 	 */
 	public static final Result FAIL(final int idx) {
-		return new Result(false, "", idx);
+		final Result fail = new Result("", idx);
+		fail.setAlias(false);
+		fail.setSuccess(false);
+		fail.setLRStatus(LeftRecursionStatus.IMPOSSIBLE);
+		return fail;
 	}
 
 	/**
-	 * Generates a Result with a single initial character, intended for when you
+	 * Constructs a successful Result with no data at the given index.
+	 *
+	 * @param startIdx the index at which the match for this Result begins
+	 */
+	public Result(final int startIdx) {
+		this("", startIdx);
+	}
+
+	/**
+	 * Constructs a Result with a single initial character, intended for when you
 	 * want to construct a Result with one initially matched character and then add
 	 * on new characters iteratively.
-	 * 
-	 * @param success   whether the Result indicates a successful match
+	 *
 	 * @param firstData the first character matched in this Result
 	 * @param startIdx  the index at which the match for this Result begins
 	 */
-	public Result(final boolean success, final char firstData, final int startIdx) {
-		this(success, "" + firstData, startIdx);
+	public Result(final char firstData, final int startIdx) {
+		this("" + firstData, startIdx);
 	}
 
 	/**
-	 * @param success
-	 * @param data
-	 * @param derivation
+	 * Constructs a successful result with the given data and start index.
+	 * 
+	 * @param data     the initial data matched
+	 * @param startIdx the index that the data was matched at in the input string
 	 */
-	public Result(final boolean success, final String data, final int startIdx) {
-		this(success, data, startIdx, LeftRecursionStatus.POSSIBLE);
+	public Result(final String data, final int startIdx) {
+		this(true, data, startIdx, LeftRecursionStatus.POSSIBLE);
 	}
 
+	/**
+	 * Constructs a result with all given fields.
+	 * 
+	 * @param success             whether the result was successful
+	 * @param data                the data that this Result matched. Cannot be null.
+	 * @param startIdx            the index that the data was matched at in the
+	 *                            input string
+	 * @param leftRecursionStatus the known recursion status of this Result
+	 * @throws NullPointerException if data is null
+	 */
 	public Result(final boolean success, final String data, final int startIdx,
 			final LeftRecursionStatus leftRecursionStatus) {
-		this.success = success;
-		this.data = data;
-		this.lRStatus = leftRecursionStatus;
-		this.startIdx = startIdx;
-		this.endIdx = startIdx + data.length();
+		setSuccess(success);
+		setData(data);
+		setLRStatus(leftRecursionStatus);
+		setStartIdx(startIdx);
+		setEndIdx(startIdx + data.length());
 	}
 
+	/**
+	 * Adds on a character to this Result, concatenating it onto the data and
+	 * incrementing the end index.
+	 * 
+	 * @param nextData
+	 */
 	public void addChar(final char nextData) {
 		this.data += nextData;
 		this.endIdx++;
+	}
+
+	/**
+	 * Adds a sub-match to this Result. Transfers the child's information to this
+	 * parent Result (appends data, sets endIndex, etc.)
+	 * 
+	 * @param child
+	 */
+	public Result addChild(final Result child) {
+
+		// Check that this child's start idx matches this parent Result's end idx
+		if (this.getEndIdx() != child.getStartIdx()) {
+			throw new IllegalArgumentException(
+					"Child does not start at the parent's current end position - not a valid child.");
+		}
+
+		// Add the child to the children list
+		children.add(child);
+
+		// Append the child's data to our own
+		setData(this.getData() + child.getData());
+
+		// Set end index equal to child's end index
+		setEndIdx(child.getEndIdx());
+
+		// Return this object so that you can add multiple children in sequence
+		return this;
 	}
 
 	/**
@@ -194,28 +250,6 @@ public class Result {
 	 */
 	public boolean isHidden() {
 		return this.isAlias() || (this.getType() == null);
-	}
-
-	/**
-	 * Adds a sub-match to this Result. Transfers the child's information to this
-	 * parent Result (appends data, sets endIndex, etc.)
-	 * 
-	 * @param child
-	 */
-	public Result addChild(final Result child) {
-		// If this is the first child, set start index and empty data
-		if (children.isEmpty()) {
-			this.setData("");
-			this.setStartIdx(child.getStartIdx());
-		}
-		// Add the child to the children list
-		children.add(child);
-		// Append the child's data to our own
-		setData(this.getData() + child.getData());
-		// Set end index equal to child's end index
-		setEndIdx(child.getEndIdx());
-		// Return this object so that you can add multiple children in sequence
-		return this;
 	}
 
 	/**
@@ -358,20 +392,36 @@ public class Result {
 		 * The Pattern at this Derivation *might* be left-recursive. We'll know after it
 		 * finishes matching once.
 		 */
-		POSSIBLE,
+		POSSIBLE("Possible"),
 		/**
 		 * The Pattern at this Derivation is definitely left-recursive. It called itself
 		 * before we had a chance to finish its first match.
 		 */
-		DETECTED,
+		DETECTED("Detected"),
 		/**
 		 * The Pattern at this Derivation is not left-recursive. We finished one full
 		 * match without it calling itself.
 		 */
-		IMPOSSIBLE;
+		IMPOSSIBLE("Impossible");
 
-		/** Display-friendly names for each value. */
-		private static final String[] NAMES = { "Possible", "Detected", "Impossible" };
+		/** Display-friendly name for this enum value */
+		private String displayName;
+
+		/**
+		 * Constructs an enum value with a display-friendly name
+		 *
+		 * @param displayName display-friendly name for this value
+		 */
+		LeftRecursionStatus(final String displayName) {
+			this.displayName = displayName;
+		}
+
+		/**
+		 * @return the enum's display name
+		 */
+		public String getDisplayName() {
+			return displayName;
+		}
 
 		/**
 		 * Gets the display name of this Enum by indexing into the display names array
@@ -381,7 +431,7 @@ public class Result {
 		 */
 		@Override
 		public String toString() {
-			return NAMES[this.ordinal()];
+			return getDisplayName();
 		}
 	}
 

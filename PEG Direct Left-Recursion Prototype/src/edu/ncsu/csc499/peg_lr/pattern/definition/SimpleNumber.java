@@ -17,7 +17,7 @@ public class SimpleNumber extends Pattern {
 			return Result.FAIL(context.getPosition());
 		}
 
-		final Result priorResult = new Result(true, context.currentChar(), context.getPosition());
+		final Result priorResult = new Result(context.currentChar(), context.getPosition());
 //		priorResult.setType("Number");
 
 		char match = context.next();
