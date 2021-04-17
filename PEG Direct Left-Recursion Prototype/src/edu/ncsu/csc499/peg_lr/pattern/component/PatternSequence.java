@@ -4,7 +4,9 @@
 package edu.ncsu.csc499.peg_lr.pattern.component;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import edu.ncsu.csc499.peg_lr.event.pattern.SequenceEvent;
 import edu.ncsu.csc499.peg_lr.pattern.Pattern;
@@ -182,23 +184,49 @@ public class PatternSequence extends PatternComponent {
 	 * patterns that are preceded by all nullable patterns.
 	 */
 	@Override
-	public List<Pattern> getPossibleLeftmostPatterns() {
-		final List<Pattern> possibleLeftmostList = new ArrayList<>();
-
-		// Loop over all patterns in the sequence. Add all patterns with only nullable
-		// patterns prior to it.
-		for (final Pattern pattern : patterns) {
-			// Add this pattern to the list
-			possibleLeftmostList.add(pattern);
-
-			// If it's not nullable, we don't have to add any more
-			if (!pattern.isNullable()) {
-				break;
+	public Iterator<Pattern> getPossibleLeftmostPatterns() {
+		
+		// Return a custom Iterator over the patterns in this sequence.
+		// Elements are returned from next() if all leftward elements are nullable.
+		return new Iterator<Pattern>() {
+			
+			/** List to return elements from */
+			List<Pattern> sequenceComponents = patterns;
+			
+			/** Current position in the list */
+			int idx = 0;
+			
+			/**
+			 * The next element is returnable if it's at the front of the list, or
+			 * the element to its left is nullable
+			 * 
+			 * @return true if the iterator is at the front of the list, or if the
+			 * previous element is nullable.
+			 */
+			@Override
+			public boolean hasNext() {
+				return idx == 0 || patterns.get(idx - 1).isNullable();
 			}
-		}
-
-		// Return the list of possible leftmost patterns
-		return possibleLeftmostList;
+			
+			/**
+			 * If there is another element to retrieve, returns it and advances the
+			 * iterator one position.
+			 * 
+			 * @return the next possibly left-recursive element in the list
+			 * @throws NoSuchElementException if there are no more left-recursive
+			 * elements in the list
+			 */
+			@Override
+			public Pattern next() {
+				// Check for no more elements
+				if (!hasNext()) {
+					throw new NoSuchElementException("No more left-recursive elements in sequence");
+				}
+				
+				// Return the next element and increment the position
+				return sequenceComponents.get(idx++);
+			}
+		};
 	}
 
 	/**
