@@ -124,7 +124,7 @@ public abstract class Pattern {
 	 *
 	 * @return true if the pattern is either an alias or has no type
 	 */
-	public boolean isInvisible() {
+	public boolean isHidden() {
 		return this.isAlias() || (this.getType() == null);
 	}
 
@@ -276,7 +276,7 @@ public abstract class Pattern {
 	public final Result lazyMatch(final InputContext context) {
 
 		// If this pattern has no Type or is an alias, delegate immediately to match()
-		if (this.isInvisible()) {
+		if (this.isHidden()) {
 
 			// Skip left-recursion and memoization
 			return this.matchAndName(context);

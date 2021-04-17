@@ -32,7 +32,7 @@ public class PatternDigitTest {
 	@Test
 	public void testProperties() {
 		Assert.assertFalse(PATTERN.isNullable());
-		Assert.assertTrue(PATTERN.isInvisible());
+		Assert.assertTrue(PATTERN.isHidden());
 		Assert.assertFalse(PATTERN.isLeftRecursive());
 	}
 

@@ -58,13 +58,13 @@ public class PatternStringTest {
 
 		// An empty string should be invisible, nullable, and not left recursive.
 		pattern = new PatternString("");
-		Assert.assertTrue(pattern.isInvisible());
+		Assert.assertTrue(pattern.isHidden());
 		Assert.assertTrue(pattern.isNullable());
 		Assert.assertFalse(pattern.isLeftRecursive());
 
 		// A non-empty string should be invisible, nullable, and not left recursive.
 		pattern = new PatternString("asdf");
-		Assert.assertTrue(pattern.isInvisible());
+		Assert.assertTrue(pattern.isHidden());
 		Assert.assertFalse(pattern.isNullable());
 		Assert.assertFalse(pattern.isLeftRecursive());
 	}

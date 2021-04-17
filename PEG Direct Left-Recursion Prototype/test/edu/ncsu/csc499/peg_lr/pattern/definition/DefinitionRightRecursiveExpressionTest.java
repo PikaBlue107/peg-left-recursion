@@ -57,7 +57,7 @@ public class DefinitionRightRecursiveExpressionTest {
 	public void testProperties() {
 		Assert.assertTrue(PATTERN.isLeftRecursive());
 		Assert.assertFalse(PATTERN.isNullable());
-		Assert.assertFalse(PATTERN.isInvisible());
+		Assert.assertFalse(PATTERN.isHidden());
 	}
 
 }

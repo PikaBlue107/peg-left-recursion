@@ -54,7 +54,7 @@ public class DefinitionNumberTest {
 	public void testProperties() {
 		Assert.assertFalse(PATTERN.isLeftRecursive());
 		Assert.assertFalse(PATTERN.isNullable());
-		Assert.assertFalse(PATTERN.isInvisible());
+		Assert.assertFalse(PATTERN.isHidden());
 	}
 
 }
