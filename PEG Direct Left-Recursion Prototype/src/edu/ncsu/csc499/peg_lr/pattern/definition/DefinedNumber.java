@@ -1,6 +1,6 @@
 package edu.ncsu.csc499.peg_lr.pattern.definition;
 
-import edu.ncsu.csc499.peg_lr.pattern.component.charset.PatternDigit;
+import edu.ncsu.csc499.peg_lr.pattern.component.charclass.PatternDigit;
 import edu.ncsu.csc499.peg_lr.pattern.component.operator.PatternRepetition;
 
 public class DefinedNumber extends DefinedPattern {

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package edu.ncsu.csc499.peg_lr.pattern.component.charset;
+package edu.ncsu.csc499.peg_lr.pattern.component.charclass;
 
 import java.util.Iterator;
 import java.util.List;

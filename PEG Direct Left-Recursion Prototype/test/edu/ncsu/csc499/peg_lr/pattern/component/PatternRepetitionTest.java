@@ -7,7 +7,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import edu.ncsu.csc499.peg_lr.pattern.Pattern;
-import edu.ncsu.csc499.peg_lr.pattern.component.charset.PatternDigit;
+import edu.ncsu.csc499.peg_lr.pattern.component.charclass.PatternDigit;
 import edu.ncsu.csc499.peg_lr.pattern.component.operator.PatternChoice;
 import edu.ncsu.csc499.peg_lr.pattern.component.operator.PatternRepetition;
 import edu.ncsu.csc499.peg_lr.pattern.definition.DefinedPattern;
