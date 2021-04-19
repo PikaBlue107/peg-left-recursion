@@ -53,10 +53,18 @@ public class DefinedPattern extends Pattern {
 		final Result overallResult = new Result(context.getPosition());
 		// Delegate to the pattern we created.
 		final Result definitionResult = getPattern().lazyMatch(context);
-		// Add that result to our onw
-		overallResult.addChild(definitionResult);
-		// Return the overall result for this definition
-		return overallResult;
+		// If it was successful
+		if (definitionResult.isSuccess()) {
+			// Add that result to our own
+			overallResult.addChild(definitionResult);
+			// Return the overall result for this definition
+			return overallResult;
+		}
+		// Otherwise, it wasn't successful
+		else {
+			// Just return the definition match
+			return definitionResult;
+		}
 	}
 
 	/**
