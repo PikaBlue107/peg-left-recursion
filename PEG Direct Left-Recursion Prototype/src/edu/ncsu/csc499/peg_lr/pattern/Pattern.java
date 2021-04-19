@@ -10,7 +10,6 @@ import edu.ncsu.csc499.peg_lr.event.pattern.MetaMatchEvent.MetaMatchEventType;
 import edu.ncsu.csc499.peg_lr.event.pattern.PatternMatchEvent;
 import edu.ncsu.csc499.peg_lr.structure.InputContext;
 import edu.ncsu.csc499.peg_lr.structure.Result;
-import edu.ncsu.csc499.peg_lr.structure.Result.LeftRecursionStatus;
 
 public abstract class Pattern {
 
@@ -228,8 +227,6 @@ public abstract class Pattern {
 			// Start matching from this current derivation we're given
 			// Attempt to *match* the Pattern (this one) against the Derivation
 			attempt = matchAndName(context);
-			// Ensure that this attempt is labeled as left-recursive
-			attempt.setLRStatus(LeftRecursionStatus.DETECTED);
 
 			// If we didn't make any progress, then exit
 			if (!attempt.isSuccess()) {
