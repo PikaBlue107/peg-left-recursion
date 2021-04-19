@@ -1,13 +1,14 @@
 /**
  * 
  */
-package edu.ncsu.csc499.peg_lr.pattern.component;
+package edu.ncsu.csc499.peg_lr.pattern.component.charset;
 
 import java.util.Iterator;
 import java.util.List;
 
 import edu.ncsu.csc499.peg_lr.event.pattern.CharacterAcceptEvent;
 import edu.ncsu.csc499.peg_lr.pattern.Pattern;
+import edu.ncsu.csc499.peg_lr.pattern.component.PatternComponent;
 import edu.ncsu.csc499.peg_lr.structure.InputContext;
 import edu.ncsu.csc499.peg_lr.structure.Result;
 
@@ -18,7 +19,7 @@ import edu.ncsu.csc499.peg_lr.structure.Result;
 public class PatternDigit extends PatternComponent {
 
 	/**
-	 * Matches a single digit as determeind by Character.isDigit()
+	 * Matches a single digit as determined by Character.isDigit()
 	 */
 	@Override
 	protected Result match(final InputContext context) {
