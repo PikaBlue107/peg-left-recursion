@@ -24,6 +24,7 @@ public class DefinedPattern extends Pattern {
 
 	/**
 	 * Creates a DefinedPattern with the given pattern definition and type name.
+	 *
 	 * @param type       the type name of the Pattern being defined
 	 * @param definition the internal Pattern that will be used upon matching
 	 */
@@ -48,8 +49,22 @@ public class DefinedPattern extends Pattern {
 	 */
 	@Override
 	protected Result match(final InputContext context) {
+		// Create a Result for the pattern we'll match
+		final Result overallResult = new Result(context.getPosition());
 		// Delegate to the pattern we created.
-		return getPattern().lazyMatch(context);
+		final Result definitionResult = getPattern().lazyMatch(context);
+		// If it was successful
+		if (definitionResult.isSuccess()) {
+			// Add that result to our own
+			overallResult.addChild(definitionResult);
+			// Return the overall result for this definition
+			return overallResult;
+		}
+		// Otherwise, it wasn't successful
+		else {
+			// Just return the definition match
+			return definitionResult;
+		}
 	}
 
 	/**
