@@ -19,21 +19,20 @@ Resulting capture stack:
 
 	| Type of Capture | Pattern  |
 	|-----------------|----------|
-	| Close           | Expr     |-------
-	| Close           | Number   |----\
-	| Close           | Digit    |--\ |
-	| Open            | Digit    |--/ |
-	| Close           | Digit    |--\ |
-	| Open            | Digit    |--/ |
-	| Open            | Number   |----/
-	| Close           | Plus     |--\
-	| Open            | Plus     |--/
-	| Close           | Expr     |
-	| Close           | Number   |
-	| Close           | Digit    |
-	| Open            | Digit    |
-	| Open            | Number   |
-	| Open            | Expr     |
-	| Open            | Expr     |
+	| Close           | Expr     |--------\
+	| Close           | Number   |-----\  |
+	| Close           | Digit    |--\  |  |
+	| Open            | Digit    |--/  |  |
+	| Close           | Digit    |--\  |  |
+	| Open            | Digit    |--/  |  |
+	| Open            | Number   |-----/  |
+	| Close           | Plus     |--\     |
+	| Open            | Plus     |--/     |
+	| Close           | Expr     |--------|
+	| Close           | Number   |-----\  |
+	| Close           | Digit    |--\  |  |
+	| Open            | Digit    |--/  |  |
+	| Open            | Number   |-----/  |
+	| Open Recursive  | Expr     |--------/
 	|_________________|__________|
 	
