@@ -26,9 +26,6 @@ public class Result {
 	 */
 	private boolean alias;
 
-	/** The left-recursion status of this Result. */
-	private LeftRecursionStatus lRStatus;
-
 	/** The sub-matches within this Result. */
 	private final List<Result> children;
 	{
@@ -46,7 +43,6 @@ public class Result {
 		final Result fail = new Result(idx);
 		fail.setAlias(false);
 		fail.setSuccess(false);
-		fail.setLRStatus(LeftRecursionStatus.IMPOSSIBLE);
 		return fail;
 	}
 
@@ -78,7 +74,7 @@ public class Result {
 	 * @param startIdx the index that the data was matched at in the input string
 	 */
 	public Result(final String data, final int startIdx) {
-		this(true, data, startIdx, LeftRecursionStatus.POSSIBLE);
+		this(true, data, startIdx);
 	}
 
 	/**
@@ -91,11 +87,9 @@ public class Result {
 	 * @param leftRecursionStatus the known recursion status of this Result
 	 * @throws NullPointerException if data is null
 	 */
-	public Result(final boolean success, final String data, final int startIdx,
-			final LeftRecursionStatus leftRecursionStatus) {
+	public Result(final boolean success, final String data, final int startIdx) {
 		setSuccess(success);
 		setData(data);
-		setLRStatus(leftRecursionStatus);
 		setStartIdx(startIdx);
 		setEndIdx(startIdx + data.length());
 	}
@@ -164,20 +158,6 @@ public class Result {
 	 */
 	public void setData(final String data) {
 		this.data = data;
-	}
-
-	/**
-	 * @return the lRStatus
-	 */
-	public LeftRecursionStatus getLRStatus() {
-		return lRStatus;
-	}
-
-	/**
-	 * @param lRStatus the lRStatus to set
-	 */
-	public void setLRStatus(final LeftRecursionStatus lRStatus) {
-		this.lRStatus = lRStatus;
 	}
 
 	/**
@@ -259,7 +239,7 @@ public class Result {
 	@Override
 	public String toString() {
 		return "Result [success=" + success + ", data=" + data + ", type=" + type + ", startIdx=" + startIdx
-				+ ", endIdx=" + endIdx + ", lRStatus=" + lRStatus + "]";
+				+ ", endIdx=" + endIdx + "]";
 	}
 
 	/**
@@ -346,9 +326,6 @@ public class Result {
 
 		tree.append(tabs(indentLevel + 1)).append("\"data\": \"").append(data).append("\",\n");
 
-		tree.append(tabs(indentLevel + 1)).append("\"left_recursion\": \"").append(this.getLRStatus().toString())
-				.append("\",\n");
-
 		tree.append(tabs(indentLevel + 1)).append("\"s\": ").append(startIdx + 1).append(",\n");
 
 		tree.append(tabs(indentLevel + 1)).append("\"e\": ").append(endIdx + 1).append(children.isEmpty() ? "" : ",")
@@ -378,61 +355,6 @@ public class Result {
 
 	private String tabs(final int num) {
 		return "  ".repeat(num);
-	}
-
-	/**
-	 * Possible options for the result of a Pattern at any given position. A Pattern
-	 * can have left recursion be possible, detected, or impossible.
-	 * 
-	 * @author Melody Griesen
-	 *
-	 */
-	public enum LeftRecursionStatus {
-		/**
-		 * The Pattern at this Derivation *might* be left-recursive. We'll know after it
-		 * finishes matching once.
-		 */
-		POSSIBLE("Possible"),
-		/**
-		 * The Pattern at this Derivation is definitely left-recursive. It called itself
-		 * before we had a chance to finish its first match.
-		 */
-		DETECTED("Detected"),
-		/**
-		 * The Pattern at this Derivation is not left-recursive. We finished one full
-		 * match without it calling itself.
-		 */
-		IMPOSSIBLE("Impossible");
-
-		/** Display-friendly name for this enum value */
-		private String displayName;
-
-		/**
-		 * Constructs an enum value with a display-friendly name
-		 *
-		 * @param displayName display-friendly name for this value
-		 */
-		LeftRecursionStatus(final String displayName) {
-			this.displayName = displayName;
-		}
-
-		/**
-		 * @return the enum's display name
-		 */
-		public String getDisplayName() {
-			return displayName;
-		}
-
-		/**
-		 * Gets the display name of this Enum by indexing into the display names array
-		 * by the Enum's ordinal.
-		 * 
-		 * @return a display-friendly name for this Enum.
-		 */
-		@Override
-		public String toString() {
-			return getDisplayName();
-		}
 	}
 
 }

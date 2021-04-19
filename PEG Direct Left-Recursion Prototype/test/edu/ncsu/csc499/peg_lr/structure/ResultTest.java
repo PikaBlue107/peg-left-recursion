@@ -4,8 +4,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.ncsu.csc499.peg_lr.structure.Result.LeftRecursionStatus;
-
 public class ResultTest {
 
 	/** Test object */
@@ -38,9 +36,6 @@ public class ResultTest {
 		Assert.assertEquals(3, FAIL.getStartIdx());
 		Assert.assertEquals(3, FAIL.getEndIdx());
 
-		// not be left-recursive
-		Assert.assertEquals(LeftRecursionStatus.IMPOSSIBLE, FAIL.getLRStatus());
-
 		// be unique from another call to FAIL:
 		Assert.assertNotSame(Result.FAIL(3), FAIL);
 
@@ -59,7 +54,6 @@ public class ResultTest {
 		Assert.assertTrue(result.isHidden());
 		Assert.assertFalse(result.isAlias());
 		Assert.assertNull(result.getType());
-		Assert.assertEquals(LeftRecursionStatus.POSSIBLE, result.getLRStatus());
 	}
 
 	@Test
@@ -75,7 +69,6 @@ public class ResultTest {
 		Assert.assertTrue(result.isHidden());
 		Assert.assertFalse(result.isAlias());
 		Assert.assertNull(result.getType());
-		Assert.assertEquals(LeftRecursionStatus.POSSIBLE, result.getLRStatus());
 	}
 
 	@Test
@@ -91,13 +84,12 @@ public class ResultTest {
 		Assert.assertTrue(result.isHidden());
 		Assert.assertFalse(result.isAlias());
 		Assert.assertNull(result.getType());
-		Assert.assertEquals(LeftRecursionStatus.POSSIBLE, result.getLRStatus());
 	}
 
 	@Test
 	public void testConstructorFull() {
 		// Construct successful result with data "asdf" at idx 1
-		result = new Result(true, "asdf", 1, LeftRecursionStatus.IMPOSSIBLE);
+		result = new Result(true, "asdf", 1);
 
 		// Ensure desired properties
 		Assert.assertTrue(result.isSuccess());
@@ -107,10 +99,9 @@ public class ResultTest {
 		Assert.assertTrue(result.isHidden());
 		Assert.assertFalse(result.isAlias());
 		Assert.assertNull(result.getType());
-		Assert.assertEquals(LeftRecursionStatus.IMPOSSIBLE, result.getLRStatus());
 
 		// Construct failed result with data "" at idx 1
-		result = new Result(false, "", 1, LeftRecursionStatus.IMPOSSIBLE);
+		result = new Result(false, "", 1);
 
 		// Ensure desired properties
 		Assert.assertFalse(result.isSuccess());
@@ -120,7 +111,6 @@ public class ResultTest {
 		Assert.assertTrue(result.isHidden());
 		Assert.assertFalse(result.isAlias());
 		Assert.assertNull(result.getType());
-		Assert.assertEquals(LeftRecursionStatus.IMPOSSIBLE, result.getLRStatus());
 	}
 
 	@Test
@@ -225,7 +215,6 @@ public class ResultTest {
 		Assert.assertTrue(toString.contains("" + result.getType()));
 		Assert.assertTrue(toString.contains("" + result.getStartIdx()));
 		Assert.assertTrue(toString.contains("" + result.getEndIdx()));
-		Assert.assertTrue(toString.contains(result.getLRStatus().toString()));
 	}
 
 }
