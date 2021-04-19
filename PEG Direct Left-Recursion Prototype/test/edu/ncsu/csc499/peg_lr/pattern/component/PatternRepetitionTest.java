@@ -107,36 +107,22 @@ public class PatternRepetitionTest {
 		// Any choice should be valid to hold an instance of left recursion
 
 		// First choice should hold left recursion
-		final Pattern firstChoiceLR = new DefinedPattern() {
+		final Pattern firstChoiceLR = new DefinedPattern("TestFirstChoiceLR") {
 
 			private final Pattern pat = new PatternChoice(this, new PatternDigit());
-
-			@Override
-			protected Pattern getPattern() {
-				return pat;
-			}
-
-			@Override
-			public String getType() {
-				return "TestFirstChoiceLR";
+			{
+				super.setDefinition(pat);
 			}
 
 		};
 		Assert.assertTrue(firstChoiceLR.isLeftRecursive());
 
 		// Second choice should also hold left recursion
-		final Pattern secondChoiceLR = new DefinedPattern() {
+		final Pattern secondChoiceLR = new DefinedPattern("TestSecondChoiceLR") {
 
 			private final Pattern pat = new PatternChoice(new PatternDigit(), this);
-
-			@Override
-			protected Pattern getPattern() {
-				return pat;
-			}
-
-			@Override
-			public String getType() {
-				return "TestSecondChoiceLR";
+			{
+				super.setDefinition(pat);
 			}
 
 		};
@@ -144,20 +130,8 @@ public class PatternRepetitionTest {
 
 		// The pattern isn't left recursive on its own
 		Assert.assertFalse(new PatternRepetition(new PatternString(""), 0, 1).isLeftRecursive());
-		final Pattern notLRDefinition = new DefinedPattern() {
-
-			private final Pattern pat = new PatternRepetition(new PatternString("a"), 1, -1);
-
-			@Override
-			public String getType() {
-				return "TestNotLRDefinition";
-			}
-
-			@Override
-			protected Pattern getPattern() {
-				return pat;
-			}
-		};
+		final Pattern notLRDefinition = new DefinedPattern("TestNotLRDefinition",
+				new PatternRepetition(new PatternString("a"), 1, -1));
 		Assert.assertFalse(notLRDefinition.isLeftRecursive());
 	}
 

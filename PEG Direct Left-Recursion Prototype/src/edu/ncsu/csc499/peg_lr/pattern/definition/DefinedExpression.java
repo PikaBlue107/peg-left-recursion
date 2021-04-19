@@ -13,20 +13,19 @@ import edu.ncsu.csc499.peg_lr.pattern.component.PatternString;
  */
 public class DefinedExpression extends DefinedPattern {
 
-	/** Internal definition used when matching. */
-	private final Pattern pattern = new PatternChoice(
-			new PatternSequence(this, new PatternString("+"), new DefinedNumber()), new DefinedNumber());
 	/** Pattern type to provide the display or reference name. */
 	private static final String TYPE = "Expression";
 
-	@Override
-	protected Pattern getPattern() {
-		return pattern;
-	}
+	/** Internal definition used when matching. */
+	private final Pattern pattern = new PatternChoice(
+			new PatternSequence(this, new PatternString("+"), new DefinedNumber()), new DefinedNumber());
 
-	@Override
-	public String getType() {
-		return TYPE;
+	/**
+	 * Expression constructor that provides the type and pattern definition.
+	 */
+	public DefinedExpression() {
+		super(TYPE);
+		super.setDefinition(pattern);
 	}
 
 }

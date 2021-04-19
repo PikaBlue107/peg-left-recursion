@@ -16,17 +16,17 @@ public class DefinedRightRecursiveExpression extends DefinedPattern {
 	/** Internal definition used when matching. */
 	private final Pattern pattern = new PatternChoice(new PatternSequence(this, new PatternString("+"), this),
 			new DefinedNumber());
+
 	/** Pattern type to provide the display or reference name. */
 	private static final String TYPE = "RightRecursiveExpression";
 
-	@Override
-	protected Pattern getPattern() {
-		return pattern;
-	}
-
-	@Override
-	public String getType() {
-		return TYPE;
+	/**
+	 * Instantiates a RightRecursiveExpression with its pattern type name and
+	 * definition
+	 */
+	protected DefinedRightRecursiveExpression() {
+		super(TYPE);
+		super.setDefinition(pattern);
 	}
 
 }
