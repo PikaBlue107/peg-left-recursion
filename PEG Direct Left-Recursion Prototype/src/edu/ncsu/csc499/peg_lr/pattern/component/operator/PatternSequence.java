@@ -1,7 +1,7 @@
 /**
  * 
  */
-package edu.ncsu.csc499.peg_lr.pattern.component;
+package edu.ncsu.csc499.peg_lr.pattern.component.operator;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -10,6 +10,7 @@ import java.util.NoSuchElementException;
 
 import edu.ncsu.csc499.peg_lr.event.pattern.SequenceEvent;
 import edu.ncsu.csc499.peg_lr.pattern.Pattern;
+import edu.ncsu.csc499.peg_lr.pattern.component.PatternComponent;
 import edu.ncsu.csc499.peg_lr.structure.InputContext;
 import edu.ncsu.csc499.peg_lr.structure.Result;
 
