@@ -1,8 +1,7 @@
 package edu.ncsu.csc499.peg_lr.pattern.definition;
 
-import edu.ncsu.csc499.peg_lr.pattern.Pattern;
-import edu.ncsu.csc499.peg_lr.pattern.component.PatternDigit;
-import edu.ncsu.csc499.peg_lr.pattern.component.PatternRepetition;
+import edu.ncsu.csc499.peg_lr.pattern.component.charclass.PatternDigit;
+import edu.ncsu.csc499.peg_lr.pattern.component.operator.PatternRepetition;
 
 public class DefinedNumber extends DefinedPattern {
 
@@ -12,14 +11,11 @@ public class DefinedNumber extends DefinedPattern {
 	/** Pattern type to indicate display and reference name. */
 	private static final String TYPE = "Number";
 
-	@Override
-	protected Pattern getPattern() {
-		return NUMBER;
-	}
-
-	@Override
-	public String getType() {
-		return TYPE;
+	/**
+	 * Instantiates a Number pattern w/ pattern definition and type name
+	 */
+	public DefinedNumber() {
+		super(TYPE, NUMBER);
 	}
 
 }

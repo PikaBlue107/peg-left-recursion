@@ -8,6 +8,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.ncsu.csc499.peg_lr.pattern.Pattern;
+import edu.ncsu.csc499.peg_lr.pattern.component.charclass.PatternDigit;
+import edu.ncsu.csc499.peg_lr.pattern.component.operator.PatternSequence;
 import edu.ncsu.csc499.peg_lr.pattern.definition.DefinedPattern;
 import edu.ncsu.csc499.peg_lr.util.PatternTestUtils;
 
@@ -69,54 +71,33 @@ public class PatternSequenceTest {
 		// left-recursive.
 
 		// First element can hold LR
-		final Pattern firstElemLR = new DefinedPattern() {
+		final Pattern firstElemLR = new DefinedPattern("TestFirstElemLR") {
 
 			private final Pattern pat = new PatternSequence(this, PAT_NON_NULLABLE);
-
-			@Override
-			protected Pattern getPattern() {
-				return pat;
-			}
-
-			@Override
-			public String getType() {
-				return "TestFirstElemLR";
+			{
+				super.setDefinition(pat);
 			}
 
 		};
 		Assert.assertTrue(firstElemLR.isLeftRecursive());
 
 		// If first element is non-nullable, second element shouldn't be left-recursive
-		final Pattern firstNonNullableSecondRecursive = new DefinedPattern() {
+		final Pattern firstNonNullableSecondRecursive = new DefinedPattern("TestFirstNonNullableSecondRecursive") {
 
 			private final Pattern pat = new PatternSequence(PAT_NON_NULLABLE, this);
-
-			@Override
-			protected Pattern getPattern() {
-				return pat;
-			}
-
-			@Override
-			public String getType() {
-				return "TestFirstNonNullableSecondRecursive";
+			{
+				super.setDefinition(pat);
 			}
 
 		};
 		Assert.assertFalse(firstNonNullableSecondRecursive.isLeftRecursive());
 
 		// If first element is nullable, second element should be left-recursive
-		final Pattern firstNullableSecondRecursive = new DefinedPattern() {
+		final Pattern firstNullableSecondRecursive = new DefinedPattern("TestFirstNullableSecondRecursive") {
 
 			private final Pattern pat = new PatternSequence(PAT_NULLABLE, this);
-
-			@Override
-			protected Pattern getPattern() {
-				return pat;
-			}
-
-			@Override
-			public String getType() {
-				return "TestFirstNullableSecondRecursive";
+			{
+				super.setDefinition(pat);
 			}
 
 		};
@@ -124,18 +105,11 @@ public class PatternSequenceTest {
 
 		// If first and second elements are non-nullable, third element shouldn't be
 		// left-recursive
-		final Pattern firstTwoNonNullableThirdRecursive = new DefinedPattern() {
+		final Pattern firstTwoNonNullableThirdRecursive = new DefinedPattern("TestFirstTwoNonNullableThirdRecursive") {
 
 			private final Pattern pat = new PatternSequence(PAT_NON_NULLABLE, PAT_NON_NULLABLE, this);
-
-			@Override
-			protected Pattern getPattern() {
-				return pat;
-			}
-
-			@Override
-			public String getType() {
-				return "TestFirstTwoNonNullableThirdRecursive";
+			{
+				super.setDefinition(pat);
 			}
 
 		};
@@ -143,18 +117,12 @@ public class PatternSequenceTest {
 
 		// If first is nullable, second is non-nullable, then third should not be
 		// left-recursive
-		final Pattern firstTwoNullableThenNonNullableThirdRecursive = new DefinedPattern() {
+		final Pattern firstTwoNullableThenNonNullableThirdRecursive = new DefinedPattern(
+				"TestFirstTwoNonNullableThirdRecursive") {
 
 			private final Pattern pat = new PatternSequence(PAT_NULLABLE, PAT_NON_NULLABLE, this);
-
-			@Override
-			protected Pattern getPattern() {
-				return pat;
-			}
-
-			@Override
-			public String getType() {
-				return "TestFirstTwoNonNullableThirdRecursive";
+			{
+				super.setDefinition(pat);
 			}
 
 		};
@@ -162,18 +130,12 @@ public class PatternSequenceTest {
 
 		// If first is non-nullable, second is nullable, then third should not be
 		// left-recursive
-		final Pattern firstTwoNonNullableThenNullableThirdRecursive = new DefinedPattern() {
+		final Pattern firstTwoNonNullableThenNullableThirdRecursive = new DefinedPattern(
+				"TestFirstTwoNonNullableThenNullableThirdRecursive") {
 
 			private final Pattern pat = new PatternSequence(PAT_NON_NULLABLE, PAT_NULLABLE, this);
-
-			@Override
-			protected Pattern getPattern() {
-				return pat;
-			}
-
-			@Override
-			public String getType() {
-				return "TestFirstTwoNonNullableThenNullableThirdRecursive";
+			{
+				super.setDefinition(pat);
 			}
 
 		};
@@ -181,18 +143,11 @@ public class PatternSequenceTest {
 
 		// If first is nullable, second is non-nullable, then third should not be
 		// left-recursive
-		final Pattern firstTwoNullableThirdRecursive = new DefinedPattern() {
+		final Pattern firstTwoNullableThirdRecursive = new DefinedPattern("TestFirstTwoNullableThirdRecursive") {
 
 			private final Pattern pat = new PatternSequence(PAT_NULLABLE, PAT_NULLABLE, this);
-
-			@Override
-			protected Pattern getPattern() {
-				return pat;
-			}
-
-			@Override
-			public String getType() {
-				return "TestFirstTwoNullableThirdRecursive";
+			{
+				super.setDefinition(pat);
 			}
 
 		};
@@ -200,20 +155,8 @@ public class PatternSequenceTest {
 
 		// The pattern isn't left recursive on its own
 		Assert.assertFalse(new PatternSequence(new PatternDigit(), new PatternString("")).isLeftRecursive());
-		final Pattern notLRDefinition = new DefinedPattern() {
-
-			private final Pattern pat = new PatternSequence(new PatternDigit(), new PatternString(""));
-
-			@Override
-			public String getType() {
-				return "TestNotLRDefinition";
-			}
-
-			@Override
-			protected Pattern getPattern() {
-				return pat;
-			}
-		};
+		final Pattern notLRDefinition = new DefinedPattern("TestNotLRDefinition",
+				new PatternSequence(new PatternDigit(), new PatternString("")));
 		Assert.assertFalse(notLRDefinition.isLeftRecursive());
 	}
 

@@ -10,7 +10,6 @@ import edu.ncsu.csc499.peg_lr.event.pattern.MetaMatchEvent.MetaMatchEventType;
 import edu.ncsu.csc499.peg_lr.event.pattern.PatternMatchEvent;
 import edu.ncsu.csc499.peg_lr.structure.InputContext;
 import edu.ncsu.csc499.peg_lr.structure.Result;
-import edu.ncsu.csc499.peg_lr.structure.Result.LeftRecursionStatus;
 
 public abstract class Pattern {
 
@@ -228,8 +227,6 @@ public abstract class Pattern {
 			// Start matching from this current derivation we're given
 			// Attempt to *match* the Pattern (this one) against the Derivation
 			attempt = matchAndName(context);
-			// Ensure that this attempt is labeled as left-recursive
-			attempt.setLRStatus(LeftRecursionStatus.DETECTED);
 
 			// If we didn't make any progress, then exit
 			if (!attempt.isSuccess()) {
@@ -260,185 +257,92 @@ public abstract class Pattern {
 		// Set the context to rest at the end of the farthest match we were able to find
 		context.setPosition(farthestMatchEndPos);
 
+		// Retrieve the growing tree's result
+		final Result finalMatch = context.resultFor(this, initialPosition);
+		// Clear it from the tree
+		context.clearResult(this, initialPosition);
+
 		// Return the result for the overall match
-		return context.resultFor(this, initialPosition);
+		return finalMatch;
 	}
 
 	/**
-	 * Lazily matches this pattern onto the provided Derivation. If the Derivation
-	 * already expresses a result for this Pattern, returns that. Otherwise,
-	 * calculates the Result of the match, saves it to the Derivation for future
-	 * use, and returns it.
+	 * Lazily matches this pattern onto the provided position. If the pattern is
+	 * hidden or not left-recursive, will immediately delegate to matchAndName(). If
+	 * the pattern is left-recursive and there is a seed already saved, returns that
+	 * seed. If there's no seed, then begins a left-recursive match by calculating a
+	 * seed and, if successful, delegating to growLeftRecursion().
 	 * 
-	 * @param context
+	 * @param context the input context storing the input string, position, and
+	 *                growing map
 	 * @return
 	 */
 	public final Result lazyMatch(final InputContext context) {
 
-		// If this pattern has no Type or is an alias, delegate immediately to match()
-		if (this.isHidden()) {
-
+		// If this pattern is hidden or not left-recursive, delegate immediately to
+		// match()
+		if (this.isHidden() | !this.isLeftRecursive()) {
 			// Skip left-recursion and memoization
 			return this.matchAndName(context);
 		}
 
-		// Begin the full meta-match
-		// Log it in the context
-		context.addHistory(new MetaMatchEvent(context, this, context.getPosition(), MetaMatchEventType.BEGIN_PREP));
+		// Otherwise, it's left-recursive.
+		else {
+			// Begin the main LR algorithm
 
-		// let m = MEMO(R,P)
-		// Let m hold the "known" result of applying this Rule at this Position
-		// Let m hold the "known" result of applying this Pattern at this Derivation
-		Result m = context.resultFor(this);
+			// Log it in the context
+			context.addHistory(new MetaMatchEvent(context, this, context.getPosition(), MetaMatchEventType.BEGIN_PREP));
 
-		// if m = NIL
-		// If the "known" result does not yet exist
-		if (m == null) {
+			// Check to see if the growing map is storing a seed at this position
+			final Result seed = context.resultFor(this);
 
-			// Log that we're going to have to manually run a match
-			context.addHistory(new MetaMatchEvent(context, this, context.getPosition(), MetaMatchEventType.RUN_MATCH));
+			// If there's no result for this Pattern at this Position
+			if (seed == null) {
+				// We're at the start of a (possibly) left-recursive match
+				// Log that we're going to have to manually run a match
+				context.addHistory(
+						new MetaMatchEvent(context, this, context.getPosition(), MetaMatchEventType.RUN_MATCH));
 
-			// Save the initial position before matching in case we need to grow the match
-			final int initialPosition = context.getPosition();
+				// Save the initial position before matching in case we need to grow the match
+				final int initialPosition = context.getPosition();
+				// Set the current Result for this match equal to a fail result
+				context.setResultFor(this, Result.FAIL(initialPosition));
 
-			// let lr = new LR(FALSE)
-			// Create a new LeftRecursion tracker that says this rule is suspected but not
-			// confirmed to be left recursive
-			// Create the subsequent Result with a LeftRecursionStatus of POSSIBLE
+				// Evaluate the Pattern at this index, possibly matching a seed
+				final Result ans = matchAndName(context);
+				// Update the retrieved answer as the new answer in the growing map
+				context.setResultFor(this, ans, initialPosition);
 
-			// m = new MemoEntry(lr,P)
-			// Set m to a failure entry that points us back to the same starting position
-			// and indicates that this rule might be left recursive
-			// Set m to a failure Result with a left recursion status of POSSIBLE to
-			// indicate we suspect but don't know that the Pattern might be left recursive
-			m = Result.FAIL(initialPosition);
+				// If it was a successful match
+				if (ans.isSuccess()) {
+					// We have a seed! Time to attempt to grow
+					// Log that we're going to start growing this left-recursive call
+					context.addHistory(new MetaMatchEvent(context, this, ans, MetaMatchEventType.BEGIN_GROW));
 
-			// MEMO(R,P) = m
-			// Set the memoized answer for applying this rule at this position to be m, the
-			// failure memo
-			// Set the Result for applying this Pattern on this Derivation to be m, the
-			// failure Result
-			context.setResultFor(this, m);
+					// Return the result of growing th left-recursive Pattern until it cannot be
+					// re-evaluated to consume any more input
+					return growLeftRecursion(context, initialPosition);
 
-			// let ans = EVAL(R.body)
-			// Evaluate the Rule at this position, saving the answer in the field "ans"
-			// Attempt to match the Pattern on this Derivation, saving the Result in the
-			// field "ans"
-			final Result ans = matchAndName(context);
-			ans.setType(getType());
-			ans.setAlias(isAlias());
-
-			ans.setLRStatus(m.getLRStatus());
-			context.setResultFor(this, ans, initialPosition);
-
-			// m.ans = ans
-			// Set the memoized answer equal to the answer from evaluating the rule at this
-			// position
-			// Set the memoized Rule's success equal to the success from evaluating the
-			// Pattern at this Derivation
-//			m.setSuccess(ans.isSuccess());
-
-			// m.pos = Pos
-			// Set the memoized position equal to the current Position after evaluating the
-			// rule
-			// Set the memoized Derivation equal to the Derivation within the Result
-			// acquired from evaluating the Pattern
-//			m.setDerivation(ans.getDerivation());
-
-			// if lr.detected and ans != FAIL
-			// If the answer from evaluating the rule says that it is left-recursive and it
-			// had a definite match when we finished evaluating it 3 lines of code up
-			// If the Result from evaluating the Pattern has a DETECTED LeftRecursionStatus
-			// and it has a successful match (seed) of the recursive pattern
-			if ((ans.getLRStatus() == LeftRecursionStatus.DETECTED) && ans.isSuccess()) {
-
-				// Log that we're going to start growing this left-recursive call
-				context.addHistory(new MetaMatchEvent(context, this, ans, MetaMatchEventType.BEGIN_GROW));
-
-				// return GROW-LR(R,P,m,NIL)
-				// return the result of growing the left-recursive rule until it cannot be
-				// re-evaluated to consume any more input
-				// return the result of growing the left-recursive Pattern until it cannot be
-				// re-evaluated to consume any more input
-				return growLeftRecursion(context, initialPosition);
+				} else {
+					// Clear the failed growing seed
+					context.clearResult(this);
+					// Return the failed Result that we got from matching. No seed.
+					return ans;
+				}
 
 			} else {
-				// Set left recursion status to impossible, since we didn't get a simultaneous
-				// call while this branch executed
-				ans.setLRStatus(LeftRecursionStatus.IMPOSSIBLE);
+				// Log that we're going to delegate to using the saved result
+				context.addHistory(new MetaMatchEvent(context, this, seed, MetaMatchEventType.ASSUME_RESULT));
 
-				// return ans
-				// Return the answer of the evaluation of the rule
-				// Return the Result of attmepting to match the Pattern
-				return ans;
+				// Set the current position of the context equal to the seed's end index
+				context.setPosition(seed.getEndIdx());
+				// Return the result of applying the rule at this position
+				return seed;
+
 			}
-
-		} else {
-
-			// Log that we're going to delegate to using the saved result
-			context.addHistory(new MetaMatchEvent(context, this, m, MetaMatchEventType.ASSUME_RESULT));
-
-			// Pos = m.pos
-			// Set the current position of parsing equal to the result m's position
-			// If the result is a success, set the current position of the context equal to
-			// the result m's end index
-			if (m.isSuccess()) { // TODO: Ideally we comment this out
-				context.setPosition(m.getEndIdx());
-			}
-
-			// if m.ans is LR
-			// if the current memoised answer of the rule application is LR, then this else
-			// block was called
-			// while another instance of this method further up the stack trace is still
-			// trying to evaluate the rule
-			// after an initial creation of a possibly left-recursive memoised answer
-			// if the current memoised Result of the Pattern application has a
-			// LeftRecursiveStatus of POSSIBLY,
-			// then this iteration of lazyMatch() was called while another iteration further
-			// up the stack trace is still
-			// in the middle of the first evaluation of this rule at this position,
-			// meaning that this rule is definitely left-recursive at this position
-			if (m.getLRStatus() == LeftRecursionStatus.POSSIBLE) {
-				// m.ans.detected = TRUE
-				// Mark this rule at this position as left-recursive for sure
-				// Mark this Pattern at this Derivation as left-recursive for sure
-				m.setLRStatus(LeftRecursionStatus.DETECTED);
-
-				// Log that we identified a left-recursive call
-
-				// Log that we're flagging this result as left-recursive
-				context.addHistory(new MetaMatchEvent(context, this, m, MetaMatchEventType.IDENTIFY_LR));
-
-				// return FAIL
-				// end this iteration with a failure so that we can find a seed later on in the
-				// rule
-				// end this iteration with a failure so that we can find a seed later on in the
-				// Pattern
-				assert !m.isSuccess();
-			} else {
-				// return m.ans
-				// Return the answer of applying the rule at this position
-				// Return the Result of applying the rule at this position
-			}
-
-			// Return the result of applying the rule at this position
-			return m;
 
 		}
 
-//		// Check for previously calculated Result
-//		if (derivation.hasSaved(this)) {
-//			return derivation.resultFor(this);
-//		}
-//
-//		// No previously-calculated Result, we gotta do it ourselves.
-//
-//		// Calculate result
-//		Result<?> result = match(derivation);
-//		// Save result
-//		derivation.setResultFor(this, result);
-//		// Return result
-//		return result;
 	}
 
 	/**

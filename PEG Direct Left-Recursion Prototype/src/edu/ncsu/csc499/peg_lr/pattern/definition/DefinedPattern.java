@@ -14,7 +14,34 @@ import edu.ncsu.csc499.peg_lr.structure.Result;
  * @author Melody Griesen
  *
  */
-public abstract class DefinedPattern extends Pattern {
+public class DefinedPattern extends Pattern {
+
+	/** Internal definition used when matching. */
+	private Pattern definition;
+
+	/** Pattern type to provide the display or reference name. */
+	private String type;
+
+	/**
+	 * Creates a DefinedPattern with the given pattern definition and type name.
+	 *
+	 * @param type       the type name of the Pattern being defined
+	 * @param definition the internal Pattern that will be used upon matching
+	 */
+	public DefinedPattern(final String type, final Pattern definition) {
+		setDefinition(definition);
+		setType(type);
+	}
+
+	/**
+	 * Internal constructor that allows a user to skip providing a pattern. This
+	 * allows them to instantiate and then set a recursive pattern if so desired.
+	 *
+	 * @param type the type name of the Pattern being defined
+	 */
+	protected DefinedPattern(final String type) {
+		setType(type);
+	}
 
 	/**
 	 * Implements the match() method by requiring a Pattern definition to be
@@ -22,16 +49,67 @@ public abstract class DefinedPattern extends Pattern {
 	 */
 	@Override
 	protected Result match(final InputContext context) {
+		// Create a Result for the pattern we'll match
+		final Result overallResult = new Result(context.getPosition());
 		// Delegate to the pattern we created.
-		return getPattern().lazyMatch(context);
+		final Result definitionResult = getPattern().lazyMatch(context);
+		// If it was successful
+		if (definitionResult.isSuccess()) {
+			// Add that result to our own
+			overallResult.addChild(definitionResult);
+			// Return the overall result for this definition
+			return overallResult;
+		}
+		// Otherwise, it wasn't successful
+		else {
+			// Just return the definition match
+			return definitionResult;
+		}
 	}
 
 	/**
-	 * Requires all subclasses to simply provide a Pattern definition.
+	 * Sets this Pattern's type.
+	 *
+	 * @param type the type to set. Cannot be null or blank.
+	 */
+	protected void setType(final String type) {
+		if ((type == null) || type.isBlank()) {
+			throw new IllegalArgumentException("Pattern type cannot be null or empty.");
+		}
+		this.type = type;
+	}
+
+	/**
+	 * Sets this Pattern's definition, the pattern that will be used for its
+	 * matching.
+	 *
+	 * @param definition the pattern that this one will delegate to upon matching
+	 */
+	protected void setDefinition(final Pattern definition) {
+		if (definition == null) {
+			throw new IllegalArgumentException("Pattern definition cannot be null.");
+		}
+		this.definition = definition;
+	}
+
+	/**
+	 * Retrieves this Pattern's type
+	 * 
+	 * @return the type name of this Pattern.
+	 */
+	@Override
+	public String getType() {
+		return type;
+	}
+
+	/**
+	 * Provides access to the pattern definition used for matching.
 	 * 
 	 * @return the Pattern that shall be used to determine matching.
 	 */
-	protected abstract Pattern getPattern();
+	public Pattern getPattern() {
+		return definition;
+	}
 
 	/**
 	 * {@inheritDoc} If component, returns pattern type. If non-component, delegates

@@ -1,7 +1,7 @@
 /**
  * 
  */
-package edu.ncsu.csc499.peg_lr.pattern.component;
+package edu.ncsu.csc499.peg_lr.pattern.component.operator;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -9,6 +9,7 @@ import java.util.List;
 
 import edu.ncsu.csc499.peg_lr.event.pattern.OrderedChoiceEvent;
 import edu.ncsu.csc499.peg_lr.pattern.Pattern;
+import edu.ncsu.csc499.peg_lr.pattern.component.PatternComponent;
 import edu.ncsu.csc499.peg_lr.structure.InputContext;
 import edu.ncsu.csc499.peg_lr.structure.Result;
 
@@ -76,7 +77,7 @@ public class PatternChoice extends PatternComponent {
 	@Override
 	protected Result match(final InputContext context) {
 		// Track the initial starting position
-		final Result choice = new Result(true, "", context.getPosition());
+		final Result choice = new Result(context.getPosition());
 
 		// Run through the list of patterns to match
 		// Keep track of the previous pattern's result
@@ -187,7 +188,7 @@ public class PatternChoice extends PatternComponent {
 	 */
 	@Override
 	protected Iterator<Pattern> getPossibleLeftmostComponents() {
-		return new ArrayList<Pattern>(patterns).iterator();
+		return new ArrayList<>(patterns).iterator();
 	}
 
 	/**

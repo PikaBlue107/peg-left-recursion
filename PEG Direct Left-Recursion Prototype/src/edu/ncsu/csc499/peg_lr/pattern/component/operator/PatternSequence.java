@@ -1,7 +1,7 @@
 /**
  * 
  */
-package edu.ncsu.csc499.peg_lr.pattern.component;
+package edu.ncsu.csc499.peg_lr.pattern.component.operator;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -10,6 +10,7 @@ import java.util.NoSuchElementException;
 
 import edu.ncsu.csc499.peg_lr.event.pattern.SequenceEvent;
 import edu.ncsu.csc499.peg_lr.pattern.Pattern;
+import edu.ncsu.csc499.peg_lr.pattern.component.PatternComponent;
 import edu.ncsu.csc499.peg_lr.structure.InputContext;
 import edu.ncsu.csc499.peg_lr.structure.Result;
 
@@ -77,7 +78,7 @@ public class PatternSequence extends PatternComponent {
 	protected Result match(final InputContext context) {
 		// Run through the list of patterns to match
 		// Keep track of the previous pattern's result
-		final Result sequence = new Result(true, "", context.getPosition());
+		final Result sequence = new Result(context.getPosition());
 		Result result;
 		// Sequence index for event reporting
 		int sequenceIdx = 0;
@@ -185,36 +186,36 @@ public class PatternSequence extends PatternComponent {
 	 */
 	@Override
 	protected Iterator<Pattern> getPossibleLeftmostComponents() {
-		
+
 		// Return a custom Iterator over the patterns in this sequence.
 		// Elements are returned from next() if all leftward elements are nullable.
-		return new Iterator<Pattern>() {
-			
+		return new Iterator<>() {
+
 			/** List to return elements from */
 			List<Pattern> sequenceComponents = patterns;
-			
+
 			/** Current position in the list */
 			int idx = 0;
-			
+
 			/**
-			 * The next element is returnable if it's at the front of the list, or
-			 * the element to its left is nullable
+			 * The next element is returnable if it's at the front of the list, or the
+			 * element to its left is nullable
 			 * 
-			 * @return true if the iterator is at the front of the list, or if the
-			 * previous element is nullable.
+			 * @return true if the iterator is at the front of the list, or if the previous
+			 *         element is nullable.
 			 */
 			@Override
 			public boolean hasNext() {
-				return idx == 0 || patterns.get(idx - 1).isNullable();
+				return (idx == 0) || patterns.get(idx - 1).isNullable();
 			}
-			
+
 			/**
-			 * If there is another element to retrieve, returns it and advances the
-			 * iterator one position.
+			 * If there is another element to retrieve, returns it and advances the iterator
+			 * one position.
 			 * 
 			 * @return the next possibly left-recursive element in the list
-			 * @throws NoSuchElementException if there are no more left-recursive
-			 * elements in the list
+			 * @throws NoSuchElementException if there are no more left-recursive elements
+			 *                                in the list
 			 */
 			@Override
 			public Pattern next() {
@@ -222,7 +223,7 @@ public class PatternSequence extends PatternComponent {
 				if (!hasNext()) {
 					throw new NoSuchElementException("No more left-recursive elements in sequence");
 				}
-				
+
 				// Return the next element and increment the position
 				return sequenceComponents.get(idx++);
 			}

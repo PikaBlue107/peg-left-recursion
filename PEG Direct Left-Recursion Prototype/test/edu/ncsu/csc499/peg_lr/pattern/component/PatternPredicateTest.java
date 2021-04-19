@@ -10,6 +10,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import edu.ncsu.csc499.peg_lr.pattern.Pattern;
+import edu.ncsu.csc499.peg_lr.pattern.component.charclass.PatternDigit;
+import edu.ncsu.csc499.peg_lr.pattern.component.operator.PatternPredicate;
 import edu.ncsu.csc499.peg_lr.pattern.definition.DefinedPattern;
 
 /**
@@ -90,36 +92,22 @@ public class PatternPredicateTest {
 
 		// First choice should hold left recursion
 		// If it's false
-		final Pattern recursiveFalsePredicate = new DefinedPattern() {
+		final Pattern recursiveFalsePredicate = new DefinedPattern("TestFirstChoiceLR") {
 
 			private final Pattern pat = new PatternPredicate(this, true);
-
-			@Override
-			protected Pattern getPattern() {
-				return pat;
-			}
-
-			@Override
-			public String getType() {
-				return "TestFirstChoiceLR";
+			{
+				super.setDefinition(pat);
 			}
 
 		};
 		Assert.assertTrue(recursiveFalsePredicate.isLeftRecursive());
 
 		// And if it's true
-		final Pattern recursiveTruePredicate = new DefinedPattern() {
+		final Pattern recursiveTruePredicate = new DefinedPattern("TestFirstChoiceLR") {
 
 			private final Pattern pat = new PatternPredicate(this, true);
-
-			@Override
-			protected Pattern getPattern() {
-				return pat;
-			}
-
-			@Override
-			public String getType() {
-				return "TestFirstChoiceLR";
+			{
+				super.setDefinition(pat);
 			}
 
 		};
@@ -127,20 +115,8 @@ public class PatternPredicateTest {
 
 		// The pattern isn't left recursive on its own
 		Assert.assertFalse(new PatternPredicate(new PatternDigit(), true).isLeftRecursive());
-		final Pattern notLRDefinition = new DefinedPattern() {
-
-			private final Pattern pat = new PatternPredicate(new PatternString(""), false);
-
-			@Override
-			public String getType() {
-				return "TestNotLRDefinition";
-			}
-
-			@Override
-			protected Pattern getPattern() {
-				return pat;
-			}
-		};
+		final Pattern notLRDefinition = new DefinedPattern("TestNotLRDefinition",
+				new PatternPredicate(new PatternString(""), false));
 		Assert.assertFalse(notLRDefinition.isLeftRecursive());
 	}
 

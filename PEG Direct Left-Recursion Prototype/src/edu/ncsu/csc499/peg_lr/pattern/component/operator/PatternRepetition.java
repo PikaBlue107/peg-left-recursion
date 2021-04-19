@@ -1,7 +1,7 @@
 /**
  * 
  */
-package edu.ncsu.csc499.peg_lr.pattern.component;
+package edu.ncsu.csc499.peg_lr.pattern.component.operator;
 
 import java.util.Iterator;
 import java.util.List;
@@ -9,6 +9,7 @@ import java.util.List;
 import edu.ncsu.csc499.peg_lr.event.pattern.PatternEvent.PatternEventType;
 import edu.ncsu.csc499.peg_lr.event.pattern.RepetitionEvent;
 import edu.ncsu.csc499.peg_lr.pattern.Pattern;
+import edu.ncsu.csc499.peg_lr.pattern.component.PatternComponent;
 import edu.ncsu.csc499.peg_lr.structure.InputContext;
 import edu.ncsu.csc499.peg_lr.structure.Result;
 
@@ -58,7 +59,7 @@ public class PatternRepetition extends PatternComponent {
 	@Override
 	protected Result match(final InputContext context) {
 		// Create an overall result to track starting position
-		final Result repetition = new Result(true, "", context.getPosition());
+		final Result repetition = new Result(context.getPosition());
 		// Track the number of successful iterations
 		int matches = 0;
 

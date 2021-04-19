@@ -1,12 +1,13 @@
 /**
  * 
  */
-package edu.ncsu.csc499.peg_lr.pattern.component;
+package edu.ncsu.csc499.peg_lr.pattern.component.operator;
 
 import java.util.Iterator;
 import java.util.List;
 
 import edu.ncsu.csc499.peg_lr.pattern.Pattern;
+import edu.ncsu.csc499.peg_lr.pattern.component.PatternComponent;
 import edu.ncsu.csc499.peg_lr.structure.InputContext;
 import edu.ncsu.csc499.peg_lr.structure.Result;
 
@@ -48,7 +49,7 @@ public class PatternPredicate extends PatternComponent {
 	protected Result match(final InputContext context) {
 
 		// Create a Result for the predication
-		final Result pred = new Result(true, "", context.getPosition());
+		final Result pred = new Result(context.getPosition());
 
 		// Save the start position
 		final int startPos = context.getPosition();
