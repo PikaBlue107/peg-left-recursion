@@ -19,6 +19,7 @@ Resulting capture stack:
 
 	| Type of Capture | Pattern  |
 	|-----------------|----------|
+	| Close Recursion | Expr     |--------\
 	| Close           | Expr     |--------\
 	| Close           | Number   |-----\  |
 	| Close           | Digit    |--\  |  |
@@ -33,6 +34,6 @@ Resulting capture stack:
 	| Close           | Digit    |--\  |  |
 	| Open            | Digit    |--/  |  |
 	| Open            | Number   |-----/  |
-	| Open Recursive  | Expr     |--------/
+	| Open Recursion  | Expr     |--------/
 	|_________________|__________|
 	
