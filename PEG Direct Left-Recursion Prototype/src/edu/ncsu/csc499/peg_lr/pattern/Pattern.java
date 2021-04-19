@@ -260,17 +260,24 @@ public abstract class Pattern {
 		// Set the context to rest at the end of the farthest match we were able to find
 		context.setPosition(farthestMatchEndPos);
 
+		// Retrieve the growing tree's result
+		final Result finalMatch = context.resultFor(this, initialPosition);
+		// Clear it from the tree
+		context.clearResult(this, initialPosition);
+
 		// Return the result for the overall match
-		return context.resultFor(this, initialPosition);
+		return finalMatch;
 	}
 
 	/**
-	 * Lazily matches this pattern onto the provided Derivation. If the Derivation
-	 * already expresses a result for this Pattern, returns that. Otherwise,
-	 * calculates the Result of the match, saves it to the Derivation for future
-	 * use, and returns it.
+	 * Lazily matches this pattern onto the provided position. If the pattern is
+	 * hidden or not left-recursive, will immediately delegate to matchAndName(). If
+	 * the pattern is left-recursive and there is a seed already saved, returns that
+	 * seed. If there's no seed, then begins a left-recursive match by calculating a
+	 * seed and, if successful, delegating to growLeftRecursion().
 	 * 
-	 * @param context
+	 * @param context the input context storing the input string, position, and
+	 *                growing map
 	 * @return
 	 */
 	public final Result lazyMatch(final InputContext context) {
@@ -278,10 +285,10 @@ public abstract class Pattern {
 		// If this pattern is hidden or not left-recursive, delegate immediately to
 		// match()
 		if (this.isHidden() | !this.isLeftRecursive()) {
-
 			// Skip left-recursion and memoization
 			return this.matchAndName(context);
 		}
+
 		// Otherwise, it's left-recursive.
 		else {
 			// Begin the main LR algorithm
@@ -289,32 +296,29 @@ public abstract class Pattern {
 			// Log it in the context
 			context.addHistory(new MetaMatchEvent(context, this, context.getPosition(), MetaMatchEventType.BEGIN_PREP));
 
+			// Check to see if the growing map is storing a seed at this position
 			final Result seed = context.resultFor(this);
 
 			// If there's no result for this Pattern at this Position
 			if (seed == null) {
 				// We're at the start of a (possibly) left-recursive match
-
 				// Log that we're going to have to manually run a match
 				context.addHistory(
 						new MetaMatchEvent(context, this, context.getPosition(), MetaMatchEventType.RUN_MATCH));
 
 				// Save the initial position before matching in case we need to grow the match
 				final int initialPosition = context.getPosition();
-
 				// Set the current Result for this match equal to a fail result
 				context.setResultFor(this, Result.FAIL(initialPosition));
 
 				// Evaluate the Pattern at this index, possibly matching a seed
 				final Result ans = matchAndName(context);
-
 				// Update the retrieved answer as the new answer in the growing map
 				context.setResultFor(this, ans, initialPosition);
 
 				// If it was a successful match
 				if (ans.isSuccess()) {
 					// We have a seed! Time to attempt to grow
-
 					// Log that we're going to start growing this left-recursive call
 					context.addHistory(new MetaMatchEvent(context, this, ans, MetaMatchEventType.BEGIN_GROW));
 
@@ -323,18 +327,18 @@ public abstract class Pattern {
 					return growLeftRecursion(context, initialPosition);
 
 				} else {
+					// Clear the failed growing seed
+					context.clearResult(this);
 					// Return the failed Result that we got from matching. No seed.
 					return ans;
 				}
 
 			} else {
-
 				// Log that we're going to delegate to using the saved result
 				context.addHistory(new MetaMatchEvent(context, this, seed, MetaMatchEventType.ASSUME_RESULT));
 
 				// Set the current position of the context equal to the seed's end index
 				context.setPosition(seed.getEndIdx());
-
 				// Return the result of applying the rule at this position
 				return seed;
 

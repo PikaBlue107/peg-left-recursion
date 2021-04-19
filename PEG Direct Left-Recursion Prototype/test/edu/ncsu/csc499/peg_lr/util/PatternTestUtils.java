@@ -202,6 +202,11 @@ public class PatternTestUtils {
 				Assert.assertTrue(scenario + "Failure: Input string was not exhausted.", matcher.context.isAtEnd());
 			}
 		}
+
+		// Ensure that the context growing map was cleared out all the way
+		for (int i = 0; i <= matcher.context.length(); i++) {
+			Assert.assertEquals(0, matcher.context.getResultCount(i));
+		}
 	}
 
 	/**

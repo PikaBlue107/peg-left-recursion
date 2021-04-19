@@ -131,6 +131,11 @@ public class InputContext {
 		return this.position == this.inputString.length();
 	}
 
+	/**
+	 * Returns the total length of the input string.
+	 *
+	 * @return the number of characters in the input string
+	 */
 	public int length() {
 		return inputString.length();
 	}
@@ -283,6 +288,47 @@ public class InputContext {
 		final Result r = this.patterns.get(index).get(p);
 		addHistory(new MemoryEvent(this, MemoryEventType.CHECK, p, r, index));
 		return r;
+	}
+
+	/**
+	 * Clears the specified pattern from the growing map at the specified index.
+	 *
+	 * @param p the pattern to clear
+	 */
+	public void clearResult(final Pattern p) {
+		clearResult(p, getPosition());
+	}
+
+	/**
+	 * Clears the specified pattern from the growing map at the specified index.
+	 *
+	 * @param p     the pattern to clear
+	 * @param index the index to clear of the pattern
+	 */
+	public void clearResult(final Pattern p, final int index) {
+		addHistory(new MemoryEvent(this, MemoryEventType.CLEAR, p, null, index));
+		patterns.get(index).remove(p);
+	}
+
+	/**
+	 * Returns the number of patterns that are registered with seeds at the current
+	 * position
+	 *
+	 * @return the number of patterns that have a saved seed at this index
+	 */
+	public int getResultCount() {
+		return getResultCount(getPosition());
+	}
+
+	/**
+	 * Returns the number of patterns that are registered with seeds at the given
+	 * position
+	 *
+	 * @param index the index to check
+	 * @return the number of patterns that have a saved seed at this index
+	 */
+	public int getResultCount(final int index) {
+		return patterns.get(index).size();
 	}
 
 	/**
