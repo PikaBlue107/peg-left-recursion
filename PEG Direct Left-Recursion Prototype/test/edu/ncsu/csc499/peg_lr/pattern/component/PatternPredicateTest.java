@@ -10,6 +10,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import edu.ncsu.csc499.peg_lr.pattern.Pattern;
+import edu.ncsu.csc499.peg_lr.pattern.component.operator.PatternPredicate;
 import edu.ncsu.csc499.peg_lr.pattern.definition.DefinedPattern;
 
 /**

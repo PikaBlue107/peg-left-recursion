@@ -1,9 +1,9 @@
 package edu.ncsu.csc499.peg_lr.pattern.definition;
 
 import edu.ncsu.csc499.peg_lr.pattern.Pattern;
-import edu.ncsu.csc499.peg_lr.pattern.component.PatternChoice;
-import edu.ncsu.csc499.peg_lr.pattern.component.PatternSequence;
 import edu.ncsu.csc499.peg_lr.pattern.component.PatternString;
+import edu.ncsu.csc499.peg_lr.pattern.component.operator.PatternChoice;
+import edu.ncsu.csc499.peg_lr.pattern.component.operator.PatternSequence;
 
 /**
  * expr <- { expr + num / num }

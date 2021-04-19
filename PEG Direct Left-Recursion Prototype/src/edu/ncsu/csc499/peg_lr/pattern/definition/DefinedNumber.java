@@ -1,7 +1,7 @@
 package edu.ncsu.csc499.peg_lr.pattern.definition;
 
 import edu.ncsu.csc499.peg_lr.pattern.component.PatternDigit;
-import edu.ncsu.csc499.peg_lr.pattern.component.PatternRepetition;
+import edu.ncsu.csc499.peg_lr.pattern.component.operator.PatternRepetition;
 
 public class DefinedNumber extends DefinedPattern {
 
