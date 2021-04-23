@@ -3,12 +3,10 @@
  */
 package edu.ncsu.csc499.peg_lr.structure;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+import edu.ncsu.csc499.peg_lr.event.EventHistory;
 import edu.ncsu.csc499.peg_lr.event.ParseEvent;
 import edu.ncsu.csc499.peg_lr.event.control.MemoryEvent;
 import edu.ncsu.csc499.peg_lr.event.control.MemoryEvent.MemoryEventType;
@@ -57,7 +55,7 @@ public class InputContext {
 	 * List of all "events" that have happened in the context (matching,
 	 * backtracking, etc.)
 	 */
-	private final List<ParseEvent> history = new ArrayList<>();
+	private final EventHistory history = new EventHistory();
 
 	/**
 	 * How far the InputContext will print to either side when running toString()
@@ -384,7 +382,7 @@ public class InputContext {
 	 * @param entry the entry to add to the end of the history.
 	 */
 	public void addHistory(final ParseEvent entry) {
-		this.history.add(entry);
+		this.history.addHistory(entry);
 	}
 
 	/**
@@ -409,15 +407,7 @@ public class InputContext {
 	 */
 	public Iterable<ParseEvent> getHistory(final Class<? extends ParseEvent> classFilter) {
 
-		if (classFilter == null) {
-			throw new NullPointerException("Cannot filter by a null filter!");
-		}
-
-		final List<ParseEvent> filtered = history.stream()
-				.filter((final ParseEvent p) -> classFilter.isAssignableFrom(p.getClass()))
-				.collect(Collectors.toList());
-
-		return filtered;
+		return this.history.getHistory(classFilter);
 
 	}
 
@@ -429,7 +419,7 @@ public class InputContext {
 	 * @return a String containing all history entries
 	 */
 	public String printHistory() {
-		return printHistory(ParseEvent.class);
+		return history.printHistory();
 	}
 
 	/**
@@ -443,20 +433,7 @@ public class InputContext {
 	 * @return a String containing all history entries
 	 */
 	public String printHistory(final Class<? extends ParseEvent> classFilter) {
-		// Set up string builder for history
-		final StringBuilder historyString = new StringBuilder();
-
-		// Track which step of history we're on
-		int historyIdx = 0;
-
-		// Loop over all history events, from earliest to latest
-		for (final ParseEvent historyEntry : getHistory()) {
-			// Append a new line with formatted columns for step and full event details
-			historyString.append(String.format("%4d:\t%s\n", historyIdx++, historyEntry.toString()));
-		}
-
-		// Return resulting string
-		return historyString.toString();
+		return history.printHistory(classFilter);
 	}
 
 	// Overall
