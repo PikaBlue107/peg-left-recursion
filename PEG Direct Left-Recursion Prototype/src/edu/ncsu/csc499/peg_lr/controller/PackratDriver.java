@@ -1,9 +1,13 @@
 package edu.ncsu.csc499.peg_lr.controller;
 
 import edu.ncsu.csc499.peg_lr.event.ParseEvent;
-import edu.ncsu.csc499.peg_lr.event.control.ControlEvent;
+import edu.ncsu.csc499.peg_lr.event.pattern.PatternMatchEvent;
 import edu.ncsu.csc499.peg_lr.pattern.Pattern;
-import edu.ncsu.csc499.peg_lr.pattern.definition.DefinedExpression;
+import edu.ncsu.csc499.peg_lr.pattern.component.PatternString;
+import edu.ncsu.csc499.peg_lr.pattern.component.operator.PatternChoice;
+import edu.ncsu.csc499.peg_lr.pattern.component.operator.PatternSequence;
+import edu.ncsu.csc499.peg_lr.pattern.definition.DefinedNumber;
+import edu.ncsu.csc499.peg_lr.pattern.definition.DefinedPattern;
 import edu.ncsu.csc499.peg_lr.structure.InputContext;
 import edu.ncsu.csc499.peg_lr.structure.Result;
 
@@ -17,10 +21,20 @@ import edu.ncsu.csc499.peg_lr.structure.Result;
 public class PackratDriver {
 
 	/** Test string to use for each run. */
-	private static final String TEST_STRING = "1+25+7";
+	private static final String TEST_STRING = "(((1)+23))";
+
+	private static Pattern plus = new PatternString("+");
+	private static Pattern number = new DefinedNumber();
 
 	/** Pattern used to match the test string. */
-	private static final Pattern MATCH_PATTERN = new DefinedExpression();
+	private static final Pattern MATCH_PATTERN = new DefinedPattern("Expression") {
+
+		private final Pattern pattern = new PatternChoice(new PatternSequence(this, plus, number),
+				new PatternSequence(new PatternString("("), this, new PatternString(")")), number);
+		{
+			super.setDefinition(pattern);
+		}
+	};
 
 	/**
 	 * Main launch point of the program. Sandbox. Playground. Laboratory.
@@ -29,7 +43,6 @@ public class PackratDriver {
 	 */
 	public static void main(final String[] args) {
 		doMatch(TEST_STRING, MATCH_PATTERN);
-//		System.out.println(InputContext.CHAR_EPSILON);
 	}
 
 	/**
@@ -48,10 +61,11 @@ public class PackratDriver {
 
 		// Print out the result
 		System.out.println(result.toString());
-
-		System.out.println("Hidden tree:");
-		System.out.println(result.printResultTree());
-		System.out.println("\n\n\n\n\n");
+		System.out.println("Definition: " + matcher.getDefinition());
+//
+//		System.out.println("Hidden tree:");
+//		System.out.println(result.printResultTree());
+//		System.out.println("\n\n\n\n\n");
 
 		System.out.println("Full tree:");
 		System.out.println(result.printResultTree(true));
@@ -59,7 +73,7 @@ public class PackratDriver {
 
 		// Print out just the history events having to do with the growing map
 		int historyIdx = 0;
-		for (final ParseEvent e : input.getHistory(ControlEvent.class)) {
+		for (final ParseEvent e : input.getHistory(PatternMatchEvent.class)) {
 			System.out.printf("%4d:\t%s\n", historyIdx++, e.toString());
 		}
 	}
