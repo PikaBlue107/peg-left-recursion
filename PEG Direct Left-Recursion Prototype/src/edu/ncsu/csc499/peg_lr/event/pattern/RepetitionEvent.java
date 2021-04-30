@@ -30,7 +30,8 @@ public class RepetitionEvent extends PatternEvent {
 	 *                      repetition, etc.
 	 */
 	public RepetitionEvent(final InputContext context, final Pattern pattern, final int repetitionNum) {
-		super(context, context.getPosition(), 0, "repetition #" + repetitionNum + " of pattern " + pattern.toString());
+		super(context, context.getPosition(), 0, "repetition #" + repetitionNum + " of pattern " + pattern.toString(),
+				pattern);
 		this.type = PatternEventType.ATTEMPT;
 	}
 
@@ -47,7 +48,7 @@ public class RepetitionEvent extends PatternEvent {
 	public RepetitionEvent(final InputContext context, final Pattern pattern, final int repetitionNum,
 			final Result result, final PatternEventType type) {
 		super(context, result.getStartIdx(), result.getData().length(), (type == PatternEventType.LIMIT ? "at " : "")
-				+ "repetition #" + repetitionNum + " of pattern " + pattern.toString());
+				+ "repetition #" + repetitionNum + " of pattern " + pattern.toString(), pattern);
 		this.type = type;
 	}
 

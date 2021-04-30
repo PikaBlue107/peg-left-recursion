@@ -19,7 +19,8 @@ public class OrderedChoiceEvent extends PatternEvent {
 	 *                  choice, third choice, etc. (0-indexed)
 	 */
 	public OrderedChoiceEvent(final InputContext context, final int choiceIdx, final Pattern pattern) {
-		super(context, context.getPosition(), 0, "ordered choice option " + choiceIdx + ": " + pattern.toString());
+		super(context, context.getPosition(), 0, "ordered choice option " + choiceIdx + ": " + pattern.toString(),
+				pattern);
 		this.type = PatternEventType.ATTEMPT;
 	}
 
@@ -36,7 +37,7 @@ public class OrderedChoiceEvent extends PatternEvent {
 	public OrderedChoiceEvent(final InputContext context, final int choiceIdx, final Pattern pattern,
 			final Result matchResult) {
 		super(context, matchResult.getStartIdx(), matchResult.getData().length(),
-				"ordered choice option " + choiceIdx + ": " + pattern.toString());
+				"ordered choice option " + choiceIdx + ": " + pattern.toString(), pattern);
 		this.type = matchResult.isSuccess() ? PatternEventType.COMMIT : PatternEventType.REJECT;
 	}
 
