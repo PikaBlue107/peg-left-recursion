@@ -30,6 +30,11 @@ public abstract class ParseEvent {
 	/** The extra details of this ParseEvent. If null, won't be printed. */
 	private final String detail;
 
+	/**
+	 * The index of this event in the full EventHistory log for the current match.
+	 */
+	private int historyIdx;
+
 	// Constants
 
 	/** Number of characters to print the event name */
@@ -97,6 +102,20 @@ public abstract class ParseEvent {
 	 */
 	public ParseEvent(final InputContext context, final int idx) {
 		this(context, idx, idx, null);
+	}
+
+	/**
+	 * @return the historyIdx
+	 */
+	public int getHistoryIdx() {
+		return historyIdx;
+	}
+
+	/**
+	 * @param historyIdx the historyIdx to set
+	 */
+	public void setHistoryIdx(final int historyIdx) {
+		this.historyIdx = historyIdx;
 	}
 
 	/**
