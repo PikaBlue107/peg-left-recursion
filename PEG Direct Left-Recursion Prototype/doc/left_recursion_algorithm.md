@@ -27,15 +27,16 @@ Expression will compile to a vector of bytecode that ends in a Return.
 
 		// TODO: Instantiate grow array
 		OPENGROW <CurrentPosition>
-		
-		// TODO: Revisit
-      	grow[0].start = <CurrentPosition>
 
       	// We know that any left-recursive rule for Expression will fail at first, so
       	// we should generate code for each non-left-recursive alternative.
       	// There is just one: Number
       	
-      	
+      	// If a seed pattern is *possibly* LR (LR is prefixed by a nullable sequence), 
+      	// attempt the nullable sequence.
+      	// If position is same as the OPENGROW that we pushed earlier (which may not be top of stack),
+      	// then this is a LR call, so it can't be a seed. Fail this seed alternative, and if we find one,
+      	// proceed to evaluate it left-recursively later on.
 		
 
 		// Delegate to non-LR alternatives
@@ -289,6 +290,20 @@ or
 
 I'm not sure how to handle this. Possibly a similar solution to the above edge case? Kinda stumped at the moment.
 
+(Both)
+
+This could be handled by the following approach.
+
+For any alternative with nullable patterns before a left-recursive call:
+
+1. Generate a left-recursive alternative (in order with other alternatives) within the growing section for that LR-Nullable pattern,
+with all leftmost nullable patterns removed.
+
+2. Generate a seed-identifying alternative (in order with other alternatives) within the seed-finding section for the LR-Nullable pattern,
+with an explicit check after the nullable leftmost patterns and before the recursive call to check that some input was consumed in evaluation of the nullable patterns.
+If no input was consumed, reject the alternative as a possibility for finding a seed (as it would have to be evaluated left-recursively, which cannot find a seed).
+
+This approach seems to generalize to any case, without incurring an exponential increase in alternatives (i.e. if we were to generate the powerset of all possible matches to ensure at least one of them matched).
     
 ### Optional LR
 LR calls that are optional within a match definition, e.g.
@@ -299,6 +314,10 @@ or
 
     S = S? "s"
     
+or
+
+	Expr = { Expr "+" }* Num
+    
 #### Remarks
 
 (Melody)
@@ -307,6 +326,22 @@ This definition is equivalent to `S = S "s" / "s"`, which is a well-defined mean
 
 Perhaps this can be generalized as a common way to approach optional LR?
 Does this have consequences if we just convert it without any special care?
+
+(Both)
+
+This does seem to have some practical use via providing a more concise way of expressing a LR definition.
+
+With only question marks, the definition would always be expandable into a finite set of definite LR or non-LR definitions,
+so that could be accepted in general with some under-the-hood adjustments.
+
+For infinite repetitions like + and *, this competes with the purpose of left recursion.
+Both techniques seek to accumulate an arbitrarily large set of repetitions of a given pattern.
+LR does this by nesting one match within another, whereas an infinite repetition does this by matching instances in sequence.
+Allowing both an infinite repetition and left-recursion seems like it should be rejected by the compiler - choose one!
+
+There may be some argument for a finite repetition such as S{1, 3} or S{5}. This would still interfere with left recursion,
+but would only "steal" a limited portion of iterations, allowing left recursion to take the rest.
+This is still an un-intuitive response, so a compiler warning seems to be in order.
     
 ### LR uses that shrink the match
 By use of left-recursive predicates, these definitions can require that a full predicate is found,
@@ -316,7 +351,11 @@ but only consume part of it, e.g.
     
 or
 
-    S = >S "s" / "sos"
+    S = "!" >S "s" / "sos"
+
+which could be better expressed as
+
+	S = { "!s" >"os" } / "sos"
     
 #### Remarks
 
@@ -324,3 +363,8 @@ or
 
 In this situation, there is no point to expanding the >Expr left-recursive match.
 So, this definition should only be matched once, without attempting to expand it.
+
+(Both)
+
+We don't see any practical use for this whatsoever.
+The initial approach would seem to be to reject this pattern, requiring that it be refactored to remove a left-recursive predicate.
