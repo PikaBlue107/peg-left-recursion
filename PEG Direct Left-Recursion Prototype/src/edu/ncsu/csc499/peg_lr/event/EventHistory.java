@@ -5,7 +5,11 @@ package edu.ncsu.csc499.peg_lr.event;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
+
+import edu.ncsu.csc499.peg_lr.event.pattern.PatternEvent;
+import edu.ncsu.csc499.peg_lr.pattern.Pattern;
 
 /**
  * Tracks a history of {@link ParseEvent}s that record the process of matching a
@@ -35,6 +39,7 @@ public class EventHistory {
 	 * @param entry the entry to add to the end of the history.
 	 */
 	public void addHistory(final ParseEvent entry) {
+		entry.setHistoryIdx(history.size());
 		this.history.add(entry);
 	}
 
@@ -44,67 +49,91 @@ public class EventHistory {
 	 * 
 	 * @return an Iterable of String objects stored in this context's history
 	 */
-	public Iterable<ParseEvent> getHistory() {
-		return getHistory(ParseEvent.class);
+	public Stream<ParseEvent> stream() {
+		return history.stream();
 	}
 
 	/**
-	 * Returns a filtered list of the context history in Iterable form, allowing a
-	 * user to construct a string with exactly the entries desired in the format
-	 * they desire.
-	 * 
-	 * @param filterName the class name used for filtering. Will accept sub-classes,
-	 *                   too.
-	 * @return a filtered list of all ParseEvents that match the class name given
-	 *         (or subclasses)
+	 * Provides a static Predicate provider to filter streams for elements that only
+	 * include the given class filter
+	 *
+	 * @param classFilter the class to filter by. Only ParseEvents that are the same
+	 *                    class or a subclass of this filter will be included.
+	 * @return a predicate to filter the Event stream by only events that match the
+	 *         given class filter
 	 */
-	public Iterable<ParseEvent> getHistory(final Class<? extends ParseEvent> classFilter) {
+	public static Predicate<ParseEvent> includeEventType(final Class<? extends ParseEvent> classFilter) {
+		return (final ParseEvent e) -> {
+			return classFilter.isAssignableFrom(e.getClass());
+		};
+	}
 
-		if (classFilter == null) {
-			throw new NullPointerException("Cannot filter by a null filter!");
-		}
+	/**
+	 * Provides a static Predicate to filter streams for elements that concern the
+	 * specified Pattern class. Events that do not concern any Pattern are included
+	 * - to exclude them, use includeEventType.
+	 * 
+	 * @param classFilter the Pattern type to include
+	 * @return a Predicate to filter the Event stream by only events that match the
+	 *         given pattern filter
+	 */
+	public static Predicate<ParseEvent> includePattern(final Class<? extends Pattern> classFilter) {
+		return includePattern(classFilter, false);
+	}
 
-		final List<ParseEvent> filtered = history.stream()
-				.filter((final ParseEvent p) -> classFilter.isAssignableFrom(p.getClass()))
-				.collect(Collectors.toList());
-
-		return filtered;
-
+	/**
+	 * Provides a static Predicate to filter streams for elements that concern the
+	 * specified Pattern class. Events that do not concern any Pattern are included
+	 * - to exclude them, use includeEventType.
+	 * 
+	 * @param classFilter the Pattern type to include
+	 * @param strict      whether to include subclasses of the specified pattern.
+	 *                    false - only exact class matches; true - subclasses too
+	 * @return a Predicate to filter the Event stream by only events that match the
+	 *         given pattern filter
+	 */
+	public static Predicate<ParseEvent> includePattern(final Class<? extends Pattern> classFilter,
+			final boolean strict) {
+		return (final ParseEvent e) -> {
+			// Determine if this event is a PatternEvent
+			if (e instanceof PatternEvent) {
+				final PatternEvent patEvent = (PatternEvent) e;
+				// If we're performing strict filtering
+				if (strict) {
+					return classFilter.equals(patEvent.getPattern().getClass());
+				}
+				// Loose filtering: include subtypes
+				else {
+					// only include it if its pattern is castable from the given class
+					return (patEvent.getPattern() == null)
+							|| classFilter.isAssignableFrom(patEvent.getPattern().getClass());
+				}
+			}
+			// Not a PatternEvent
+			else {
+				// Include it
+				return true;
+			}
+		};
 	}
 
 	/**
 	 * Creates a String of the form "%4d:\t%s\n" for each entry in history, where
 	 * the number is a continuous incrementing counter, and the string is
-	 * historyEntry.toString()
-	 * 
-	 * @return a String containing all history entries
-	 */
-	public String printHistory() {
-		return printHistory(ParseEvent.class);
-	}
-
-	/**
-	 * Creates a String of the form "%4d:\t%s\n" for each entry in history, where
-	 * the number is a continuous incrementing counter, and the string is
-	 * historyEntry.toString(). Only includes entries that are valid objects or
-	 * sub-objects of the given filter class.
+	 * historyEntry.toString().
 	 * 
 	 * @param classFilter only history events that are inherited from this class
 	 *                    will be printed
 	 * @return a String containing all history entries
 	 */
-	public String printHistory(final Class<? extends ParseEvent> classFilter) {
+	public static String printHistory(final Stream<ParseEvent> stream) {
 		// Set up string builder for history
 		final StringBuilder historyString = new StringBuilder();
 
-		// Track which step of history we're on
-		int historyIdx = 0;
-
-		// Loop over all history events, from earliest to latest
-		for (final ParseEvent historyEntry : getHistory()) {
+		stream.forEach((final ParseEvent historyEntry) -> {
 			// Append a new line with formatted columns for step and full event details
-			historyString.append(String.format("%4d:\t%s\n", historyIdx++, historyEntry.toString()));
-		}
+			historyString.append(String.format("%4d:\t%s\n", historyEntry.getHistoryIdx(), historyEntry.toString()));
+		});
 
 		// Return resulting string
 		return historyString.toString();

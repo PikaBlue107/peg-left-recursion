@@ -376,64 +376,13 @@ public class InputContext {
 
 	// History
 
-	/**
-	 * Adds the given entry into the context's history list.
-	 *
-	 * @param entry the entry to add to the end of the history.
-	 */
-	public void addHistory(final ParseEvent entry) {
-		this.history.addHistory(entry);
+	public EventHistory getHistory() {
+		return this.history;
 	}
 
-	/**
-	 * Provides the context's history in Iterable form, allowing a user to construct
-	 * a string with each entry in this context's history in their desired format.
-	 * 
-	 * @return an Iterable of String objects stored in this context's history
-	 */
-	public Iterable<ParseEvent> getHistory() {
-		return getHistory(ParseEvent.class);
-	}
-
-	/**
-	 * Returns a filtered list of the context history in Iterable form, allowing a
-	 * user to construct a string with exactly the entries desired in the format
-	 * they desire.
-	 * 
-	 * @param filterName the class name used for filtering. Will accept sub-classes,
-	 *                   too.
-	 * @return a filtered list of all ParseEvents that match the class name given
-	 *         (or subclasses)
-	 */
-	public Iterable<ParseEvent> getHistory(final Class<? extends ParseEvent> classFilter) {
-
-		return this.history.getHistory(classFilter);
-
-	}
-
-	/**
-	 * Creates a String of the form "%4d:\t%s\n" for each entry in history, where
-	 * the number is a continuous incrementing counter, and the string is
-	 * historyEntry.toString()
-	 * 
-	 * @return a String containing all history entries
-	 */
-	public String printHistory() {
-		return history.printHistory();
-	}
-
-	/**
-	 * Creates a String of the form "%4d:\t%s\n" for each entry in history, where
-	 * the number is a continuous incrementing counter, and the string is
-	 * historyEntry.toString(). Only includes entries that are valid objects or
-	 * sub-objects of the given filter class.
-	 * 
-	 * @param classFilter only history events that are inherited from this class
-	 *                    will be printed
-	 * @return a String containing all history entries
-	 */
-	public String printHistory(final Class<? extends ParseEvent> classFilter) {
-		return history.printHistory(classFilter);
+	// For convenience
+	public void addHistory(final ParseEvent event) {
+		history.addHistory(event);
 	}
 
 	// Overall
