@@ -1,6 +1,7 @@
 package edu.ncsu.csc499.peg_lr.controller;
 
-import edu.ncsu.csc499.peg_lr.event.ParseEvent;
+import edu.ncsu.csc499.peg_lr.event.EventHistory;
+import edu.ncsu.csc499.peg_lr.event.control.GrowingEvent;
 import edu.ncsu.csc499.peg_lr.event.pattern.PatternMatchEvent;
 import edu.ncsu.csc499.peg_lr.pattern.Pattern;
 import edu.ncsu.csc499.peg_lr.pattern.component.PatternString;
@@ -21,7 +22,7 @@ import edu.ncsu.csc499.peg_lr.structure.Result;
 public class PackratDriver {
 
 	/** Test string to use for each run. */
-	private static final String TEST_STRING = "(((1)+23))";
+	private static final String TEST_STRING = "(1+23)";
 
 	private static Pattern plus = new PatternString("+");
 	private static Pattern number = new DefinedNumber();
@@ -71,10 +72,10 @@ public class PackratDriver {
 		System.out.println(result.printResultTree(true));
 		System.out.println("\n\n\n\n\n");
 
-		// Print out just the history events having to do with the growing map
-		int historyIdx = 0;
-		for (final ParseEvent e : input.getHistory(PatternMatchEvent.class)) {
-			System.out.printf("%4d:\t%s\n", historyIdx++, e.toString());
-		}
+		// Print the history according to given filters
+		System.out.println(EventHistory.printHistory(input.getHistory().stream()
+				.filter(EventHistory.includeEventType(PatternMatchEvent.class)
+						.or(EventHistory.includeEventType(GrowingEvent.class)))
+				.filter(EventHistory.includePattern(DefinedPattern.class))));
 	}
 }

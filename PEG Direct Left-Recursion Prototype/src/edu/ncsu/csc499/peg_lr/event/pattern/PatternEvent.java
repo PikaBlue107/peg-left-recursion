@@ -4,6 +4,7 @@
 package edu.ncsu.csc499.peg_lr.event.pattern;
 
 import edu.ncsu.csc499.peg_lr.event.ParseEvent;
+import edu.ncsu.csc499.peg_lr.pattern.Pattern;
 import edu.ncsu.csc499.peg_lr.structure.InputContext;
 
 /**
@@ -57,8 +58,17 @@ public abstract class PatternEvent extends ParseEvent {
 		}
 	}
 
-	public PatternEvent(final InputContext context, final int startIdx, final int length, final String detail) {
+	/** The Pattern that this PatternEvent concerns. */
+	private final Pattern pattern;
+
+	public PatternEvent(final InputContext context, final int startIdx, final int length, final String detail,
+			final Pattern pattern) {
 		super(context, startIdx, length, detail);
+		this.pattern = pattern;
+	}
+
+	public Pattern getPattern() {
+		return pattern;
 	}
 
 }

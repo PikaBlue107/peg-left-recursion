@@ -18,8 +18,10 @@ public class PatternMatchEvent extends PatternEvent {
 	 * @param type
 	 */
 	public PatternMatchEvent(final InputContext context, final Result matchResult, final Pattern pattern) {
-		super(context, matchResult.getStartIdx(), matchResult.getData().length(), pattern.getClass().getSimpleName()
-				+ (matchResult.isSuccess() ? " matches \"" + matchResult.getData() + "\"" : " does not match"));
+		super(context, matchResult.getStartIdx(), matchResult.getData().length(),
+				pattern.getClass().getSimpleName()
+						+ (matchResult.isSuccess() ? " matches \"" + matchResult.getData() + "\"" : " does not match"),
+				pattern);
 		this.type = matchResult.isSuccess() ? PatternEventType.ACCEPT : PatternEventType.REJECT;
 	}
 
@@ -31,7 +33,7 @@ public class PatternMatchEvent extends PatternEvent {
 	 * @param pattern the pattern that this Event occurs for
 	 */
 	public PatternMatchEvent(final InputContext context, final int idx, final Pattern pattern) {
-		super(context, idx, 0, pattern.toString());
+		super(context, idx, 0, pattern.toString(), pattern);
 		type = PatternEventType.ATTEMPT;
 	}
 

@@ -19,7 +19,7 @@ public class SequenceEvent extends PatternEvent {
 	 *                    first component, third component, etc. (0-indexed)
 	 */
 	public SequenceEvent(final InputContext context, final int sequenceIdx, final Pattern pattern) {
-		super(context, context.getPosition(), 0, "sequence step " + sequenceIdx + ": " + pattern.toString());
+		super(context, context.getPosition(), 0, "sequence step " + sequenceIdx + ": " + pattern.toString(), pattern);
 		this.type = PatternEventType.ATTEMPT;
 	}
 
@@ -35,7 +35,7 @@ public class SequenceEvent extends PatternEvent {
 	public SequenceEvent(final InputContext context, final int sequenceIdx, final Pattern pattern,
 			final Result matchResult) {
 		super(context, matchResult.getStartIdx(), matchResult.getData().length(),
-				"sequence step " + sequenceIdx + ": " + pattern.toString());
+				"sequence step " + sequenceIdx + ": " + pattern.toString(), pattern);
 		this.type = matchResult.isSuccess() ? PatternEventType.ACCEPT : PatternEventType.REJECT;
 	}
 
